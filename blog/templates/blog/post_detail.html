@@ -39,53 +39,54 @@
         {% endif %}
 
         <!-- Article Header -->
-        <header class="mb-8">
-            <div class="flex flex-wrap gap-2 mb-4">
+        <header class="mb-10 rounded-[2rem] bg-gradient-to-br from-orange-50 to-purple-100 p-8 shadow-2xl border border-gray-200">
+            <div class="flex flex-wrap gap-2 mb-5">
                 <a href="{{ post.category.get_absolute_url }}"
-                   class="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-orange-600 transition">
-                    {{ post.category.name }}
+                   class="inline-flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-[0.18em] hover:bg-orange-600 transition">
+                    <i class="fas fa-folder-open"></i> {{ post.category.name }}
                 </a>
                 {% if post.is_featured %}
-                <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">
-                    <i class="fas fa-star text-yellow-500 mr-1"></i>Featured
+                <span class="inline-flex items-center gap-2 bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-[0.18em]">
+                    <i class="fas fa-star text-yellow-500"></i> Featured
                 </span>
                 {% endif %}
-                {% for tag in post.tags.all|slice:":3" %}
-                <a href="{{ tag.get_absolute_url }}"
-                   class="text-gray-500 hover:text-orange-600 text-sm">
-                    #{{ tag.name }}
-                </a>
-                {% endfor %}
             </div>
 
-            <h1 class="text-4xl lg:text-5xl font-bold mb-6 text-gray-900 leading-tight">
+            <h1 class="text-5xl lg:text-6xl font-extrabold mb-6 text-gray-900 leading-tight">
                 {{ post.title }}
             </h1>
 
-            <!-- Author Info -->
-            <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-gray-200">
-                <div class="flex items-center gap-3">
-                    {% if post.author.profile.avatar %}
-                    <img src="{{ post.author.profile.avatar.url }}" 
-                         alt="{{ post.author.get_full_name }}"
-                         class="w-10 h-10 rounded-full ring-2 ring-orange-500 object-cover">
-                    {% else %}
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-orange-500 to-purple-600 text-white flex items-center justify-center font-bold text-sm">
-                        {{ post.author.get_full_name|first|upper }}
-                    </div>
-                    {% endif %}
-                    <div>
-                        <div class="font-semibold text-gray-900">{{ post.author.get_full_name }}</div>
-                        <div class="text-sm text-gray-500">
-                            {{ post.published_date|date:"F d, Y" }} · {{ post.reading_time }}
+            {% if post.excerpt %}
+            <p class="max-w-3xl text-lg leading-8 text-gray-600 mb-8">{{ post.excerpt }}</p>
+            {% endif %}
+
+            <div class="grid gap-4 gap-y-6 lg:grid-cols-[1.7fr_auto] items-end">
+                <div class="space-y-3">
+                    <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                        <div class="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-2 shadow-sm">
+                            <i class="far fa-user text-orange-500"></i>
+                            <span class="font-medium text-gray-800">{{ post.author.get_full_name }}</span>
+                        </div>
+                        <div class="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-2 shadow-sm">
+                            <i class="far fa-calendar-alt text-orange-500"></i>
+                            <span>{{ post.published_date|date:"F d, Y" }}</span>
+                        </div>
+                        <div class="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-2 shadow-sm">
+                            <i class="far fa-clock text-orange-500"></i>
+                            <span>{{ post.reading_time }}</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex gap-4 text-sm text-gray-500">
-                    <span><i class="far fa-eye mr-1"></i> {{ post.view_count }}</span>
-                    <span><i class="far fa-comment mr-1"></i> {{ post.comments.count }}</span>
-                    <span><i class="fas fa-share-alt mr-1"></i> {{ post.share_count }}</span>
+                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                    <div class="rounded-3xl bg-white p-4 shadow-sm border border-gray-200 text-center">
+                        <div class="text-sm text-gray-500">Views</div>
+                        <div class="mt-2 text-xl font-bold text-orange-600">{{ post.view_count }}</div>
+                    </div>
+                    <div class="rounded-3xl bg-white p-4 shadow-sm border border-gray-200 text-center">
+                        <div class="text-sm text-gray-500">Comments</div>
+                        <div class="mt-2 text-xl font-bold text-orange-600">{{ post.comments.count }}</div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -161,6 +162,37 @@
                 </div>
             </div>
         </div>
+
+        {% if related_posts %}
+        <section class="mb-12">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">More stories you may like</h2>
+                <a href="{% url 'blog:blog' %}" class="text-orange-500 hover:text-orange-600 text-sm font-semibold">View all articles</a>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-6">
+                {% for related in related_posts %}
+                <article class="group rounded-2xl border border-gray-200 bg-white p-5 transition hover:shadow-lg hover:border-orange-200">
+                    <div class="flex flex-col gap-4">
+                        {% if related.featured_image %}
+                        <img src="{{ related.featured_image.url }}" alt="{{ related.title }}" class="w-full h-48 rounded-2xl object-cover">
+                        {% endif %}
+                        <div>
+                            <span class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-orange-600 font-semibold">{{ related.category.name }}</span>
+                            <h3 class="mt-3 text-xl font-semibold text-gray-900 leading-tight">
+                                <a href="{{ related.get_absolute_url }}" class="hover:text-orange-600 transition">{{ related.title }}</a>
+                            </h3>
+                            <p class="mt-3 text-sm text-gray-600 line-clamp-2">{{ related.excerpt|default:related.title }}</p>
+                        </div>
+                        <div class="flex items-center justify-between text-sm text-gray-500">
+                            <span>{{ related.published_date|date:"M d, Y" }}</span>
+                            <span class="text-orange-500 font-semibold">Read more</span>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
 
         <!-- Comments Section -->
         <div class="mb-12">

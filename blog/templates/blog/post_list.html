@@ -8,30 +8,45 @@
 <div class="min-h-screen bg-gray-50">
     <!-- Hero Section -->
     <section class="relative bg-gradient-to-br from-orange-600 via-orange-500 to-purple-700 text-white overflow-hidden">
-        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="absolute inset-0 bg-black/25"></div>
         <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
         <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl"></div>
-        
-        <div class="relative container mx-auto px-4 py-20 lg:py-28">
+        <div class="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/10 via-transparent to-transparent"></div>
+
+        <div class="relative container mx-auto px-4 py-10 lg:py-12">
             <div class="max-w-4xl mx-auto text-center">
-                <h1 class="text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-orange-200 bg-clip-text text-transparent">
-                    Latest Stories
+                <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm uppercase tracking-[0.35em] text-orange-100 mb-6">
+                    <i class="fas fa-feather-alt text-orange-200"></i> Blog & News
+                </span>
+                <h1 class="text-5xl lg:text-6xl font-bold mb-6 tracking-tight leading-tight bg-gradient-to-r from-white to-orange-200 bg-clip-text text-transparent">
+                    Latest Stories from Victory Teens
                 </h1>
-                <p class="text-xl mb-10 text-orange-100">Discover inspiring stories, updates, and news from our community</p>
-                
-                <form method="get" class="max-w-xl mx-auto">
-                    <div class="flex gap-3 bg-white/10 backdrop-blur-md rounded-2xl p-1 border border-white/20">
-                        <input type="text" 
-                               name="q" 
-                               value="{{ query }}"
-                               placeholder="Search articles..."
-                               class="flex-1 px-6 py-3 bg-transparent text-white placeholder-white/60 focus:outline-none">
-                        <button type="submit" 
-                                class="bg-white text-orange-600 px-6 py-3 rounded-xl font-semibold hover:bg-orange-50 transition-all hover:scale-105">
-                            <i class="fas fa-search mr-2"></i>Search
+                <p class="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-orange-100/90">
+                    Discover inspiring stories, community updates, and the impact our programs are making every day.
+                </p>
+
+                <form method="get" class="max-w-2xl mx-auto">
+                    <div class="flex flex-col sm:flex-row gap-3 bg-white/10 backdrop-blur-md rounded-3xl p-1 border border-white/20">
+                        <div class="relative flex-1">
+                            <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-orange-100/80">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text"
+                                   name="q"
+                                   value="{{ query }}"
+                                   placeholder="Search articles..."
+                                   class="w-full rounded-3xl border border-white/20 bg-white/10 py-4 pl-12 pr-5 text-white placeholder-white/60 focus:border-white/50 focus:outline-none focus:ring-2 focus:ring-white/30" />
+                        </div>
+                        <button type="submit" class="inline-flex items-center justify-center rounded-3xl bg-white text-orange-600 px-6 py-4 font-semibold transition hover:bg-orange-50 hover:text-orange-700">
+                            <i class="fas fa-arrow-right mr-2"></i>Search
                         </button>
                     </div>
                 </form>
+
+                <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-orange-100/80">
+                    <span class="inline-flex items-center gap-2 bg-white/10 px-4 py-3 rounded-full"> <i class="fas fa-check-circle"></i> Hand-picked stories</span>
+                    <span class="inline-flex items-center gap-2 bg-white/10 px-4 py-3 rounded-full"> <i class="fas fa-heart"></i> Community impact first</span>
+                </div>
             </div>
         </div>
     </section>
@@ -116,9 +131,9 @@
                     {% for post in page_obj %}
                     <article class="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
                         <div class="flex flex-col md:flex-row">
-                            {% if post.thumbnail_image %}
+                            {% if post.thumbnail_image or post.featured_image %}
                             <div class="md:w-2/5 relative overflow-hidden">
-                                <img src="{{ post.thumbnail_image.url }}" 
+                                <img src="{{ post.thumbnail_image.url|default:post.featured_image.url }}" 
                                      alt="{{ post.title }}"
                                      class="w-full h-56 md:h-full object-cover group-hover:scale-105 transition duration-500">
                                 <div class="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition"></div>
@@ -241,12 +256,21 @@
                     </div>
 
                     <!-- Newsletter Widget -->
-                    <div class="relative overflow-hidden bg-gradient-to-br from-orange-500 to-purple-600 rounded-2xl shadow-md p-6 text-white">
+                    <!-- <div class="relative overflow-hidden bg-gradient-to-br from-orange-500 to-purple-600 rounded-2xl shadow-md p-6 text-white">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mt-16 -mr-16"></div>
                         <div class="absolute bottom-0 left-0 w-24 h-24 bg-black/10 rounded-full -mb-12 -ml-12"></div>
-                        
-                       
-                    </div>
+                        <div class="relative z-10">
+                            <h3 class="text-xl font-bold mb-3">Stay inspired</h3>
+                            <p class="text-sm text-orange-100 mb-5">Receive the latest blog posts, success stories, and volunteer news in your inbox.</p>
+                            <form method="post" action="" class="space-y-3">
+                                {% csrf_token %}
+                                <input type="email" name="email" placeholder="Email address" class="w-full rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-orange-100 focus:outline-none focus:ring-2 focus:ring-white/30" required>
+                                <button type="submit" class="w-full rounded-2xl bg-white text-orange-600 px-4 py-3 font-semibold uppercase tracking-[0.12em] hover:bg-orange-50 transition">Subscribe</button>
+                            </form>
+                        </div>
+                    </div> -->
+
+
                 </div>
             </aside>
         </div>

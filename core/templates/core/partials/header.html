@@ -14,14 +14,14 @@
             </a>
 
             <div class="hidden md:flex items-center gap-4 text-sm md:text-base font-medium text-vto-gray-700">
-                <a href="{% url 'home' %}" class="rounded-full px-4 py-2 transition duration-300 hover:bg-vto-gray-100 {% if request.resolver_match.url_name == 'home' %}text-vto-orange-dark bg-vto-orange-golden/10{% endif %}">Home</a>
-                <a href="{% url 'about' %}" class="rounded-full px-4 py-2 transition duration-300 hover:bg-vto-gray-100 {% if request.resolver_match.url_name == 'about' %}text-vto-orange-dark bg-vto-orange-golden/10{% endif %}">About</a>
-                <a href="{% url 'programs' %}" class="rounded-full px-4 py-2 transition duration-300 hover:bg-vto-gray-100 {% if request.resolver_match.url_name == 'programs' %}text-vto-orange-dark bg-vto-orange-golden/10{% endif %}">Programs</a>
-                <a href="{% url 'blog:blog' %}" class="rounded-full px-4 py-2 transition duration-300 hover:bg-vto-gray-100 {% if 'blog' in request.resolver_match.app_names %}text-vto-orange-dark bg-vto-orange-golden/10{% endif %}">Blog</a>
+                <a href="{% url 'home' %}" class="rounded-full text-xl px-4 py-2 transition duration-300 hover:bg-vto-gray-100 {% if request.resolver_match.url_name == 'home' %}text-vto-orange-dark bg-vto-orange-golden/10{% endif %}">Home</a>
+                <a href="{% url 'about' %}" class="rounded-full text-xl px-4 py-2 transition duration-300 hover:bg-vto-gray-100 {% if request.resolver_match.url_name == 'about' %}text-vto-orange-dark bg-vto-orange-golden/10{% endif %}">About</a>
+                <a href="{% url 'programs' %}" class="rounded-full text-xl px-4 py-2 transition duration-300 hover:bg-vto-gray-100 {% if request.resolver_match.url_name == 'programs' %}text-vto-orange-dark bg-vto-orange-golden/10{% endif %}">Programs</a>
+                <a href="{% url 'blog:blog' %}" class="rounded-full text-xl px-4 py-2 transition duration-300 hover:bg-vto-gray-100 {% if 'blog' in request.resolver_match.app_names %}text-vto-orange-dark bg-vto-orange-golden/10{% endif %}">Blog</a>
             </div>
 
             <div class="hidden md:flex items-center gap-3">
-                <a href="{% url 'volunteer' %}" class="rounded-full border border-vto-orange-dark/15 bg-vto-orange-dark/5 px-4 py-2 text-sm font-semibold text-vto-orange-dark transition duration-300 hover:bg-vto-orange-dark/10">Volunteer</a>
+                <a href="{% url 'volunteer' %}" class="rounded-full text-xl border border-vto-orange-dark/15 bg-vto-orange-dark/5 px-4 py-2 text-sm font-semibold text-vto-orange-dark transition duration-300 hover:bg-vto-orange-dark/10">Volunteer</a>
             </div>
 
             <!-- Mobile Menu Button -->
