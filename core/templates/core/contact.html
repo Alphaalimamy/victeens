@@ -1,0 +1,189 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-vto-purple/5 to-vto-orange-dark/5 py-16">
+    <div class="container mx-auto px-4 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold text-vto-black mb-6">Contact Us</h1>
+        <p class="text-xl text-vto-gray-600 max-w-3xl mx-auto">
+            We'd love to hear from you! Whether you have questions, want to volunteer, or need more information, 
+            our team is here to help.
+        </p>
+    </div>
+</section>
+
+<!-- Contact Information & Form -->
+<section class="py-16">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Contact Information -->
+            <div>
+                <h2 class="text-2xl font-bold text-vto-black mb-8">Get in Touch</h2>
+                
+                <div class="space-y-8">
+                    <!-- Address -->
+                    <div class="flex items-start">
+                        <div class="w-12 h-12 rounded-full bg-vto-orange-dark/10 text-vto-orange-dark flex items-center justify-center mr-4">
+                            <i class="fas fa-map-marker-alt text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-vto-black mb-1">Visit Our Office</h3>
+                            <p class="text-vto-gray-600">
+                                123 Dundas Street<br>
+                                Freetown, Sierra Leone<br>
+                                P.O. Box 232-00100
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Phone -->
+                    <div class="flex items-start">
+                        <div class="w-12 h-12 rounded-full bg-vto-purple/10 text-vto-purple flex items-center justify-center mr-4">
+                            <i class="fas fa-phone text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-vto-black mb-1">Call Us</h3>
+                            <p class="text-vto-gray-600">
+                                Main Office: +232 77 345 678<br>
+                                Emergency: +232 77 456 789<br>
+                                Fax: +232 77 123 4567
+                            </p>
+                            <p class="text-sm text-vto-gray-500 mt-2">
+                                Monday - Friday: 8:00 AM - 5:00 PM EAT
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Email -->
+                    <div class="flex items-start">
+                        <div class="w-12 h-12 rounded-full bg-vto-orange-golden/10 text-vto-orange-golden flex items-center justify-center mr-4">
+                            <i class="fas fa-envelope text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-vto-black mb-1">Email Us</h3>
+                            <p class="text-vto-gray-600">
+                                General Inquiries: info@victoryteens.org<br>
+                                Donations: donations@victoryteens.org<br>
+                                Volunteers: volunteer@victoryteens.org<br>
+                                Partnerships: partnerships@victoryteens.org
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Social Media -->
+                    <div>
+                        <h3 class="text-lg font-bold text-vto-black mb-4">Connect With Us</h3>
+                        <div class="flex space-x-4">
+                            <a href="#" class="w-12 h-12 rounded-full bg-vto-gray-100 text-vto-gray-700 hover:bg-vto-orange-dark hover:text-white flex items-center justify-center transition-colors">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 rounded-full bg-vto-gray-100 text-vto-gray-700 hover:bg-vto-orange-dark hover:text-white flex items-center justify-center transition-colors">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 rounded-full bg-vto-gray-100 text-vto-gray-700 hover:bg-vto-orange-dark hover:text-white flex items-center justify-center transition-colors">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 rounded-full bg-vto-gray-100 text-vto-gray-700 hover:bg-vto-orange-dark hover:text-white flex items-center justify-center transition-colors">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 rounded-full bg-vto-gray-100 text-vto-gray-700 hover:bg-vto-orange-dark hover:text-white flex items-center justify-center transition-colors">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+            
+            </div>
+            
+            <!-- Contact Form -->
+            <div class="card p-8">
+                <h2 class="text-2xl font-bold text-vto-black mb-6">Send Us a Message</h2>
+                <p class="text-vto-gray-600 mb-8">
+                    Fill out the form below and we'll get back to you as soon as possible. 
+                    We typically respond within 24 hours.
+                </p>
+                
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="space-y-6">
+                        <!-- Name -->
+                        <div>
+                            <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                Full Name *
+                            </label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Email & Phone -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                    Email Address *
+                                </label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                    Phone Number
+                                </label>
+                                {{ form.phone }}
+                                {% if form.phone.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.phone.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Subject -->
+                        <div>
+                            <label for="{{ form.subject.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                Subject *
+                            </label>
+                            {{ form.subject }}
+                            {% if form.subject.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.subject.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Message -->
+                        <div>
+                            <label for="{{ form.message.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                Your Message *
+                            </label>
+                            {{ form.message }}
+                            {% if form.message.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.message.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div>
+                            <button type="submit" class="btn-primary w-full">
+                                <i class="fas fa-paper-plane mr-2"></i> Send Message
+                            </button>
+                        </div>
+                        
+                        <!-- Privacy Note -->
+                        <p class="text-sm text-vto-gray-500 text-center">
+                            By submitting this form, you agree to our 
+                            <a href="#" class="text-vto-orange-dark hover:underline">Privacy Policy</a>. 
+                            We will never share your information with third parties.
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,396 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    /* Animation Classes */
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    
+    .fade-in-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .stagger-child > * {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    
+    .stagger-child.visible > *:nth-child(1) { transition-delay: 0s; }
+    .stagger-child.visible > *:nth-child(2) { transition-delay: 0.1s; }
+    .stagger-child.visible > *:nth-child(3) { transition-delay: 0.2s; }
+    .stagger-child.visible > *:nth-child(4) { transition-delay: 0.3s; }
+    .stagger-child.visible > *:nth-child(5) { transition-delay: 0.4s; }
+    .stagger-child.visible > *:nth-child(6) { transition-delay: 0.5s; }
+    
+    .stagger-child.visible > * {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    /* Hero Background Gradient */
+    .hero-gradient-programs {
+        background: linear-gradient(135deg, #FDFDFD 0%, #E5B899 100%);
+    }
+    
+    /* Program Card Animation */
+    .program-card {
+        transition: all 0.3s ease;
+    }
+    
+    .program-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Feature List Styles */
+    .feature-item {
+        transition: all 0.2s ease;
+    }
+    
+    .feature-item:hover {
+        transform: translateX(5px);
+        color: #B83E09;
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="relative py-24 overflow-hidden hero-gradient-programs">
+    <!-- Decorative Elements -->
+    <div class="absolute inset-0">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-vto-purple/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-vto-orange/10 rounded-full blur-3xl"></div>
+    </div>
+    
+    <div class="container mx-auto px-6 lg:px-12 relative z-10">
+        <div id="hero-content" class="stagger-child max-w-3xl mx-auto text-center">
+            <span class="inline-block px-4 py-2 bg-vto-orange/10 text-vto-orange rounded-full text-sm font-medium mb-6 fade-in-up">
+                Our Programs
+            </span>
+            <h1 class="text-5xl lg:text-6xl font-bold text-vto-black mb-6 fade-in-up">
+                Comprehensive Support
+                <span class="block bg-gradient-to-r from-vto-orange to-vto-purple bg-clip-text text-transparent">
+                    For Every Teen
+                </span>
+            </h1>
+            <p class="text-xl text-vto-gray-600 leading-relaxed fade-in-up">
+                Our holistic approach addresses every aspect of a teenager's development, 
+                from education to emotional well-being, ensuring they have everything they need to succeed.
+            </p>
+        </div>
+    </div>
+</section>
+
+
+<!-- Programs Grid -->
+<section class="py-24 bg-white">
+    <div class="container mx-auto px-6 lg:px-12">
+        <div id="programs-container" class="space-y-24 stagger-child">
+            {% for program in programs %}
+            <!-- Program Item -->
+            <div class="fade-in-up grid lg:grid-cols-2 gap-12 items-center {% if forloop.counter|divisibleby:2 %}lg:flex-row-reverse{% endif %}">
+                <!-- Image Column -->
+                <div class="{% if forloop.counter|divisibleby:2 %}lg:order-2{% endif %}">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-gradient-to-br {{ program.gradient_color }} rounded-3xl rotate-3 opacity-20"></div>
+                        <img
+                            src="{{ program.image_url }}"
+                            alt="{{ program.title }}"
+                            class="relative rounded-3xl shadow-xl w-full h-[400px] object-cover program-card"
+                            onerror="this.src='https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=80'"
+                        />
+                    </div>
+                </div>
+                
+                <!-- Content Column -->
+                <div class="space-y-6 {% if forloop.counter|divisibleby:2 %}lg:order-1{% endif %}">
+                    <div class="w-16 h-16 bg-gradient-to-br {{ program.gradient_color }} rounded-2xl flex items-center justify-center">
+                        <i class="{{ program.icon_class }} text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-3xl lg:text-4xl font-bold text-vto-black">{{ program.title }}</h2>
+                    <p class="text-xl text-vto-gray-600 leading-relaxed">{{ program.description }}</p>
+                    <ul class="space-y-3">
+                        {% for feature in program.features.all %}
+                        <li class="flex items-center gap-3 feature-item">
+                            <i class="fas fa-check-circle text-vto-orange"></i>
+                            <span class="text-vto-gray-700">{{ feature }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <a href="{% url 'contact' %}" class="inline-flex items-center bg-gradient-to-r from-vto-orange to-vto-orange-golden text-white px-8 py-3 rounded-full mt-4 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                        Learn More
+                        <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform duration-300"></i>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <!-- Fallback if no programs are passed -->
+            <div class="space-y-24">
+                <!-- Education Support -->
+                <div class="fade-in-up grid lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <div class="relative">
+                            <div class="absolute inset-0 bg-gradient-to-br from-vto-orange to-vto-orange-golden rounded-3xl rotate-3 opacity-20"></div>
+                            <img
+                                src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=80"
+                                alt="Education Support"
+                                class="relative rounded-3xl shadow-xl w-full h-[400px] object-cover program-card"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="w-16 h-16 bg-gradient-to-br from-vto-orange to-vto-orange-golden rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-book-open text-white text-2xl"></i>
+                        </div>
+                        <h2 class="text-3xl lg:text-4xl font-bold text-vto-black">Education Support</h2>
+                        <p class="text-xl text-vto-gray-600 leading-relaxed">
+                            Comprehensive educational assistance including tutoring, scholarships, and school supplies.
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3 feature-item">
+                                <i class="fas fa-check-circle text-vto-orange"></i>
+                                <span class="text-vto-gray-700">One-on-one tutoring</span>
+                            </li>
+                            <li class="flex items-center gap-3 feature-item">
+                                <i class="fas fa-check-circle text-vto-orange"></i>
+                                <span class="text-vto-gray-700">Scholarship programs</span>
+                            </li>
+                            <li class="flex items-center gap-3 feature-item">
+                                <i class="fas fa-check-circle text-vto-orange"></i>
+                                <span class="text-vto-gray-700">School supplies provision</span>
+                            </li>
+                            <li class="flex items-center gap-3 feature-item">
+                                <i class="fas fa-check-circle text-vto-orange"></i>
+                                <span class="text-vto-gray-700">College prep guidance</span>
+                            </li>
+                        </ul>
+                        <a href="{% url 'contact' %}" class="inline-flex items-center bg-gradient-to-r from-vto-orange to-vto-orange-golden text-white px-8 py-3 rounded-full mt-4 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                            Learn More
+                            <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform duration-300"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Safe Housing -->
+                <div class="fade-in-up grid lg:grid-cols-2 gap-12 items-center lg:flex-row-reverse">
+                    <div class="lg:order-2">
+                        <div class="relative">
+                            <div class="absolute inset-0 bg-gradient-to-br from-vto-purple to-vto-orange rounded-3xl rotate-3 opacity-20"></div>
+                            <img
+                                src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&q=80"
+                                alt="Safe Housing"
+                                class="relative rounded-3xl shadow-xl w-full h-[400px] object-cover program-card"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-6 lg:order-1">
+                        <div class="w-16 h-16 bg-gradient-to-br from-vto-purple to-vto-orange rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-home text-white text-2xl"></i>
+                        </div>
+                        <h2 class="text-3xl lg:text-4xl font-bold text-vto-black">Safe Housing</h2>
+                        <p class="text-xl text-vto-gray-600 leading-relaxed">
+                            Providing secure, nurturing homes where teens can thrive and grow.
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3 feature-item">
+                                <i class="fas fa-check-circle text-vto-orange"></i>
+                                <span class="text-vto-gray-700">Residential shelters</span>
+                            </li>
+                            <li class="flex items-center gap-3 feature-item">
+                                <i class="fas fa-check-circle text-vto-orange"></i>
+                                <span class="text-vto-gray-700">24/7 supervision</span>
+                            </li>
+                            <li class="flex items-center gap-3 feature-item">
+                                <i class="fas fa-check-circle text-vto-orange"></i>
+                                <span class="text-vto-gray-700">Nutritious meals</span>
+                            </li>
+                            <li class="flex items-center gap-3 feature-item">
+                                <i class="fas fa-check-circle text-vto-orange"></i>
+                                <span class="text-vto-gray-700">Safe environment</span>
+                            </li>
+                        </ul>
+                        <a href="{% url 'contact' %}" class="inline-flex items-center bg-gradient-to-r from-vto-purple to-vto-orange text-white px-8 py-3 rounded-full mt-4 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                            Learn More
+                            <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform duration-300"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Youth Mentorship -->
+                <div class="fade-in-up grid lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <div class="relative">
+                            <div class="absolute inset-0 bg-gradient-to-br from-vto-orange-golden to-vto-purple rounded-3xl rotate-3 opacity-20"></div>
+                            <img
+                                src="https://images.unsplash.com/photo-1529390079861-591f39ece728?w=600&q=80"
+                                alt="Youth Mentorship"
+                                class="relative rounded-3xl shadow-xl w-full h-[400px] object-cover program-card"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="w-16 h-16 bg-gradient-to-br from-vto-orange-golden to-vto-purple rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-users text-white text-2xl"></i>
+                        </div>
+                        <h2 class="text-3xl lg:text-4xl font-bold text-vto-black">Youth Mentorship</h2>
+                        <p class="text-xl text-vto-gray-600 leading-relaxed">
+                            Connecting teens with caring adults who guide them toward successful futures.
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3 feature-item">
+                                <i class="fas fa-check-circle text-vto-orange"></i>
+                                <span class="text-vto-gray-700">Career mentoring</span>
+                            </li>
+                            <li class="flex items-center gap-3 feature-item">
+                                <i class="fas fa-check-circle text-vto-orange"></i>
+                                <span class="text-vto-gray-700">Life coaching</span>
+                            </li>
+                            <li class="flex items-center gap-3 feature-item">
+                                <i class="fas fa-check-circle text-vto-orange"></i>
+                                <span class="text-vto-gray-700">Peer support groups</span>
+                            </li>
+                            <li class="flex items-center gap-3 feature-item">
+                                <i class="fas fa-check-circle text-vto-orange"></i>
+                                <span class="text-vto-gray-700">Leadership training</span>
+                            </li>
+                        </ul>
+                        <a href="{% url 'contact' %}" class="inline-flex items-center bg-gradient-to-r from-vto-orange-golden to-vto-purple text-white px-8 py-3 rounded-full mt-4 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                            Learn More
+                            <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform duration-300"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-24 bg-gradient-to-br from-vto-purple to-vto-orange text-white">
+    <div class="container mx-auto px-6 lg:px-12">
+        <div id="cta-content" class="text-center max-w-3xl mx-auto fade-in-up">
+            <h2 class="text-4xl lg:text-5xl font-bold mb-6">
+                Help Us Expand Our Programs
+            </h2>
+            <p class="text-xl text-white/80 mb-10">
+                Your support enables us to reach more teens and provide them with 
+                the comprehensive care they deserve.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="" class="bg-white text-vto-orange hover:bg-vto-gray-100 px-10 py-6 rounded-full font-bold text-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg">
+                    <i class="fas fa-heart mr-2"></i>
+                    Donate Today
+                </a>
+                <a href="" class="bg-transparent border-2 border-white text-white hover:bg-white/10 px-10 py-6 rounded-full font-bold text-lg transition-all duration-300 hover:shadow-lg">
+                    <i class="fas fa-users mr-2"></i>
+                    Volunteer
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Scroll Animation Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to check if element is in viewport
+    function isInViewport(element) {
+        const rect = element.getBoundingClientRect();
+        return (
+            rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.85 &&
+            rect.bottom >= 0
+        );
+    }
+    
+    // Function to add visible class to elements in viewport
+    function handleScrollAnimation() {
+        const elements = document.querySelectorAll('.fade-in-up, .stagger-child');
+        
+        elements.forEach(element => {
+            if (isInViewport(element)) {
+                element.classList.add('visible');
+            }
+        });
+    }
+    
+    // Initialize scroll animation
+    handleScrollAnimation();
+    
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScrollAnimation);
+    
+    // Add resize event listener
+    window.addEventListener('resize', handleScrollAnimation);
+    
+    // Hero section staggered animation
+    const heroContent = document.getElementById('hero-content');
+    if (heroContent) {
+        setTimeout(() => {
+            heroContent.classList.add('visible');
+        }, 100);
+    }
+    
+    // Programs container staggered animation
+    const programsContainer = document.getElementById('programs-container');
+    if (programsContainer) {
+        setTimeout(() => {
+            programsContainer.classList.add('visible');
+        }, 300);
+    }
+    
+    // CTA content animation
+    const ctaContent = document.getElementById('cta-content');
+    if (ctaContent) {
+        setTimeout(() => {
+            ctaContent.classList.add('visible');
+        }, 500);
+    }
+    
+    // Program card hover effects
+    const programCards = document.querySelectorAll('.program-card');
+    programCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.02)';
+            this.style.transition = 'transform 0.3s ease';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+    
+    // Feature item hover effects
+    const featureItems = document.querySelectorAll('.feature-item');
+    featureItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            const icon = this.querySelector('i');
+            if (icon) {
+                icon.style.transform = 'scale(1.2)';
+                icon.style.transition = 'transform 0.2s ease';
+            }
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            const icon = this.querySelector('i');
+            if (icon) {
+                icon.style.transform = 'scale(1)';
+            }
+        });
+    });
+});
+</script>
+
+<!-- Optional: Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+{% endblock %}

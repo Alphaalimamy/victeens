@@ -1,0 +1,461 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Donation {{ donation.donation_id }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Back Button -->
+        <a href="{% url 'donations:my_donations' %}" class="inline-flex items-center text-vto-orange-dark hover:text-vto-orange-golden mb-6">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Donation History
+        </a>
+        
+        <!-- Donation Header -->
+        <div class="card p-8 mb-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-vto-black mb-2">Donation {{ donation.donation_id }}</h1>
+                    <div class="flex items-center space-x-4">
+                        <span class="px-3 py-1 rounded-full text-sm font-medium 
+                            {% if donation.payment_status == 'completed' %}bg-green-100 text-green-800
+                            {% elif donation.payment_status == 'pending' %}bg-yellow-100 text-yellow-800
+                            {% elif donation.payment_status == 'failed' %}bg-red-100 text-red-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ donation.get_payment_status_display }}
+                        </span>
+                        <span class="text-vto-gray-500">
+                            {{ donation.created_at|date:"F j, Y g:i A" }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="mt-4 md:mt-0">
+                    <span class="text-3xl font-bold text-vto-orange-dark">KES {{ donation.amount|floatformat:2|intcomma }}</span>
+                </div>
+            </div>
+            
+            <!-- Status Timeline -->
+            <div class="mb-8">
+                <h3 class="text-lg font-bold text-vto-black mb-4">Donation Status</h3>
+                <div class="relative">
+                    <!-- Timeline Line -->
+                    <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-vto-gray-300"></div>
+                    
+                    <div class="space-y-6">
+                        <!-- Created -->
+                        <div class="flex items-start">
+                            <div class="relative">
+                                <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center z-10">
+                                    <i class="fas fa-check text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="ml-6">
+                                <p class="font-medium text-vto-black">Donation Created</p>
+                                <p class="text-sm text-vto-gray-600">{{ donation.created_at|date:"F j, Y g:i A" }}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Payment -->
+                        <div class="flex items-start">
+                            <div class="relative">
+                                <div class="w-8 h-8 rounded-full 
+                                    {% if donation.payment_status == 'completed' %}bg-green-500
+                                    {% elif donation.payment_status == 'pending' %}bg-yellow-500
+                                    {% else %}bg-gray-300{% endif %} 
+                                    flex items-center justify-center z-10">
+                                    <i class="fas 
+                                        {% if donation.payment_status == 'completed' %}fa-check
+                                        {% elif donation.payment_status == 'pending' %}fa-clock
+                                        {% else %}fa-times{% endif %} 
+                                        text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="ml-6">
+                                <p class="font-medium text-vto-black">Payment {{ donation.get_payment_status_display }}</p>
+                                <p class="text-sm text-vto-gray-600">
+                                    {% if donation.payment_status == 'completed' %}
+                                    Completed via {{ donation.get_payment_method_display }}
+                                    {% elif donation.payment_status == 'pending' %}
+                                    Awaiting confirmation
+                                    {% else %}
+                                    Payment issue detected
+                                    {% endif %}
+                                </p>
+                                {% if donation.transaction_id %}
+                                <p class="text-xs text-vto-gray-500 mt-1">
+                                    Transaction ID: {{ donation.transaction_id }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Receipt -->
+                        <div class="flex items-start">
+                            <div class="relative">
+                                <div class="w-8 h-8 rounded-full 
+                                    {% if donation.receipt_sent %}bg-green-500
+                                    {% else %}bg-gray-300{% endif %} 
+                                    flex items-center justify-center z-10">
+                                    <i class="fas 
+                                        {% if donation.receipt_sent %}fa-check
+                                        {% else %}fa-envelope{% endif %} 
+                                        text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="ml-6">
+                                <p class="font-medium text-vto-black">Receipt Sent</p>
+                                <p class="text-sm text-vto-gray-600">
+                                    {% if donation.receipt_sent %}
+                                    Sent to {{ donation.donor_email }} on {{ donation.receipt_sent_at|date:"F j, Y" }}
+                                    {% else %}
+                                    Receipt will be sent shortly
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Donation Details -->
+            <div class="lg:col-span-2">
+                <div class="card p-8 mb-8">
+                    <h2 class="text-2xl font-bold text-vto-black mb-6">Donation Details</h2>
+                    
+                    <div class="space-y-6">
+                        <!-- Basic Information -->
+                        <div>
+                            <h3 class="text-lg font-bold text-vto-black mb-4">Basic Information</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <p class="text-sm text-vto-gray-600 mb-1">Donation Type</p>
+                                    <p class="font-medium">{{ donation.get_donation_type_display }}</p>
+                                </div>
+                                
+                                <div>
+                                    <p class="text-sm text-vto-gray-600 mb-1">Frequency</p>
+                                    <p class="font-medium">
+                                        {% if donation.is_recurring %}
+                                        {{ donation.get_donation_type_display }}
+                                        {% else %}
+                                        One-time
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                
+                                <div>
+                                    <p class="text-sm text-vto-gray-600 mb-1">Payment Method</p>
+                                    <p class="font-medium">{{ donation.get_payment_method_display }}</p>
+                                </div>
+                                
+                                <div>
+                                    <p class="text-sm text-vto-gray-600 mb-1">Currency</p>
+                                    <p class="font-medium">{{ donation.currency }}</p>
+                                </div>
+                                
+                                {% if donation.category %}
+                                <div>
+                                    <p class="text-sm text-vto-gray-600 mb-1">Category</p>
+                                    <p class="font-medium">{{ donation.category.name }}</p>
+                                </div>
+                                {% endif %}
+                                
+                                {% if donation.campaign %}
+                                <div>
+                                    <p class="text-sm text-vto-gray-600 mb-1">Campaign</p>
+                                    <p class="font-medium">{{ donation.campaign.title }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Donor Information -->
+                        <div>
+                            <h3 class="text-lg font-bold text-vto-black mb-4">Donor Information</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <p class="text-sm text-vto-gray-600 mb-1">Name</p>
+                                    <p class="font-medium">{{ donation.get_donor_display_name }}</p>
+                                </div>
+                                
+                                <div>
+                                    <p class="text-sm text-vto-gray-600 mb-1">Email</p>
+                                    <p class="font-medium">{{ donation.donor_email }}</p>
+                                </div>
+                                
+                                {% if donation.donor_phone %}
+                                <div>
+                                    <p class="text-sm text-vto-gray-600 mb-1">Phone</p>
+                                    <p class="font-medium">{{ donation.donor_phone }}</p>
+                                </div>
+                                {% endif %}
+                                
+                                <div>
+                                    <p class="text-sm text-vto-gray-600 mb-1">Visibility</p>
+                                    <p class="font-medium">
+                                        {% if donation.is_anonymous %}
+                                        Anonymous
+                                        {% else %}
+                                        Public
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dedication -->
+                        {% if donation.is_dedicated %}
+                        <div class="p-4 bg-vto-gray-50 rounded-lg">
+                            <h3 class="text-lg font-bold text-vto-black mb-3">Dedication Information</h3>
+                            <div>
+                                <p class="text-sm text-vto-gray-600 mb-1">Dedicated To</p>
+                                <p class="font-medium text-lg">{{ donation.dedication_name }}</p>
+                            </div>
+                            {% if donation.dedication_message %}
+                            <div class="mt-3">
+                                <p class="text-sm text-vto-gray-600 mb-1">Message</p>
+                                <p class="italic">"{{ donation.dedication_message }}"</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Notes -->
+                        {% if donation.notes %}
+                        <div>
+                            <h3 class="text-lg font-bold text-vto-black mb-3">Notes</h3>
+                            <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <p class="text-sm text-yellow-800">{{ donation.notes }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Impact Summary -->
+                <div class="card p-8">
+                    <h2 class="text-2xl font-bold text-vto-black mb-6">Your Impact</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-lg font-bold text-vto-black mb-4">What Your Donation Provides</h3>
+                            <div class="space-y-4">
+                                {% if donation.amount >= 500 %}
+                                <div class="flex items-start">
+                                    <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                    <span>Nutritious meals for {{ donation.amount|divisibleby:500 }} teen(s)</span>
+                                </div>
+                                {% endif %}
+                                
+                                {% if donation.amount >= 1000 %}
+                                <div class="flex items-start">
+                                    <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                    <span>School supplies for {{ donation.amount|divisibleby:1000 }} week(s)</span>
+                                </div>
+                                {% endif %}
+                                
+                                {% if donation.amount >= 5000 %}
+                                <div class="flex items-start">
+                                    <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                    <span>Medical care for {{ donation.amount|divisibleby:5000 }} month(s)</span>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="flex items-start">
+                                    <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                    <span>Support for Victory Teens programs</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-lg font-bold text-vto-black mb-4">Thank You</h3>
+                            <p class="text-vto-gray-600 mb-6">
+                                Your generous donation of KES {{ donation.amount|floatformat:2|intcomma }} helps us continue our mission 
+                                of providing hope and future for orphaned teens.
+                            </p>
+                            <div class="flex items-center text-sm text-vto-gray-500">
+                                <i class="fas fa-heart text-vto-orange-dark mr-2"></i>
+                                <span>You're making a real difference!</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Share Your Donation -->
+                    <div class="mt-8 pt-8 border-t border-vto-gray-100">
+                        <h3 class="text-lg font-bold text-vto-black mb-4">Share Your Generosity</h3>
+                        <p class="text-vto-gray-600 mb-6">
+                            Inspire others by sharing your donation on social media.
+                        </p>
+                        <div class="flex space-x-4">
+                            <button onclick="shareDonationOnFacebook()" class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors">
+                                <i class="fab fa-facebook-f"></i>
+                            </button>
+                            <button onclick="shareDonationOnTwitter()" class="w-12 h-12 rounded-full bg-blue-400 text-white flex items-center justify-center hover:bg-blue-500 transition-colors">
+                                <i class="fab fa-twitter"></i>
+                            </button>
+                            <button onclick="shareDonationOnWhatsApp()" class="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition-colors">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Receipt Card -->
+                <div class="card p-6 mb-8">
+                    <h3 class="text-xl font-bold text-vto-black mb-6">Receipt</h3>
+                    
+                    <div class="space-y-4 mb-6">
+                        <div class="flex justify-between">
+                            <span class="text-vto-gray-600">Receipt Number</span>
+                            <span class="font-medium">{{ donation.receipt_number }}</span>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <span class="text-vto-gray-600">Date</span>
+                            <span class="font-medium">{{ donation.created_at|date:"M j, Y" }}</span>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <span class="text-vto-gray-600">Amount</span>
+                            <span class="font-bold text-vto-orange-dark">KES {{ donation.amount|floatformat:2|intcomma }}</span>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <span class="text-vto-gray-600">Status</span>
+                            <span class="font-medium 
+                                {% if donation.payment_status == 'completed' %}text-green-600
+                                {% elif donation.payment_status == 'pending' %}text-yellow-600
+                                {% else %}text-red-600{% endif %}">
+                                {{ donation.get_payment_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <button onclick="downloadReceipt()" class="btn-primary w-full">
+                            <i class="fas fa-download mr-2"></i> Download Receipt
+                        </button>
+                        
+                        <button onclick="emailReceipt()" class="btn-outline w-full">
+                            <i class="fas fa-envelope mr-2"></i> Email Receipt
+                        </button>
+                        
+                        <button onclick="printReceipt()" class="btn-outline w-full">
+                            <i class="fas fa-print mr-2"></i> Print Receipt
+                        </button>
+                    </div>
+                    
+                    <div class="mt-6 p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <p class="text-sm text-green-800">
+                                This receipt is valid for tax purposes. Tax ID: 123-456-789
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Need Help? -->
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-vto-black mb-4">Need Help?</h3>
+                    <div class="space-y-4">
+                        <a href="{% url 'contact' %}" class="flex items-center text-sm text-vto-gray-600 hover:text-vto-orange-dark">
+                            <i class="fas fa-question-circle mr-3"></i>
+                            <span>Questions about this donation</span>
+                        </a>
+                        
+                        <a href="#" class="flex items-center text-sm text-vto-gray-600 hover:text-vto-orange-dark">
+                            <i class="fas fa-exchange-alt mr-3"></i>
+                            <span>Request refund or modification</span>
+                        </a>
+                        
+                        <a href="#" class="flex items-center text-sm text-vto-gray-600 hover:text-vto-orange-dark">
+                            <i class="fas fa-file-invoice mr-3"></i>
+                            <span>Tax-related questions</span>
+                        </a>
+                        
+                        <div class="pt-4 border-t border-vto-gray-100">
+                            <div class="flex items-center text-sm">
+                                <i class="fas fa-phone text-vto-orange-dark mr-3"></i>
+                                <span>+254 712 345 678</span>
+                            </div>
+                            <div class="flex items-center text-sm mt-2">
+                                <i class="fas fa-envelope text-vto-orange-dark mr-3"></i>
+                                <span>donations@victoryteens.org</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Related Actions -->
+                <div class="card p-6 mt-8">
+                    <h3 class="text-xl font-bold text-vto-black mb-4">Related Actions</h3>
+                    <div class="space-y-3">
+                        {% if donation.payment_status == 'pending' and donation.payment_method == 'bank_transfer' %}
+                        <a href="{% url 'donations:pending' donation.donation_id %}" class="btn-outline w-full">
+                            <i class="fas fa-clock mr-2"></i> Check Payment Status
+                        </a>
+                        {% endif %}
+                        
+                        <a href="{% url 'donations:make_donation' %}" class="btn-primary w-full">
+                            <i class="fas fa-heart mr-2"></i> Make Another Donation
+                        </a>
+                        
+                        {% if donation.campaign %}
+                        <a href="{% url 'donations:campaign_detail' donation.campaign.slug %}" class="btn-outline w-full">
+                            <i class="fas fa-bullseye mr-2"></i> View Campaign
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Share functions
+function shareDonationOnFacebook() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(`I just donated KES {{ donation.amount|floatformat:2|intcomma }} to Victory Teens Organization! Join me in supporting orphaned teens.`);
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank');
+}
+
+function shareDonationOnTwitter() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(`I donated KES {{ donation.amount|floatformat:2|intcomma }} to @VictoryTeens! Support orphaned teens today.`);
+    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+}
+
+function shareDonationOnWhatsApp() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(`I just donated KES {{ donation.amount|floatformat:2|intcomma }} to Victory Teens Organization! Support orphaned teens: ${url}`);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+
+// Receipt functions
+function downloadReceipt() {
+    // In production, this would download a PDF
+    alert('Receipt PDF will be downloaded.');
+}
+
+function emailReceipt() {
+    // In production, this would send an email
+    alert('Receipt will be emailed to {{ donation.donor_email }}');
+}
+
+function printReceipt() {
+    window.print();
+}
+</script>
+{% endblock %}

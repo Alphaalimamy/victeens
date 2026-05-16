@@ -1,0 +1,182 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Posts tagged with "{{ tag.name }}" - {{ site_name }}{% endblock %}
+{% block meta_description %}Browse all blog posts tagged with {{ tag.name }} on Victory Teens Organization.{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-b from-vto-white to-vto-gray-50">
+    <!-- Hero Section -->
+    <div class="relative bg-gradient-to-r from-vto-orange to-vto-purple text-white">
+        <div class="absolute inset-0 bg-black opacity-40"></div>
+        <div class="relative container mx-auto px-4 py-16 md:py-24">
+            <div class="max-w-3xl mx-auto text-center">
+                <h1 class="text-4xl md:text-5xl font-bold mb-6 font-montserrat">
+                    Tag: {{ tag.name }}
+                </h1>
+                <p class="text-xl mb-8 opacity-90">
+                    Browse all articles tagged with "{{ tag.name }}"
+                </p>
+                <div class="flex items-center justify-center gap-4">
+                    <span class="text-lg">
+                        <i class="fas fa-tag mr-2"></i>
+                        {{ page_obj.paginator.count }} article{{ page_obj.paginator.count|pluralize }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Posts Column -->
+            <div class="lg:w-2/3">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900">
+                        All Articles
+                    </h2>
+                </div>
+
+                <!-- Posts Grid -->
+                <div class="space-y-8 mb-12">
+                    {% for post in page_obj %}
+                    <article class="bg-white rounded-xl shadow-md hover:shadow-lg transition duration-300 p-6">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            {% if post.thumbnail_image %}
+                            <div class="md:w-1/3">
+                                <a href="{{ post.get_absolute_url }}">
+                                    <img src="{{ post.thumbnail_image.url }}" 
+                                         alt="{{ post.title }}"
+                                         class="w-full h-48 object-cover rounded-lg hover:opacity-90 transition">
+                                </a>
+                            </div>
+                            {% endif %}
+                            <div class="md:w-{% if post.thumbnail_image %}2/3{% else %}full{% endif %}">
+                                <div class="flex flex-wrap items-center gap-3 mb-3">
+                                    <a href="{{ post.category.get_absolute_url }}"
+                                       class="bg-vto-gray-100 text-vto-orange px-3 py-1 rounded-full text-sm font-semibold hover:bg-vto-orange hover:text-white transition">
+                                        {{ post.category.name }}
+                                    </a>
+                                </div>
+                                
+                                <h3 class="text-2xl font-bold mb-3">
+                                    <a href="{{ post.get_absolute_url }}" 
+                                       class="text-gray-900 hover:text-vto-orange transition">
+                                        {{ post.title }}
+                                    </a>
+                                </h3>
+                                
+                                <p class="text-gray-600 mb-4">{{ post.excerpt }}</p>
+                                
+                                <div class="flex items-center justify-between text-sm text-gray-500">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex items-center">
+                                            {% if post.author.profile.avatar %}
+                                            <img src="{{ post.author.profile.avatar.url }}" 
+                                                 alt="{{ post.author.get_full_name }}"
+                                                 class="w-6 h-6 rounded-full mr-2">
+                                            {% endif %}
+                                            <span>{{ post.author.get_full_name }}</span>
+                                        </div>
+                                        <span><i class="far fa-clock mr-1"></i> {{ post.published_date|date:"M d, Y" }}</span>
+                                        <span><i class="far fa-eye mr-1"></i> {{ post.view_count }}</span>
+                                    </div>
+                                    <span class="text-vto-orange">{{ post.reading_time }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    {% empty %}
+                    <div class="text-center py-12">
+                        <i class="fas fa-newspaper text-6xl text-gray-300 mb-4"></i>
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">No articles with this tag</h3>
+                        <p class="text-gray-500">Check back soon for updates!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.paginator.num_pages > 1 %}
+                <nav class="flex justify-center mb-12">
+                    <ul class="flex items-center space-x-2">
+                        {% if page_obj.has_previous %}
+                        <li>
+                            <a href="?page={{ page_obj.previous_page_number }}"
+                               class="px-4 py-2 border rounded-lg hover:bg-vto-orange hover:text-white hover:border-vto-orange transition">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li>
+                                <span class="px-4 py-2 bg-vto-orange text-white border border-vto-orange rounded-lg font-semibold">
+                                    {{ num }}
+                                </span>
+                            </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li>
+                                <a href="?page={{ num }}"
+                                   class="px-4 py-2 border rounded-lg hover:bg-gray-100 transition">
+                                    {{ num }}
+                                </a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                        <li>
+                            <a href="?page={{ page_obj.next_page_number }}"
+                               class="px-4 py-2 border rounded-lg hover:bg-vto-orange hover:text-white hover:border-vto-orange transition">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:w-1/3">
+                <!-- Categories -->
+                <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                    <h3 class="text-xl font-bold mb-4 text-gray-900 flex items-center">
+                        <i class="fas fa-folder mr-2 text-vto-orange"></i> Categories
+                    </h3>
+                    <ul class="space-y-2">
+                        {% for category in categories %}
+                        <li>
+                            <a href="{{ category.get_absolute_url }}"
+                               class="flex justify-between items-center p-3 rounded-lg hover:bg-gray-50 transition group">
+                                <span class="font-medium group-hover:text-vto-orange">{{ category.name }}</span>
+                                <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-sm">
+                                    {{ category.post_count }}
+                                </span>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- All Tags -->
+                <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                    <h3 class="text-xl font-bold mb-4 text-gray-900 flex items-center">
+                        <i class="fas fa-tags mr-2 text-vto-purple"></i> All Tags
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for tag in popular_tags %}
+                        <a href="{{ tag.get_absolute_url }}"
+                           class="inline-block {% if tag.id == current_tag.id %}bg-vto-purple text-white{% else %}bg-gray-100 text-gray-700{% endif %} hover:bg-vto-purple hover:text-white px-3 py-1 rounded-full text-sm transition">
+                            #{{ tag.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,182 @@
+{% load tailwind_tags %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}
+            {% if title %}{{ title }} - {% endif %}{{ site_name|default:"Victory Teens Organization" }}
+        {% endblock %}
+    </title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="icon" type="image/x-icon" href="{{ STATIC_URL }}images/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          poppins: ['Poppins', 'sans-serif'],
+          montserrat: ['Montserrat', 'sans-serif'],
+          'open-sans': ['Open Sans', 'sans-serif'],
+        },
+        colors: {
+          /* Victory Teens Organization Color Palette */
+          'vto-white': '#FDFDFD',
+
+          'vto-orange': {
+            DEFAULT: '#B83E09',
+            dark: '#B83E09',
+            golden: '#EEA552',
+          },
+          
+          'vto-purple': '#6E3595',
+          'vto-peach': '#E5B899',
+          'vto-black': '#1C1C1C',
+
+          'vto-gray': {
+            50: '#f9fafb',
+            100: '#f3f4f6',
+            200: '#e5e7eb',
+            300: '#d1d5db',
+            400: '#9ca3af',
+            500: '#6b7280',
+            600: '#4b5563',
+            700: '#374151',
+            800: '#1f2937',
+            900: '#111827',
+          },
+        },
+
+        animation: {
+          'fade-in': 'fadeIn 0.5s ease-in-out',
+          'slide-up': 'slideUp 0.3s ease-out',
+          'pulse-gentle': 'pulseGentle 2s infinite',
+        },
+
+        keyframes: {
+          fadeIn: {
+            '0%': { opacity: '0' },
+            '100%': { opacity: '1' },
+          },
+          slideUp: {
+            '0%': { transform: 'translateY(10px)', opacity: '0' },
+            '100%': { transform: 'translateY(0)', opacity: '1' },
+          },
+          pulseGentle: {
+            '0%, 100%': { opacity: '1' },
+            '50%': { opacity: '0.8' },
+          },
+        },
+
+        backgroundImage: {
+          'hero-gradient': 'linear-gradient(135deg, #FDFDFD 0%, #E5B899 100%)',
+          'donation-gradient': 'linear-gradient(135deg, #B83E09 0%, #EEA552 100%)',
+          'volunteer-gradient': 'linear-gradient(135deg, #6E3595 0%, #B83E09 100%)',
+        },
+      },
+    },
+  };
+</script>
+
+   
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+  
+    <!-- Meta tags -->
+    <meta name="description" content="{% block meta_description %}Victory Teens Organization - Providing hope and future for orphaned teens{% endblock %}">
+    <meta name="keywords" content="orphanage, charity, teens, donations, volunteers, Kenya">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% block og_title %}{{ site_name|default:"Victory Teens Organization" }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Providing hope and future for orphaned teens{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:image" content="{% block og_image %}{{ STATIC_URL }}images/og-image.jpg{% endblock %}">
+    
+    {% block head_extra %}{% endblock %}
+</head>
+<body class="bg-vto-white text-vto-black font-sans min-h-screen flex flex-col leading-relaxed">
+    <!-- Skip to main content -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-vto-orange-dark text-white p-2 rounded-lg z-50">
+        Skip to main content
+    </a>
+    
+    <!-- Header/Navigation -->
+   
+    {% include "core/partials/header.html" %}
+    <!-- Messages/Notifications -->
+    {% if messages %}
+    <div class="container mx-auto px-4 mt-4">
+        {% for message in messages %}
+        <div class="message p-4 mb-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+            {{ message }}
+            <button type="button" class="float-right text-lg" onclick="this.parentElement.style.display='none'">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main id="main-content" class="flex-grow px-10">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+
+    {% include "core/partials/footer.html" %}
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="fixed bottom-8 right-8 bg-vto-orange-dark text-white p-3 rounded-full shadow-lg hover:bg-vto-orange-golden transition-all duration-300 hidden z-40">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    
+    <!-- JavaScript -->
+    <script>
+        // Back to Top Button
+        const backToTopButton = document.getElementById('back-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.remove('hidden');
+            } else {
+                backToTopButton.classList.add('hidden');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        // Auto-dismiss messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const messages = document.querySelectorAll('.message');
+                messages.forEach(message => {
+                    message.style.transition = 'opacity 0.5s';
+                    message.style.opacity = '0';
+                    setTimeout(() => message.remove(), 500);
+                });
+            }, 5000);
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Django Browser Reload for development -->
+    {% if debug %}
+        {% load django_browser_reload %}
+        {% django_browser_reload_script %}
+    {% endif %}
+</body>
+</html>

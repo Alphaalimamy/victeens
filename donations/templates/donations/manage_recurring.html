@@ -1,0 +1,449 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Manage Recurring Donation - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Back Button -->
+        <a href="{% url 'donations:my_donations' %}" class="inline-flex items-center text-vto-orange-dark hover:text-vto-orange-golden mb-6">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Donation History
+        </a>
+        
+        <!-- Subscription Header -->
+        <div class="card p-8 mb-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-vto-black mb-2">Manage Recurring Donation</h1>
+                    <div class="flex items-center space-x-4">
+                        <span class="px-3 py-1 rounded-full text-sm font-medium 
+                            {% if recurring.status == 'active' %}bg-green-100 text-green-800
+                            {% elif recurring.status == 'paused' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ recurring.get_status_display }}
+                        </span>
+                        <span class="text-vto-gray-500">
+                            Started {{ recurring.start_date|date:"F j, Y" }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="mt-4 md:mt-0 text-right">
+                    <p class="text-3xl font-bold text-vto-orange-dark">KES {{ recurring.amount|floatformat:2|intcomma }}</p>
+                    <p class="text-vto-gray-600">{{ recurring.get_frequency_display }}</p>
+                </div>
+            </div>
+            
+            <!-- Subscription Details -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="text-lg font-bold text-vto-black mb-4">Subscription Details</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-vto-gray-600">Subscription ID</span>
+                            <span class="font-medium">{{ recurring.subscription_id }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-vto-gray-600">Payment Method</span>
+                            <span class="font-medium">{{ recurring.get_payment_method_display }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-vto-gray-600">Next Payment</span>
+                            <span class="font-medium">{{ recurring.next_payment_date|date:"F j, Y" }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-vto-gray-600">Total Paid</span>
+                            <span class="font-bold text-green-600">KES {{ recurring.total_amount|floatformat:2|intcomma }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-vto-black mb-4">Impact Summary</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-vto-gray-600">Payments Made</span>
+                            <span class="font-medium">{{ recurring.total_payments }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-vto-gray-600">Months Active</span>
+                            <span class="font-medium">{{ recurring.months_sponsored }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-vto-gray-600">Average Impact</span>
+                            <span class="font-medium">
+                                {% with impact=recurring.amount|mul:recurring.total_payments|div:500 %}
+                                {{ impact|floatformat:0 }} meals provided
+                                {% endwith %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Timeline -->
+            <div>
+                <h3 class="text-lg font-bold text-vto-black mb-4">Payment History</h3>
+                <div class="space-y-4">
+                    {% for payment in payment_history|slice:":5" %}
+                    <div class="flex items-center justify-between p-4 bg-vto-gray-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-4">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">Payment {{ forloop.counter }}</p>
+                                <p class="text-sm text-vto-gray-600">Completed • KES {{ recurring.amount|floatformat:2|intcomma }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-vto-gray-600">{{ payment.date|date:"M j, Y" }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <p class="text-vto-gray-500">No payment history yet. First payment scheduled for {{ recurring.next_payment_date|date:"F j, Y" }}</p>
+                    </div>
+                    {% endfor %}
+                    
+                    {% if payment_history|length > 5 %}
+                    <div class="text-center">
+                        <a href="#" class="text-vto-orange-dark hover:text-vto-orange-golden font-medium">
+                            <i class="fas fa-history mr-2"></i> View Complete History
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Management Options -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Update Settings -->
+            <div class="lg:col-span-2">
+                <div class="card p-8">
+                    <h2 class="text-2xl font-bold text-vto-black mb-6">Update Settings</h2>
+                    
+                    <form method="post" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        <!-- Amount -->
+                        <div>
+                            <h3 class="text-lg font-bold text-vto-black mb-4">Update Amount</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                <label class="relative">
+                                    <input type="radio" name="new_amount" value="1000" 
+                                           class="absolute opacity-0">
+                                    <div class="cursor-pointer border-2 border-vto-gray-300 rounded-xl p-4 text-center transition-all duration-200 hover:border-vto-orange-dark hover:bg-vto-orange-dark/5 amount-option">
+                                        <div class="text-lg font-bold text-vto-black">KES 1,000</div>
+                                        <div class="text-xs text-vto-gray-500 mt-1">Monthly</div>
+                                    </div>
+                                </label>
+                                
+                                <label class="relative">
+                                    <input type="radio" name="new_amount" value="2000" 
+                                           class="absolute opacity-0" checked>
+                                    <div class="cursor-pointer border-2 border-vto-orange-dark rounded-xl p-4 text-center bg-vto-orange-dark/5 amount-option">
+                                        <div class="text-lg font-bold text-vto-black">KES 2,000</div>
+                                        <div class="text-xs text-vto-gray-500 mt-1">Monthly</div>
+                                    </div>
+                                </label>
+                                
+                                <label class="relative">
+                                    <input type="radio" name="new_amount" value="5000" 
+                                           class="absolute opacity-0">
+                                    <div class="cursor-pointer border-2 border-vto-gray-300 rounded-xl p-4 text-center transition-all duration-200 hover:border-vto-orange-dark hover:bg-vto-orange-dark/5 amount-option">
+                                        <div class="text-lg font-bold text-vto-black">KES 5,000</div>
+                                        <div class="text-xs text-vto-gray-500 mt-1">Monthly</div>
+                                    </div>
+                                </label>
+                                
+                                <label class="relative">
+                                    <input type="radio" name="new_amount" value="custom" 
+                                           class="absolute opacity-0">
+                                    <div class="cursor-pointer border-2 border-vto-gray-300 rounded-xl p-4 text-center transition-all duration-200 hover:border-vto-orange-dark hover:bg-vto-orange-dark/5 amount-option">
+                                        <div class="text-lg font-bold text-vto-black">Custom</div>
+                                        <div class="text-xs text-vto-gray-500 mt-1">Amount</div>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div id="customAmountInput" class="hidden">
+                                <label class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                    Enter Custom Amount (KES)
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span class="text-vto-gray-500">KES</span>
+                                    </div>
+                                    <input type="number" name="custom_amount" min="100" step="100" 
+                                           class="input-field pl-10" placeholder="Enter amount">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Frequency -->
+                        <div>
+                            <h3 class="text-lg font-bold text-vto-black mb-4">Update Frequency</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {% for value, label in frequency_choices %}
+                                <label class="relative">
+                                    <input type="radio" name="new_frequency" value="{{ value }}" 
+                                           {% if value == recurring.frequency %}checked{% endif %}
+                                           class="absolute opacity-0">
+                                    <div class="cursor-pointer border-2 border-vto-gray-300 rounded-xl p-4 text-center transition-all duration-200 hover:border-vto-orange-dark hover:bg-vto-orange-dark/5 frequency-option 
+                                         {% if value == recurring.frequency %}border-vto-orange-dark bg-vto-orange-dark/5{% endif %}">
+                                        <div class="text-lg font-bold text-vto-black">{{ label }}</div>
+                                    </div>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Payment Method -->
+                        <div>
+                            <h3 class="text-lg font-bold text-vto-black mb-4">Update Payment Method</h3>
+                            <div class="space-y-3">
+                                <label class="flex items-center p-4 border border-vto-gray-300 rounded-lg cursor-pointer hover:border-vto-orange-dark hover:bg-vto-orange-dark/5">
+                                    <input type="radio" name="payment_method" value="mpesa" 
+                                           {% if recurring.payment_method == 'mpesa' %}checked{% endif %}
+                                           class="h-4 w-4 text-vto-orange-dark">
+                                    <div class="ml-3">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-mobile-alt text-green-600 text-xl mr-3"></i>
+                                            <span class="font-medium">M-Pesa</span>
+                                        </div>
+                                        <p class="text-sm text-vto-gray-600">Pay with mobile money</p>
+                                    </div>
+                                </label>
+                                
+                                <label class="flex items-center p-4 border border-vto-gray-300 rounded-lg cursor-pointer hover:border-vto-orange-dark hover:bg-vto-orange-dark/5">
+                                    <input type="radio" name="payment_method" value="stripe" 
+                                           {% if recurring.payment_method == 'stripe' %}checked{% endif %}
+                                           class="h-4 w-4 text-vto-orange-dark">
+                                    <div class="ml-3">
+                                        <div class="flex items-center">
+                                            <i class="fab fa-cc-stripe text-vto-purple text-xl mr-3"></i>
+                                            <span class="font-medium">Credit/Debit Card</span>
+                                        </div>
+                                        <p class="text-sm text-vto-gray-600">Pay with card ending in {{ recurring.payment_method_last4|default:"••••" }}</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-vto-gray-100">
+                            <button type="submit" name="action" value="update" class="btn-primary">
+                                <i class="fas fa-save mr-2"></i> Update Subscription
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Management Actions -->
+            <div class="lg:col-span-1">
+                <!-- Status Actions -->
+                <div class="card p-6 mb-8">
+                    <h3 class="text-xl font-bold text-vto-black mb-6">Subscription Actions</h3>
+                    
+                    <div class="space-y-4">
+                        {% if recurring.status == 'active' %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" name="action" value="pause" class="btn-outline w-full">
+                                <i class="fas fa-pause mr-2"></i> Pause Subscription
+                            </button>
+                        </form>
+                        
+                        <button onclick="showCancelModal()" class="btn-outline w-full border-red-300 text-red-600 hover:bg-red-50">
+                            <i class="fas fa-times-circle mr-2"></i> Cancel Subscription
+                        </button>
+                        
+                        {% elif recurring.status == 'paused' %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" name="action" value="resume" class="btn-primary w-full">
+                                <i class="fas fa-play mr-2"></i> Resume Subscription
+                            </button>
+                        </form>
+                        {% endif %}
+                        
+                        <a href="{% url 'donations:detail' recurring.donation.donation_id %}" class="btn-outline w-full">
+                            <i class="fas fa-eye mr-2"></i> View Donation Details
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Impact Preview -->
+                <div class="card p-6 mb-8">
+                    <h3 class="text-xl font-bold text-vto-black mb-4">Your Continued Impact</h3>
+                    <p class="text-vto-gray-600 mb-6">
+                        By keeping your recurring donation active, you provide consistent support that allows us to plan long-term programs.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar-check text-green-500 mr-3"></i>
+                            <span>Reliable funding for programs</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-chart-line text-blue-500 mr-3"></i>
+                            <span>Ability to plan long-term</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-heart text-red-500 mr-3"></i>
+                            <span>Sustained impact on teens' lives</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contact Support -->
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-vto-black mb-4">Need Help?</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center text-sm">
+                            <i class="fas fa-phone text-vto-orange-dark mr-3"></i>
+                            <span>+254 712 345 678</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <i class="fas fa-envelope text-vto-orange-dark mr-3"></i>
+                            <span>recurring@victoryteens.org</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <i class="fas fa-clock text-vto-orange-dark mr-3"></i>
+                            <span>Mon-Fri, 8AM-5PM EAT</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Modal -->
+<div id="cancelModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full">
+        <div class="p-6 border-b border-vto-gray-100">
+            <h3 class="text-xl font-bold text-vto-black">Cancel Subscription</h3>
+        </div>
+        <div class="p-6">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mr-4">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-red-800">Are you sure?</h4>
+                    <p class="text-sm text-red-600">Your recurring donation will stop immediately</p>
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <h5 class="font-bold text-red-800 mb-2">What happens when you cancel:</h5>
+                    <ul class="text-sm text-red-700 space-y-1 list-disc pl-5">
+                        <li>No further payments will be processed</li>
+                        <li>Your subscription status will change to "Cancelled"</li>
+                        <li>You can restart anytime by creating a new donation</li>
+                        <li>Past donations and receipts remain accessible</li>
+                    </ul>
+                </div>
+                
+                <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <h5 class="font-bold text-yellow-800 mb-2">Consider pausing instead</h5>
+                    <p class="text-sm text-yellow-700">
+                        If you need a break, you can pause your subscription and resume later without losing your history.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <label class="flex items-start">
+                    <input type="checkbox" id="confirmCancel" 
+                           class="h-4 w-4 text-red-600 mt-1 mr-3">
+                    <span class="text-sm text-vto-gray-700">
+                        I understand that cancelling will stop all future payments and I want to proceed.
+                    </span>
+                </label>
+            </div>
+        </div>
+        <div class="p-6 border-t border-vto-gray-100 flex justify-end space-x-4">
+            <button onclick="closeCancelModal()" class="btn-outline">
+                Go Back
+            </button>
+            <form method="post" class="inline">
+                {% csrf_token %}
+                <button type="submit" name="action" value="cancel" 
+                        id="cancelButton" disabled
+                        class="btn-primary bg-red-600 hover:bg-red-700 border-red-600">
+                    <i class="fas fa-times-circle mr-2"></i> Confirm Cancellation
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Amount selection
+document.querySelectorAll('input[name="new_amount"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        // Style selected amount
+        document.querySelectorAll('.amount-option').forEach(option => {
+            option.classList.remove('border-vto-orange-dark', 'bg-vto-orange-dark/5');
+            option.classList.add('border-vto-gray-300');
+        });
+        
+        if (this.checked) {
+            this.nextElementSibling.classList.add('border-vto-orange-dark', 'bg-vto-orange-dark/5');
+            this.nextElementSibling.classList.remove('border-vto-gray-300');
+        }
+        
+        // Show/hide custom amount input
+        if (this.value === 'custom') {
+            document.getElementById('customAmountInput').classList.remove('hidden');
+        } else {
+            document.getElementById('customAmountInput').classList.add('hidden');
+        }
+    });
+});
+
+// Frequency selection
+document.querySelectorAll('input[name="new_frequency"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        document.querySelectorAll('.frequency-option').forEach(option => {
+            option.classList.remove('border-vto-orange-dark', 'bg-vto-orange-dark/5');
+            option.classList.add('border-vto-gray-300');
+        });
+        
+        if (this.checked) {
+            this.nextElementSibling.classList.add('border-vto-orange-dark', 'bg-vto-orange-dark/5');
+            this.nextElementSibling.classList.remove('border-vto-gray-300');
+        }
+    });
+});
+
+// Cancel modal
+function showCancelModal() {
+    document.getElementById('cancelModal').classList.remove('hidden');
+}
+
+function closeCancelModal() {
+    document.getElementById('cancelModal').classList.add('hidden');
+}
+
+// Enable/disable cancel button based on confirmation
+document.getElementById('confirmCancel').addEventListener('change', function() {
+    document.getElementById('cancelButton').disabled = !this.checked;
+});
+
+// Close modal when clicking outside
+document.getElementById('cancelModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeCancelModal();
+    }
+});
+</script>
+{% endblock %}

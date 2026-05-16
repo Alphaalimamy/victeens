@@ -1,0 +1,346 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Campaigns - {{ block.super }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-vto-purple to-vto-orange-dark text-white py-16">
+    <div class="container mx-auto px-4">
+        <div class="text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">Our Campaigns</h1>
+            <p class="text-xl max-w-3xl mx-auto mb-8">
+                Discover our ongoing initiatives and choose a campaign that resonates with your heart. 
+                Every campaign has a specific goal and impact.
+            </p>
+            <a href="{% url 'donations:make_donation' %}" class="bg-white text-vto-orange-dark hover:bg-vto-gray-100 px-8 py-4 rounded-lg font-bold text-lg transition-all duration-300 transform hover:-translate-y-1">
+                <i class="fas fa-heart mr-2"></i> Support a Campaign
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Active Campaigns -->
+<section class="py-16">
+    <div class="container mx-auto px-4">
+        <div class="mb-12">
+            <h2 class="section-title">Active Campaigns</h2>
+            <p class="section-subtitle">Campaigns currently raising funds</p>
+        </div>
+        
+        {% if campaigns %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for campaign in campaigns %}
+            {% if campaign.is_ongoing %}
+            <div class="card overflow-hidden hover-lift">
+                <!-- Campaign Image -->
+                <div class="relative h-48 overflow-hidden">
+                    {% if campaign.image %}
+                    <img src="{{ campaign.image.url }}" alt="{{ campaign.title }}" 
+                         class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                    {% else %}
+                    <div class="w-full h-full bg-gradient-to-r from-vto-orange-dark to-vto-purple flex items-center justify-center">
+                        <i class="fas fa-heart text-white text-4xl"></i>
+                    </div>
+                    {% endif %}
+                    
+                    {% if campaign.is_featured %}
+                    <div class="absolute top-4 left-4">
+                        <span class="bg-vto-orange-dark text-white px-3 py-1 rounded-full text-xs font-bold">
+                            <i class="fas fa-star mr-1"></i> Featured
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Progress Badge -->
+                    <div class="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold">
+                        {{ campaign.progress_percentage|floatformat:0 }}% Funded
+                    </div>
+                </div>
+                
+                <!-- Campaign Info -->
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-vto-black mb-3">{{ campaign.title }}</h3>
+                    
+                    <p class="text-vto-gray-600 mb-6 line-clamp-3">{{ campaign.description|truncatewords:30 }}</p>
+                    
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-vto-gray-600">Raised: KES {{ campaign.current_amount|intcomma }}</span>
+                            <span class="text-vto-gray-600">Goal: KES {{ campaign.goal_amount|intcomma }}</span>
+                        </div>
+                        <div class="w-full bg-vto-gray-200 rounded-full h-3">
+                            <div class="bg-vto-orange-dark h-3 rounded-full" style="width: {{ campaign.progress_percentage }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Campaign Stats -->
+                    <div class="flex justify-between text-sm text-vto-gray-500 mb-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            {% if campaign.days_left %}
+                            {{ campaign.days_left }} days left
+                            {% else %}
+                            Ongoing
+                            {% endif %}
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-users mr-2"></i>
+                            {{ campaign.donation_set.count }} donors
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="space-y-3">
+                        <a href="{% url 'donations:campaign_detail' campaign.slug %}" class="btn-outline w-full">
+                            <i class="fas fa-info-circle mr-2"></i> Learn More
+                        </a>
+                        <a href="{% url 'donations:make_donation' %}?campaign={{ campaign.id }}" class="btn-primary w-full">
+                            <i class="fas fa-donate mr-2"></i> Donate Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- No Active Campaigns -->
+        <div class="text-center py-12">
+            <div class="text-4xl text-vto-gray-300 mb-4">
+                <i class="fas fa-calendar-times"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-vto-black mb-2">No Active Campaigns</h3>
+            <p class="text-vto-gray-600 mb-6 max-w-md mx-auto">
+                We're currently between campaigns. Check back soon or support our general fund.
+            </p>
+            <a href="{% url 'donations:make_donation' %}" class="btn-primary">
+                <i class="fas fa-heart mr-2"></i> Support General Fund
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Completed Campaigns -->
+{% if campaigns %}
+{% with completed_campaigns=campaigns|filter:"is_ongoing=False" %}
+{% if completed_campaigns %}
+<section class="py-16 bg-vto-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="mb-12">
+            <h2 class="section-title">Completed Campaigns</h2>
+            <p class="section-subtitle">Campaigns that have successfully achieved their goals</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for campaign in completed_campaigns|slice:":6" %}
+            <div class="card overflow-hidden">
+                <div class="p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <h3 class="text-xl font-bold text-vto-black">{{ campaign.title }}</h3>
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">
+                            <i class="fas fa-check-circle mr-1"></i> Completed
+                        </span>
+                    </div>
+                    
+                    <p class="text-vto-gray-600 mb-6 line-clamp-3">{{ campaign.description|truncatewords:25 }}</p>
+                    
+                    <!-- Final Stats -->
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-vto-gray-600">Final Amount</span>
+                                <span class="font-bold text-green-600">KES {{ campaign.current_amount|intcomma }}</span>
+                            </div>
+                            <div class="w-full bg-green-100 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-sm text-vto-gray-500">
+                            <div class="flex justify-between">
+                                <span>Ran from</span>
+                                <span>{{ campaign.start_date|date:"M j, Y" }} - {{ campaign.end_date|date:"M j, Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <a href="{% url 'donations:campaign_detail' campaign.slug %}" class="btn-outline w-full">
+                            <i class="fas fa-history mr-2"></i> View Results
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endwith %}
+{% endif %}
+
+<!-- How to Start a Campaign -->
+<section class="py-16">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="card p-8">
+                <h2 class="text-3xl font-bold text-vto-black mb-6 text-center">Want to Start Your Own Campaign?</h2>
+                <p class="text-lg text-vto-gray-600 mb-8 text-center">
+                    You can create a personal fundraising campaign to support Victory Teens Organization. 
+                    It's a great way to celebrate special occasions or honor loved ones.
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                    <div class="text-center">
+                        <div class="w-16 h-16 rounded-full bg-vto-orange-dark/10 text-vto-orange-dark flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-bullhorn text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-vto-black mb-2">Create Your Page</h3>
+                        <p class="text-vto-gray-600">Set up a personalized campaign with photos and your story</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-16 h-16 rounded-full bg-vto-purple/10 text-vto-purple flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-share-alt text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-vto-black mb-2">Share with Friends</h3>
+                        <p class="text-vto-gray-600">Use social media and email to spread the word</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-16 h-16 rounded-full bg-vto-orange-golden/10 text-vto-orange-golden flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-trophy text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-vto-black mb-2">Make an Impact</h3>
+                        <p class="text-vto-gray-600">Track donations and see the difference you're making</p>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button onclick="showCampaignModal()" class="btn-primary px-8 py-4 text-lg">
+                        <i class="fas fa-plus-circle mr-2"></i> Start a Fundraiser
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-16 bg-gradient-to-r from-vto-orange-dark/10 to-vto-purple/10">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-vto-black mb-6">Can't Decide Which Campaign to Support?</h2>
+        <p class="text-xl text-vto-gray-600 mb-8 max-w-2xl mx-auto">
+            Your donation to our General Fund goes where it's needed most, allowing us to respond quickly to urgent needs.
+        </p>
+        <a href="{% url 'donations:make_donation' %}" class="btn-primary px-8 py-4 text-lg">
+            <i class="fas fa-heart mr-2"></i> Donate to General Fund
+        </a>
+    </div>
+</section>
+
+<!-- Campaign Creation Modal -->
+<div id="campaignModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-vto-gray-100 flex justify-between items-center">
+            <h3 class="text-xl font-bold text-vto-black">Start Your Fundraiser</h3>
+            <button onclick="closeCampaignModal()" class="text-vto-gray-500 hover:text-vto-black">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <div class="space-y-6">
+                <div class="card p-6">
+                    <h4 class="text-lg font-bold text-vto-black mb-4">Fundraiser Ideas</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 border border-vto-gray-200 rounded-lg hover:border-vto-orange-dark hover:bg-vto-orange-dark/5 transition-colors">
+                            <div class="flex items-center mb-2">
+                                <div class="w-10 h-10 rounded-full bg-vto-orange-dark/10 text-vto-orange-dark flex items-center justify-center mr-3">
+                                    <i class="fas fa-birthday-cake"></i>
+                                </div>
+                                <h5 class="font-bold text-vto-black">Birthday Fundraiser</h5>
+                            </div>
+                            <p class="text-sm text-vto-gray-600">Ask friends to donate instead of giving gifts</p>
+                        </div>
+                        
+                        <div class="p-4 border border-vto-gray-200 rounded-lg hover:border-vto-purple hover:bg-vto-purple/5 transition-colors">
+                            <div class="flex items-center mb-2">
+                                <div class="w-10 h-10 rounded-full bg-vto-purple/10 text-vto-purple flex items-center justify-center mr-3">
+                                    <i class="fas fa-running"></i>
+                                </div>
+                                <h5 class="font-bold text-vto-black">Fitness Challenge</h5>
+                            </div>
+                            <p class="text-sm text-vto-gray-600">Run, walk, or cycle and get sponsors for your effort</p>
+                        </div>
+                        
+                        <div class="p-4 border border-vto-gray-200 rounded-lg hover:border-vto-orange-golden hover:bg-vto-orange-golden/5 transition-colors">
+                            <div class="flex items-center mb-2">
+                                <div class="w-10 h-10 rounded-full bg-vto-orange-golden/10 text-vto-orange-golden flex items-center justify-center mr-3">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <h5 class="font-bold text-vto-black">Memorial/Tribute</h5>
+                            </div>
+                            <p class="text-sm text-vto-gray-600">Honor a loved one by supporting a cause they cared about</p>
+                        </div>
+                        
+                        <div class="p-4 border border-vto-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors">
+                            <div class="flex items-center mb-2">
+                                <div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3">
+                                    <i class="fas fa-hands-helping"></i>
+                                </div>
+                                <h5 class="font-bold text-vto-black">Corporate Matching</h5>
+                            </div>
+                            <p class="text-sm text-vto-gray-600">Leverage your company's matching gift program</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card p-6">
+                    <h4 class="text-lg font-bold text-vto-black mb-4">Get Started</h4>
+                    <p class="text-vto-gray-600 mb-6">
+                        To start a personal fundraiser, please contact our fundraising team who will help you set up your campaign page.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-envelope text-vto-orange-dark mr-3"></i>
+                            <span>fundraising@victoryteens.org</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-phone text-vto-orange-dark mr-3"></i>
+                            <span>+254 712 345 678 (Fundraising Department)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="p-6 border-t border-vto-gray-100 flex justify-end">
+            <button onclick="closeCampaignModal()" class="btn-primary">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showCampaignModal() {
+    document.getElementById('campaignModal').classList.remove('hidden');
+}
+
+function closeCampaignModal() {
+    document.getElementById('campaignModal').classList.add('hidden');
+}
+
+// Close modal when clicking outside
+document.getElementById('campaignModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeCampaignModal();
+    }
+});
+</script>
+{% endblock %}

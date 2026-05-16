@@ -1,0 +1,622 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    /* Animation Classes */
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    
+    .fade-in-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .fade-in-left {
+        opacity: 0;
+        transform: translateX(-30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    
+    .fade-in-left.visible {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    .stagger-child > * {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    
+    .stagger-child.visible > *:nth-child(1) { transition-delay: 0s; }
+    .stagger-child.visible > *:nth-child(2) { transition-delay: 0.1s; }
+    .stagger-child.visible > *:nth-child(3) { transition-delay: 0.2s; }
+    .stagger-child.visible > *:nth-child(4) { transition-delay: 0.3s; }
+    .stagger-child.visible > *:nth-child(5) { transition-delay: 0.4s; }
+    .stagger-child.visible > *:nth-child(6) { transition-delay: 0.5s; }
+    
+    .stagger-child.visible > * {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    /* Hero Background Gradient */
+    .hero-gradient-volunteer {
+        background: linear-gradient(135deg, #6E3595 0%, #B83E09 100%);
+    }
+    
+    /* Opportunity Card Styles */
+    .opportunity-card {
+        transition: all 0.3s ease;
+    }
+    
+    .opportunity-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Interest Checkbox Styles */
+    .interest-option {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .interest-option.selected {
+        border-color: #B83E09;
+        background-color: rgba(184, 62, 9, 0.05);
+    }
+    
+    /* Form Input Styles */
+    .form-input {
+        transition: all 0.2s ease;
+    }
+    
+    .form-input:focus {
+        border-color: #B83E09;
+        box-shadow: 0 0 0 3px rgba(184, 62, 9, 0.1);
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="relative py-24 overflow-hidden hero-gradient-volunteer">
+    <!-- Decorative Elements -->
+    <div class="absolute inset-0">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-vto-orange-golden/20 rounded-full blur-3xl"></div>
+    </div>
+    
+    <div class="container mx-auto px-6 lg:px-12 relative z-10">
+        <div id="hero-content" class="stagger-child max-w-3xl mx-auto text-center text-white">
+            <div class="fade-in-up w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-8">
+                <i class="fas fa-users text-3xl text-white"></i>
+            </div>
+            <h1 class="text-5xl lg:text-6xl font-bold mb-6 fade-in-up">
+                Join Our Volunteer Family
+            </h1>
+            <p class="text-xl text-white/90 leading-relaxed fade-in-up">
+                Your time and talents can transform a teenager's life. Discover meaningful 
+                volunteer opportunities that match your skills and interests.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Opportunities Section -->
+<section class="py-24 bg-white">
+    <div class="container mx-auto px-6 lg:px-12">
+        <div id="section-header" class="text-center max-w-3xl mx-auto mb-16 fade-in-up">
+            <span class="text-vto-orange font-medium">Opportunities</span>
+            <h2 class="text-4xl lg:text-5xl font-bold text-vto-black mt-3 mb-6">
+                Ways to Get Involved
+            </h2>
+            <p class="text-xl text-vto-gray-600">
+                Choose from a variety of volunteer roles that fit your schedule and expertise.
+            </p>
+        </div>
+
+        <div id="opportunities-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 stagger-child">
+            <!-- Academic Tutoring -->
+            <div class="fade-in-up bg-vto-gray-50 rounded-2xl p-8 hover:shadow-xl transition-all group opportunity-card">
+                <div class="w-14 h-14 bg-gradient-to-br from-vto-orange to-vto-purple rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-book-open text-white text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-vto-black mb-3">Academic Tutoring</h3>
+                <p class="text-vto-gray-600 mb-6">Help teens with homework, test prep, and academic skills.</p>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center gap-2 text-vto-gray-500">
+                        <i class="fas fa-clock text-vto-orange"></i>
+                        <span>2-4 hours/week</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-vto-gray-500">
+                        <i class="fas fa-map-marker-alt text-vto-orange"></i>
+                        <span>In-person or Virtual</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mentorship Program -->
+            <div class="fade-in-up bg-vto-gray-50 rounded-2xl p-8 hover:shadow-xl transition-all group opportunity-card">
+                <div class="w-14 h-14 bg-gradient-to-br from-vto-orange to-vto-purple rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-users text-white text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-vto-black mb-3">Mentorship Program</h3>
+                <p class="text-vto-gray-600 mb-6">Become a trusted mentor and guide a teen toward success.</p>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center gap-2 text-vto-gray-500">
+                        <i class="fas fa-clock text-vto-orange"></i>
+                        <span>4-6 hours/month</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-vto-gray-500">
+                        <i class="fas fa-map-marker-alt text-vto-orange"></i>
+                        <span>In-person</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meal Preparation -->
+            <div class="fade-in-up bg-vto-gray-50 rounded-2xl p-8 hover:shadow-xl transition-all group opportunity-card">
+                <div class="w-14 h-14 bg-gradient-to-br from-vto-orange to-vto-purple rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-utensils text-white text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-vto-black mb-3">Meal Preparation</h3>
+                <p class="text-vto-gray-600 mb-6">Help prepare nutritious meals for our residential teens.</p>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center gap-2 text-vto-gray-500">
+                        <i class="fas fa-clock text-vto-orange"></i>
+                        <span>3-4 hours/week</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-vto-gray-500">
+                        <i class="fas fa-map-marker-alt text-vto-orange"></i>
+                        <span>Community Kitchen</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Support -->
+            <div class="fade-in-up bg-vto-gray-50 rounded-2xl p-8 hover:shadow-xl transition-all group opportunity-card">
+                <div class="w-14 h-14 bg-gradient-to-br from-vto-orange to-vto-purple rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-calendar-alt text-white text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-vto-black mb-3">Event Support</h3>
+                <p class="text-vto-gray-600 mb-6">Assist with fundraising events and community activities.</p>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center gap-2 text-vto-gray-500">
+                        <i class="fas fa-clock text-vto-orange"></i>
+                        <span>Flexible</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-vto-gray-500">
+                        <i class="fas fa-map-marker-alt text-vto-orange"></i>
+                        <span>Various Locations</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Career Coaching -->
+            <div class="fade-in-up bg-vto-gray-50 rounded-2xl p-8 hover:shadow-xl transition-all group opportunity-card">
+                <div class="w-14 h-14 bg-gradient-to-br from-vto-orange to-vto-purple rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-briefcase text-white text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-vto-black mb-3">Career Coaching</h3>
+                <p class="text-vto-gray-600 mb-6">Share your professional experience and help teens prepare for careers.</p>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center gap-2 text-vto-gray-500">
+                        <i class="fas fa-clock text-vto-orange"></i>
+                        <span>2-3 hours/month</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-vto-gray-500">
+                        <i class="fas fa-map-marker-alt text-vto-orange"></i>
+                        <span>In-person or Virtual</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wellness Activities -->
+            <div class="fade-in-up bg-vto-gray-50 rounded-2xl p-8 hover:shadow-xl transition-all group opportunity-card">
+                <div class="w-14 h-14 bg-gradient-to-br from-vto-orange to-vto-purple rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-heart text-white text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-vto-black mb-3">Wellness Activities</h3>
+                <p class="text-vto-gray-600 mb-6">Lead yoga, sports, art, or other wellness activities.</p>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center gap-2 text-vto-gray-500">
+                        <i class="fas fa-clock text-vto-orange"></i>
+                        <span>2-4 hours/week</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-vto-gray-500">
+                        <i class="fas fa-map-marker-alt text-vto-orange"></i>
+                        <span>Recreation Center</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Benefits Section -->
+<section class="py-24 bg-vto-gray-50">
+    <div class="container mx-auto px-6 lg:px-12">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <div id="benefits-image" class="fade-in-left">
+                <img
+                    src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&q=80"
+                    alt="Volunteers working together"
+                    class="rounded-3xl shadow-2xl w-full h-auto"
+                    onerror="this.src='{% static 'images/volunteer-group.jpg' %}'"
+                >
+            </div>
+            
+            <div id="benefits-content" class="space-y-8 stagger-child">
+                <div class="fade-in-up">
+                    <span class="text-vto-orange font-medium">Why Volunteer?</span>
+                    <h2 class="text-4xl font-bold text-vto-black mt-3 mb-6">
+                        The Benefits of Giving Back
+                    </h2>
+                </div>
+
+                <ul class="space-y-4">
+                    <li class="fade-in-up flex items-start gap-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-vto-orange to-vto-orange-golden rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-check text-white text-sm"></i>
+                        </div>
+                        <span class="text-vto-gray-700 text-lg">Make a real difference in a young person's life</span>
+                    </li>
+                    <li class="fade-in-up flex items-start gap-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-vto-orange to-vto-orange-golden rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-check text-white text-sm"></i>
+                        </div>
+                        <span class="text-vto-gray-700 text-lg">Gain valuable experience and skills</span>
+                    </li>
+                    <li class="fade-in-up flex items-start gap-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-vto-orange to-vto-orange-golden rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-check text-white text-sm"></i>
+                        </div>
+                        <span class="text-vto-gray-700 text-lg">Join a supportive community of like-minded people</span>
+                    </li>
+                    <li class="fade-in-up flex items-start gap-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-vto-orange to-vto-orange-golden rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-check text-white text-sm"></i>
+                        </div>
+                        <span class="text-vto-gray-700 text-lg">Flexible scheduling to fit your lifestyle</span>
+                    </li>
+                    <li class="fade-in-up flex items-start gap-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-vto-orange to-vto-orange-golden rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-check text-white text-sm"></i>
+                        </div>
+                        <span class="text-vto-gray-700 text-lg">Comprehensive training and ongoing support</span>
+                    </li>
+                    <li class="fade-in-up flex items-start gap-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-vto-orange to-vto-orange-golden rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-check text-white text-sm"></i>
+                        </div>
+                        <span class="text-vto-gray-700 text-lg">Recognition and appreciation events</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Application Form -->
+<section class="py-24 bg-white">
+    <div class="container mx-auto px-6 lg:px-12">
+        <div id="form-section" class="max-w-3xl mx-auto fade-in-up">
+            <div class="text-center mb-12">
+                <span class="text-vto-orange font-medium">Get Started</span>
+                <h2 class="text-4xl lg:text-5xl font-bold text-vto-black mt-3 mb-6">
+                    Volunteer Application
+                </h2>
+                <p class="text-xl text-vto-gray-600">
+                    Fill out the form below and our team will contact you to discuss opportunities.
+                </p>
+            </div>
+
+            <!-- Form  -->
+            <form method="post" action="#" class="bg-white shadow-xl rounded-3xl overflow-hidden border border-vto-gray-200">
+                {% csrf_token %}
+                <div class="p-8 lg:p-10">
+                    <div class="space-y-6">
+                        <!-- Name Fields -->
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="firstName" class="block text-vto-gray-700 font-medium mb-2">
+                                    First Name <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="firstName" name="first_name" required
+                                    class="w-full px-4 py-3 border border-vto-gray-300 rounded-xl form-input focus:outline-none focus:border-vto-orange"
+                                    placeholder="Mohamed">
+                            </div>
+                            <div>
+                                <label for="lastName" class="block text-vto-gray-700 font-medium mb-2">
+                                    Last Name <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="lastName" name="last_name" required
+                                    class="w-full px-4 py-3 border border-vto-gray-300 rounded-xl form-input focus:outline-none focus:border-vto-orange"
+                                    placeholder="Kamara">
+                            </div>
+                        </div>
+
+                        <!-- Contact Fields -->
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="email" class="block text-vto-gray-700 font-medium mb-2">
+                                    Email Address <span class="text-red-500">*</span>
+                                </label>
+                                <input type="email" id="email" name="email" required
+                                    class="w-full px-4 py-3 border border-vto-gray-300 rounded-xl form-input focus:outline-none focus:border-vto-orange"
+                                    placeholder="mohamed@gmail.com">
+                            </div>
+                            <div>
+                                <label for="phone" class="block text-vto-gray-700 font-medium mb-2">
+                                    Phone Number
+                                </label>
+                                <input type="tel" id="phone" name="phone"
+                                    class="w-full px-4 py-3 border border-vto-gray-300 rounded-xl form-input focus:outline-none focus:border-vto-orange"
+                                    placeholder="23277000000">
+                            </div>
+                        </div>
+
+                        <!-- Areas of Interest -->
+                        <div>
+                            <label class="block text-vto-gray-700 font-medium mb-4">
+                                Areas of Interest <span class="text-red-500">*</span>
+                            </label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="interests-container">
+                                <div data-interest="Academic Tutoring" 
+                                     class="interest-option p-3 rounded-xl border-2 border-vto-gray-200 hover:border-vto-gray-300 flex items-center gap-2">
+                                    <input type="checkbox" id="interest-tutoring" name="interests" value="Academic Tutoring" 
+                                           class="hidden interest-checkbox">
+                                    <div class="w-5 h-5 border-2 border-vto-gray-300 rounded flex items-center justify-center">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <span class="text-sm font-medium">Academic Tutoring</span>
+                                </div>
+                                
+                                <div data-interest="Mentorship Program" 
+                                     class="interest-option p-3 rounded-xl border-2 border-vto-gray-200 hover:border-vto-gray-300 flex items-center gap-2">
+                                    <input type="checkbox" id="interest-mentorship" name="interests" value="Mentorship Program" 
+                                           class="hidden interest-checkbox">
+                                    <div class="w-5 h-5 border-2 border-vto-gray-300 rounded flex items-center justify-center">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <span class="text-sm font-medium">Mentorship Program</span>
+                                </div>
+                                
+                                <div data-interest="Meal Preparation" 
+                                     class="interest-option p-3 rounded-xl border-2 border-vto-gray-200 hover:border-vto-gray-300 flex items-center gap-2">
+                                    <input type="checkbox" id="interest-meals" name="interests" value="Meal Preparation" 
+                                           class="hidden interest-checkbox">
+                                    <div class="w-5 h-5 border-2 border-vto-gray-300 rounded flex items-center justify-center">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <span class="text-sm font-medium">Meal Preparation</span>
+                                </div>
+                                
+                                <div data-interest="Event Support" 
+                                     class="interest-option p-3 rounded-xl border-2 border-vto-gray-200 hover:border-vto-gray-300 flex items-center gap-2">
+                                    <input type="checkbox" id="interest-events" name="interests" value="Event Support" 
+                                           class="hidden interest-checkbox">
+                                    <div class="w-5 h-5 border-2 border-vto-gray-300 rounded flex items-center justify-center">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <span class="text-sm font-medium">Event Support</span>
+                                </div>
+                                
+                                <div data-interest="Career Coaching" 
+                                     class="interest-option p-3 rounded-xl border-2 border-vto-gray-200 hover:border-vto-gray-300 flex items-center gap-2">
+                                    <input type="checkbox" id="interest-career" name="interests" value="Career Coaching" 
+                                           class="hidden interest-checkbox">
+                                    <div class="w-5 h-5 border-2 border-vto-gray-300 rounded flex items-center justify-center">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <span class="text-sm font-medium">Career Coaching</span>
+                                </div>
+                                
+                                <div data-interest="Wellness Activities" 
+                                     class="interest-option p-3 rounded-xl border-2 border-vto-gray-200 hover:border-vto-gray-300 flex items-center gap-2">
+                                    <input type="checkbox" id="interest-wellness" name="interests" value="Wellness Activities" 
+                                           class="hidden interest-checkbox">
+                                    <div class="w-5 h-5 border-2 border-vto-gray-300 rounded flex items-center justify-center">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <span class="text-sm font-medium">Wellness Activities</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Availability -->
+                        <div>
+                            <label for="availability" class="block text-vto-gray-700 font-medium mb-2">
+                                Availability
+                            </label>
+                            <select id="availability" name="availability"
+                                    class="w-full px-4 py-3 border border-vto-gray-300 rounded-xl form-input focus:outline-none focus:border-vto-orange">
+                                <option value="" selected disabled>Select your availability</option>
+                                <option value="weekday-morning">Weekday Mornings</option>
+                                <option value="weekday-afternoon">Weekday Afternoons</option>
+                                <option value="weekday-evening">Weekday Evenings</option>
+                                <option value="weekend">Weekends</option>
+                                <option value="flexible">Flexible</option>
+                            </select>
+                        </div>
+
+                        <!-- Message -->
+                        <div>
+                            <label for="message" class="block text-vto-gray-700 font-medium mb-2">
+                                Tell Us About Yourself
+                            </label>
+                            <textarea id="message" name="message" rows="4"
+                                class="w-full px-4 py-3 border border-vto-gray-300 rounded-xl form-input focus:outline-none focus:border-vto-orange"
+                                placeholder="Share your background, skills, and why you want to volunteer with us..."></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit"
+                            class="w-full bg-gradient-to-r from-vto-purple to-vto-orange text-white py-4 rounded-xl text-lg font-semibold shadow-lg hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1">
+                            Submit Application
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+// Scroll Animation Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to check if element is in viewport
+    function isInViewport(element) {
+        const rect = element.getBoundingClientRect();
+        return (
+            rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.85 &&
+            rect.bottom >= 0
+        );
+    }
+    
+    // Function to add visible class to elements in viewport
+    function handleScrollAnimation() {
+        const elements = document.querySelectorAll('.fade-in-up, .fade-in-left, .stagger-child');
+        
+        elements.forEach(element => {
+            if (isInViewport(element)) {
+                element.classList.add('visible');
+            }
+        });
+    }
+    
+    // Initialize scroll animation
+    handleScrollAnimation();
+    
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScrollAnimation);
+    
+    // Add resize event listener
+    window.addEventListener('resize', handleScrollAnimation);
+    
+    // Hero section staggered animation
+    const heroContent = document.getElementById('hero-content');
+    if (heroContent) {
+        setTimeout(() => {
+            heroContent.classList.add('visible');
+        }, 100);
+    }
+    
+    // Section header animation
+    const sectionHeader = document.getElementById('section-header');
+    if (sectionHeader) {
+        setTimeout(() => {
+            sectionHeader.classList.add('visible');
+        }, 200);
+    }
+    
+    // Opportunities grid staggered animation
+    const opportunitiesGrid = document.getElementById('opportunities-grid');
+    if (opportunitiesGrid) {
+        setTimeout(() => {
+            opportunitiesGrid.classList.add('visible');
+        }, 300);
+    }
+    
+    // Benefits image animation
+    const benefitsImage = document.getElementById('benefits-image');
+    if (benefitsImage) {
+        setTimeout(() => {
+            benefitsImage.classList.add('visible');
+        }, 200);
+    }
+    
+    // Benefits content staggered animation
+    const benefitsContent = document.getElementById('benefits-content');
+    if (benefitsContent) {
+        setTimeout(() => {
+            benefitsContent.classList.add('visible');
+        }, 300);
+    }
+    
+    // Form section animation
+    const formSection = document.getElementById('form-section');
+    if (formSection) {
+        setTimeout(() => {
+            formSection.classList.add('visible');
+        }, 400);
+    }
+    
+    // Interest checkbox functionality
+    const interestOptions = document.querySelectorAll('.interest-option');
+    interestOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const checkbox = this.querySelector('.interest-checkbox');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                this.classList.add('selected');
+                this.querySelector('.w-5.h-5').classList.add('bg-vto-orange', 'border-vto-orange');
+            } else {
+                this.classList.remove('selected');
+                this.querySelector('.w-5.h-5').classList.remove('bg-vto-orange', 'border-vto-orange');
+            }
+        });
+    });
+    
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(event) {
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
+        const email = document.getElementById('email').value;
+        const checkboxes = document.querySelectorAll('.interest-checkbox:checked');
+        
+        // Basic validation
+        if (!firstName || !lastName || !email) {
+            event.preventDefault();
+            alert('Please fill in all required fields.');
+            return false;
+        }
+        
+        if (checkboxes.length === 0) {
+            event.preventDefault();
+            alert('Please select at least one area of interest.');
+            return false;
+        }
+        
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            event.preventDefault();
+            alert('Please enter a valid email address.');
+            return false;
+        }
+        
+        return true;
+    });
+    
+    // Opportunity card hover effects
+    const opportunityCards = document.querySelectorAll('.opportunity-card');
+    opportunityCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            const iconContainer = this.querySelector('.w-14.h-14');
+            if (iconContainer) {
+                iconContainer.style.transform = 'scale(1.1)';
+            }
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            const iconContainer = this.querySelector('.w-14.h-14');
+            if (iconContainer) {
+                iconContainer.style.transform = 'scale(1)';
+            }
+        });
+    });
+});
+</script>
+
+<!-- Optional: Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+{% endblock %}

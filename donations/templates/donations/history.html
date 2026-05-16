@@ -1,0 +1,559 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}My Donations - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-vto-black mb-2">My Donation History</h1>
+            <p class="text-vto-gray-600">Track all your donations and recurring subscriptions</p>
+        </div>
+        
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="card p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-lg bg-vto-orange-dark/10 text-vto-orange-dark flex items-center justify-center mr-4">
+                        <i class="fas fa-donate text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-vto-gray-600">Total Donated</p>
+                        <p class="text-2xl font-bold text-vto-black">KES {{ total_donated|floatformat:2|intcomma }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-lg bg-vto-purple/10 text-vto-purple flex items-center justify-center mr-4">
+                        <i class="fas fa-heart text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-vto-gray-600">Total Donations</p>
+                        <p class="text-2xl font-bold text-vto-black">{{ total_donations|intcomma }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-lg bg-vto-orange-golden/10 text-vto-orange-golden flex items-center justify-center mr-4">
+                        <i class="fas fa-calendar-check text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-vto-gray-600">Recurring</p>
+                        <p class="text-2xl font-bold text-vto-black">{{ recurring.count|intcomma }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-lg bg-green-100 text-green-600 flex items-center justify-center mr-4">
+                        <i class="fas fa-trophy text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-vto-gray-600">Impact Level</p>
+                        <p class="text-2xl font-bold text-vto-black">
+                            {% if total_donated >= 1000000 %}
+                            Champion
+                            {% elif total_donated >= 100000 %}
+                            Hero
+                            {% elif total_donated >= 10000 %}
+                            Supporter
+                            {% else %}
+                            Friend
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Donation History -->
+            <div class="lg:col-span-2">
+                <!-- Tabs -->
+                <div class="mb-6 border-b border-vto-gray-200">
+                    <nav class="flex space-x-8">
+                        <button id="tab-all" class="tab-button active py-4 px-1 text-sm font-medium border-b-2 border-vto-orange-dark text-vto-orange-dark">
+                            All Donations
+                        </button>
+                        <button id="tab-recurring" class="tab-button py-4 px-1 text-sm font-medium border-b-2 border-transparent text-vto-gray-500 hover:text-vto-gray-700">
+                            Recurring
+                        </button>
+                        <button id="tab-completed" class="tab-button py-4 px-1 text-sm font-medium border-b-2 border-transparent text-vto-gray-500 hover:text-vto-gray-700">
+                            Completed
+                        </button>
+                    </nav>
+                </div>
+                
+                <!-- All Donations Tab -->
+                <div id="tab-all-content" class="tab-content">
+                    {% if donations %}
+                    <div class="space-y-4">
+                        {% for donation in donations %}
+                        <div class="card p-6 hover-lift">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between">
+                                <div class="mb-4 md:mb-0">
+                                    <div class="flex items-center mb-2">
+                                        <h3 class="text-lg font-bold text-vto-black">Donation {{ donation.donation_id }}</h3>
+                                        <span class="ml-3 px-2 py-1 rounded-full text-xs font-medium 
+                                            {% if donation.payment_status == 'completed' %}bg-green-100 text-green-800
+                                            {% elif donation.payment_status == 'pending' %}bg-yellow-100 text-yellow-800
+                                            {% elif donation.payment_status == 'failed' %}bg-red-100 text-red-800
+                                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                            {{ donation.get_payment_status_display }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="space-y-1">
+                                        <p class="text-sm text-vto-gray-600">
+                                            <i class="fas fa-calendar-alt mr-2"></i>
+                                            {{ donation.created_at|date:"F j, Y g:i A" }}
+                                        </p>
+                                        {% if donation.campaign %}
+                                        <p class="text-sm text-vto-gray-600">
+                                            <i class="fas fa-bullseye mr-2"></i>
+                                            {{ donation.campaign.title }}
+                                        </p>
+                                        {% endif %}
+                                        <p class="text-sm text-vto-gray-600">
+                                            <i class="fas fa-credit-card mr-2"></i>
+                                            {{ donation.get_payment_method_display }}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-right">
+                                    <p class="text-2xl font-bold text-vto-orange-dark mb-2">KES {{ donation.amount|floatformat:2|intcomma }}</p>
+                                    <div class="space-x-2">
+                                        <a href="{% url 'donations:detail' donation.donation_id %}" class="btn-outline text-sm">
+                                            <i class="fas fa-eye mr-1"></i> View
+                                        </a>
+                                        {% if donation.payment_status == 'completed' %}
+                                        <button onclick="downloadReceipt('{{ donation.donation_id }}')" class="btn-outline text-sm">
+                                            <i class="fas fa-download mr-1"></i> Receipt
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% if donation.is_dedicated and donation.dedication_name %}
+                            <div class="mt-4 p-3 bg-vto-gray-50 rounded-lg">
+                                <p class="text-sm text-vto-gray-600">Dedicated to</p>
+                                <p class="font-medium">{{ donation.dedication_name }}</p>
+                                {% if donation.dedication_message %}
+                                <p class="text-sm text-vto-gray-600 mt-1">"{{ donation.dedication_message }}"</p>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if donations.has_other_pages %}
+                    <div class="mt-8">
+                        <nav class="flex justify-center">
+                            <ul class="inline-flex items-center space-x-2">
+                                {% if donations.has_previous %}
+                                <li>
+                                    <a href="?page={{ donations.previous_page_number }}" 
+                                       class="px-3 py-2 rounded-lg border border-vto-gray-300 text-vto-gray-700 hover:bg-vto-gray-50">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                {% for num in donations.paginator.page_range %}
+                                    {% if donations.number == num %}
+                                    <li>
+                                        <span class="px-4 py-2 rounded-lg bg-vto-orange-dark text-white font-medium">
+                                            {{ num }}
+                                        </span>
+                                    </li>
+                                    {% elif num > donations.number|add:'-3' and num < donations.number|add:'3' %}
+                                    <li>
+                                        <a href="?page={{ num }}" 
+                                           class="px-4 py-2 rounded-lg border border-vto-gray-300 text-vto-gray-700 hover:bg-vto-gray-50">
+                                            {{ num }}
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if donations.has_next %}
+                                <li>
+                                    <a href="?page={{ donations.next_page_number }}" 
+                                       class="px-3 py-2 rounded-lg border border-vto-gray-300 text-vto-gray-700 hover:bg-vto-gray-50">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
+                    
+                    {% else %}
+                    <!-- No Donations -->
+                    <div class="card p-12 text-center">
+                        <div class="text-4xl text-vto-gray-300 mb-4">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-vto-black mb-2">No Donations Yet</h3>
+                        <p class="text-vto-gray-600 mb-6 max-w-md mx-auto">
+                            You haven't made any donations yet. Your first donation can change a teen's life.
+                        </p>
+                        <a href="{% url 'donations:make_donation' %}" class="btn-primary">
+                            <i class="fas fa-heart mr-2"></i> Make Your First Donation
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Recurring Tab -->
+                <div id="tab-recurring-content" class="tab-content hidden">
+                    {% if recurring %}
+                    <div class="space-y-4">
+                        {% for subscription in recurring %}
+                        <div class="card p-6 hover-lift">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between">
+                                <div class="mb-4 md:mb-0">
+                                    <div class="flex items-center mb-2">
+                                        <h3 class="text-lg font-bold text-vto-black">Recurring Donation</h3>
+                                        <span class="ml-3 px-2 py-1 rounded-full text-xs font-medium 
+                                            {% if subscription.status == 'active' %}bg-green-100 text-green-800
+                                            {% elif subscription.status == 'paused' %}bg-yellow-100 text-yellow-800
+                                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                            {{ subscription.get_status_display }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="space-y-1">
+                                        <p class="text-sm text-vto-gray-600">
+                                            <i class="fas fa-redo mr-2"></i>
+                                            {{ subscription.get_frequency_display }} donation
+                                        </p>
+                                        <p class="text-sm text-vto-gray-600">
+                                            <i class="fas fa-calendar-check mr-2"></i>
+                                            Next payment: {{ subscription.next_payment_date|date:"F j, Y" }}
+                                        </p>
+                                        <p class="text-sm text-vto-gray-600">
+                                            <i class="fas fa-credit-card mr-2"></i>
+                                            {{ subscription.get_payment_method_display }}
+                                            {% if subscription.payment_method_last4 %}
+                                            ending in {{ subscription.payment_method_last4 }}
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-right">
+                                    <p class="text-2xl font-bold text-vto-orange-dark mb-2">KES {{ subscription.amount|floatformat:2|intcomma }}</p>
+                                    <div class="space-x-2">
+                                        <a href="{% url 'donations:manage_recurring' subscription.subscription_id %}" class="btn-outline text-sm">
+                                            <i class="fas fa-cog mr-1"></i> Manage
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex items-center justify-between text-sm">
+                                <div>
+                                    <span class="text-vto-gray-600">Started:</span>
+                                    <span class="font-medium ml-1">{{ subscription.start_date|date:"F j, Y" }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-vto-gray-600">Total paid:</span>
+                                    <span class="font-medium ml-1">KES {{ subscription.total_amount|floatformat:2|intcomma }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-vto-gray-600">Payments:</span>
+                                    <span class="font-medium ml-1">{{ subscription.total_payments }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <!-- No Recurring Donations -->
+                    <div class="card p-12 text-center">
+                        <div class="text-4xl text-vto-gray-300 mb-4">
+                            <i class="fas fa-redo"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-vto-black mb-2">No Recurring Donations</h3>
+                        <p class="text-vto-gray-600 mb-6 max-w-md mx-auto">
+                            Recurring donations provide consistent support for our teens. Consider setting up a monthly donation.
+                        </p>
+                        <a href="{% url 'donations:make_donation' %}" class="btn-primary">
+                            <i class="fas fa-calendar-check mr-2"></i> Start Recurring Donation
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Completed Tab -->
+                <div id="tab-completed-content" class="tab-content hidden">
+                    {% with completed_donations=donations|filter:"payment_status='completed'" %}
+                    {% if completed_donations %}
+                    <div class="space-y-4">
+                        {% for donation in completed_donations|slice:":5" %}
+                        <div class="card p-6">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-bold text-vto-black mb-2">Donation {{ donation.donation_id }}</h3>
+                                    <p class="text-sm text-vto-gray-600">
+                                        {{ donation.created_at|date:"F j, Y" }} • 
+                                        {{ donation.get_payment_method_display }}
+                                    </p>
+                                    {% if donation.campaign %}
+                                    <p class="text-sm text-vto-purple font-medium mt-1">
+                                        <i class="fas fa-bullseye mr-1"></i>{{ donation.campaign.title }}
+                                    </p>
+                                    {% endif %}
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-bold text-vto-orange-dark">KES {{ donation.amount|floatformat:2|intcomma }}</p>
+                                    <button onclick="downloadReceipt('{{ donation.donation_id }}')" class="btn-outline text-sm mt-2">
+                                        <i class="fas fa-download mr-1"></i> Receipt
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <!-- No Completed Donations -->
+                    <div class="card p-12 text-center">
+                        <div class="text-4xl text-vto-gray-300 mb-4">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-vto-black mb-2">No Completed Donations</h3>
+                        <p class="text-vto-gray-600 mb-6">
+                            Completed donations will appear here once processed.
+                        </p>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Quick Actions -->
+                <div class="card p-6 mb-8">
+                    <h3 class="text-xl font-bold text-vto-black mb-6">Quick Actions</h3>
+                    <div class="space-y-4">
+                        <a href="{% url 'donations:make_donation' %}" class="flex items-center justify-between p-4 rounded-lg border border-vto-gray-200 hover:border-vto-orange-dark hover:bg-vto-orange-dark/5 transition-all group">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-lg bg-vto-orange-dark/10 text-vto-orange-dark flex items-center justify-center mr-3">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                                <span class="font-medium">Make New Donation</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-vto-gray-400 group-hover:text-vto-orange-dark"></i>
+                        </a>
+                        
+                        <a href="#" onclick="downloadAllReceipts()" class="flex items-center justify-between p-4 rounded-lg border border-vto-gray-200 hover:border-vto-purple hover:bg-vto-purple/5 transition-all group">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-lg bg-vto-purple/10 text-vto-purple flex items-center justify-center mr-3">
+                                    <i class="fas fa-download"></i>
+                                </div>
+                                <span class="font-medium">Download All Receipts</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-vto-gray-400 group-hover:text-vto-purple"></i>
+                        </a>
+                        
+                        <a href="#" onclick="emailDonationSummary()" class="flex items-center justify-between p-4 rounded-lg border border-vto-gray-200 hover:border-vto-orange-golden hover:bg-vto-orange-golden/5 transition-all group">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-lg bg-vto-orange-golden/10 text-vto-orange-golden flex items-center justify-center mr-3">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <span class="font-medium">Email Summary</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-vto-gray-400 group-hover:text-vto-orange-golden"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Impact Summary -->
+                <div class="card p-6 mb-8">
+                    <h3 class="text-xl font-bold text-vto-black mb-6">Your Impact</h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <p class="text-sm text-vto-gray-600 mb-2">Total Impact</p>
+                            <div class="flex items-end">
+                                <span class="text-3xl font-bold text-vto-orange-dark">{{ total_donations }}</span>
+                                <span class="text-vto-gray-600 ml-2">donations made</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <p class="text-sm text-vto-gray-600 mb-2">Estimated Impact</p>
+                            <ul class="space-y-2">
+                                <li class="flex items-center">
+                                    <i class="fas fa-utensils text-green-500 mr-2"></i>
+                                    <span>{{ total_meals|default:"0" }} meals provided</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-book text-blue-500 mr-2"></i>
+                                    <span>{{ total_books|default:"0" }} educational materials</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-home text-purple-500 mr-2"></i>
+                                    <span>{{ total_shelter|default:"0" }} nights of shelter</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tax Information -->
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-vto-black mb-4">Tax Information</h3>
+                    <p class="text-sm text-vto-gray-600 mb-4">
+                        All donations to Victory Teens Organization are tax-deductible. Keep your receipts for tax purposes.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-center text-sm">
+                            <i class="fas fa-file-invoice text-vto-orange-dark mr-3"></i>
+                            <span>Tax ID: 123-456-789</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <i class="fas fa-calendar text-vto-orange-dark mr-3"></i>
+                            <span>Tax year ends: December 31</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <i class="fas fa-question-circle text-vto-orange-dark mr-3"></i>
+                            <a href="#" class="text-vto-orange-dark hover:underline">Tax FAQs</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Download Modal -->
+<div id="receiptModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full">
+        <div class="p-6 border-b border-vto-gray-100 flex justify-between items-center">
+            <h3 class="text-xl font-bold text-vto-black">Download Receipt</h3>
+            <button onclick="closeReceiptModal()" class="text-vto-gray-500 hover:text-vto-black">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <p class="text-vto-gray-600 mb-6">
+                Choose format for your receipt:
+            </p>
+            <div class="space-y-3">
+                <button onclick="downloadPDF()" class="w-full flex items-center justify-between p-4 rounded-lg border border-vto-gray-200 hover:border-red-500 hover:bg-red-50 transition-all">
+                    <div class="flex items-center">
+                        <i class="fas fa-file-pdf text-red-500 text-2xl mr-3"></i>
+                        <div>
+                            <p class="font-medium text-vto-black">PDF Format</p>
+                            <p class="text-sm text-vto-gray-600">Best for printing and archiving</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-download text-vto-gray-400"></i>
+                </button>
+                
+                <button onclick="downloadImage()" class="w-full flex items-center justify-between p-4 rounded-lg border border-vto-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all">
+                    <div class="flex items-center">
+                        <i class="fas fa-file-image text-blue-500 text-2xl mr-3"></i>
+                        <div>
+                            <p class="font-medium text-vto-black">Image Format</p>
+                            <p class="text-sm text-vto-gray-600">PNG image for sharing</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-download text-vto-gray-400"></i>
+                </button>
+            </div>
+        </div>
+        <div class="p-6 border-t border-vto-gray-100">
+            <p class="text-sm text-vto-gray-500">
+                <i class="fas fa-info-circle mr-1"></i>
+                Receipts are also available in your email
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Tab functionality
+document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', function() {
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.remove('active', 'border-vto-orange-dark', 'text-vto-orange-dark');
+            btn.classList.add('text-vto-gray-500', 'border-transparent');
+        });
+        
+        // Add active class to clicked tab
+        this.classList.add('active', 'border-vto-orange-dark', 'text-vto-orange-dark');
+        this.classList.remove('text-vto-gray-500', 'border-transparent');
+        
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.add('hidden');
+        });
+        
+        // Show selected tab content
+        const tabId = this.id.replace('tab-', '');
+        document.getElementById(`${tabId}-content`).classList.remove('hidden');
+    });
+});
+
+// Receipt functions
+let currentDonationId = '';
+
+function downloadReceipt(donationId) {
+    currentDonationId = donationId;
+    document.getElementById('receiptModal').classList.remove('hidden');
+}
+
+function closeReceiptModal() {
+    document.getElementById('receiptModal').classList.add('hidden');
+}
+
+function downloadPDF() {
+    // In production, this would generate and download a PDF
+    alert(`PDF receipt for donation ${currentDonationId} will be generated.`);
+    closeReceiptModal();
+}
+
+function downloadImage() {
+    // In production, this would generate and download an image
+    alert(`Image receipt for donation ${currentDonationId} will be generated.`);
+    closeReceiptModal();
+}
+
+function downloadAllReceipts() {
+    // In production, this would generate a ZIP of all receipts
+    alert('All receipts will be downloaded as a ZIP file.');
+}
+
+function emailDonationSummary() {
+    // In production, this would send an email
+    alert('A donation summary will be emailed to you.');
+}
+
+// Close modal when clicking outside
+document.getElementById('receiptModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeReceiptModal();
+    }
+});
+</script>
+{% endblock %}

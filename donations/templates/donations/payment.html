@@ -1,0 +1,470 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Complete Payment - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Progress Steps -->
+        <div class="mb-12">
+            <div class="flex items-center justify-center">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="text-sm font-medium text-green-500 ml-2">Amount</div>
+                </div>
+                <div class="w-24 h-1 bg-green-500 mx-4"></div>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="text-sm font-medium text-green-500 ml-2">Details</div>
+                </div>
+                <div class="w-24 h-1 bg-green-500 mx-4"></div>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-vto-orange-dark text-white flex items-center justify-center font-bold">
+                        3
+                    </div>
+                    <div class="text-sm font-medium text-vto-orange-dark ml-2">Payment</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Payment Form -->
+            <div class="lg:col-span-2">
+                <div class="card p-8">
+                    <h1 class="text-3xl font-bold text-vto-black mb-2">Complete Your Payment</h1>
+                    <p class="text-vto-gray-600 mb-8">
+                        You're almost done! Please provide payment details to complete your donation of 
+                        <span class="font-bold text-vto-orange-dark">KES {{ donation.amount|floatformat:2 }}</span>.
+                    </p>
+                    
+                    <!-- Donation Summary -->
+                    <div class="mb-8 p-6 bg-vto-gray-50 rounded-xl">
+                        <h3 class="text-lg font-bold text-vto-black mb-4">Donation Summary</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-vto-gray-600">Donation ID</p>
+                                <p class="font-bold">{{ donation.donation_id }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-vto-gray-600">Amount</p>
+                                <p class="font-bold">KES {{ donation.amount|floatformat:2 }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-vto-gray-600">Frequency</p>
+                                <p class="font-bold">{{ donation.get_donation_type_display }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-vto-gray-600">Campaign</p>
+                                <p class="font-bold">
+                                    {% if donation.campaign %}
+                                        {{ donation.campaign.title }}
+                                    {% else %}
+                                        General Fund
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Method Specific Form -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-bold text-vto-black mb-6">Payment Details</h3>
+                        
+                        {% if payment_method == 'mpesa' %}
+                        <!-- M-Pesa Payment Form -->
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <div class="mb-8">
+                                <div class="flex items-center mb-6">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-4">
+                                        <i class="fas fa-mobile-alt text-2xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-bold text-vto-black">M-Pesa Payment</h4>
+                                        <p class="text-vto-gray-600">You'll receive a prompt on your phone to complete the payment</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="space-y-6">
+                                    <div>
+                                        <label for="{{ payment_form.phone_number.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                            M-Pesa Phone Number *
+                                        </label>
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <i class="fas fa-phone text-vto-gray-400"></i>
+                                            </div>
+                                            {{ payment_form.phone_number }}
+                                        </div>
+                                        {% if payment_form.phone_number.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ payment_form.phone_number.errors.0 }}</p>
+                                        {% endif %}
+                                        <p class="mt-2 text-sm text-vto-gray-500">
+                                            Enter your M-Pesa registered phone number (e.g., 0722 123 456)
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                        <div class="flex">
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-info-circle text-yellow-400"></i>
+                                            </div>
+                                            <div class="ml-3">
+                                                <h4 class="text-sm font-medium text-yellow-800">Important Instructions</h4>
+                                                <div class="mt-2 text-sm text-yellow-700">
+                                                    <ol class="list-decimal pl-5 space-y-1">
+                                                        <li>Ensure you have sufficient funds in your M-Pesa account</li>
+                                                        <li>You will receive a prompt on your phone to enter your M-Pesa PIN</li>
+                                                        <li>Check your phone within 60 seconds after submitting</li>
+                                                        <li>If you don't receive a prompt, please try again</li>
+                                                    </ol>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-8 border-t border-vto-gray-100 flex justify-between items-center">
+                                <a href="{% url 'donations:make_donation' %}" class="text-vto-orange-dark hover:text-vto-orange-golden">
+                                    <i class="fas fa-arrow-left mr-2"></i> Back to Donation
+                                </a>
+                                <button type="submit" class="btn-primary px-8">
+                                    <i class="fas fa-mobile-alt mr-2"></i> Pay with M-Pesa
+                                </button>
+                            </div>
+                        </form>
+                        
+                        {% elif payment_method == 'stripe' %}
+                        <!-- Card Payment Form -->
+                        <form method="post" id="cardPaymentForm">
+                            {% csrf_token %}
+                            
+                            <div class="mb-8">
+                                <div class="flex items-center mb-6">
+                                    <div class="w-12 h-12 rounded-full bg-vto-purple/10 text-vto-purple flex items-center justify-center mr-4">
+                                        <i class="fab fa-cc-stripe text-2xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-bold text-vto-black">Card Payment</h4>
+                                        <p class="text-vto-gray-600">Pay securely with your credit or debit card</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="space-y-6">
+                                    <div>
+                                        <label for="{{ payment_form.card_name.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                            Name on Card *
+                                        </label>
+                                        {{ payment_form.card_name }}
+                                        {% if payment_form.card_name.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ payment_form.card_name.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="{{ payment_form.card_number.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                            Card Number *
+                                        </label>
+                                        {{ payment_form.card_number }}
+                                        {% if payment_form.card_number.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ payment_form.card_number.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 gap-6">
+                                        <div>
+                                            <label for="{{ payment_form.card_expiry.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                                Expiry Date (MM/YY) *
+                                            </label>
+                                            {{ payment_form.card_expiry }}
+                                            {% if payment_form.card_expiry.errors %}
+                                            <p class="mt-1 text-sm text-red-600">{{ payment_form.card_expiry.errors.0 }}</p>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div>
+                                            <label for="{{ payment_form.card_cvc.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                                CVC *
+                                            </label>
+                                            {{ payment_form.card_cvc }}
+                                            {% if payment_form.card_cvc.errors %}
+                                            <p class="mt-1 text-sm text-red-600">{{ payment_form.card_cvc.errors.0 }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="inline-flex items-center">
+                                            {{ payment_form.save_card }}
+                                            <span class="ml-2 text-sm text-vto-gray-700">Save this card for future donations</span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-vto-gray-50 rounded-lg">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-lock text-green-500"></i>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm text-vto-gray-600">
+                                                    Your payment is secured with 256-bit SSL encryption. We never store your full card details.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-8 border-t border-vto-gray-100 flex justify-between items-center">
+                                <a href="{% url 'donations:make_donation' %}" class="text-vto-orange-dark hover:text-vto-orange-golden">
+                                    <i class="fas fa-arrow-left mr-2"></i> Back to Donation
+                                </a>
+                                <button type="submit" class="btn-primary px-8">
+                                    <i class="fas fa-lock mr-2"></i> Pay Securely
+                                </button>
+                            </div>
+                        </form>
+                        
+                        {% elif payment_method == 'bank_transfer' %}
+                        <!-- Bank Transfer Form -->
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <div class="mb-8">
+                                <div class="flex items-center mb-6">
+                                    <div class="w-12 h-12 rounded-full bg-vto-orange-golden/10 text-vto-orange-golden flex items-center justify-center mr-4">
+                                        <i class="fas fa-university text-2xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-bold text-vto-black">Bank Transfer</h4>
+                                        <p class="text-vto-gray-600">Transfer funds directly to our bank account</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Bank Details -->
+                                <div class="mb-8 p-6 bg-vto-gray-50 rounded-xl">
+                                    <h4 class="font-bold text-vto-black mb-4">Bank Account Details</h4>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between">
+                                            <span class="text-vto-gray-600">Bank Name:</span>
+                                            <span class="font-medium">Equity Bank Kenya Ltd</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-vto-gray-600">Account Name:</span>
+                                            <span class="font-medium">Victory Teens Organization</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-vto-gray-600">Account Number:</span>
+                                            <span class="font-medium">0123456789012</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-vto-gray-600">Swift Code:</span>
+                                            <span class="font-medium">EQBLKENAXXX</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-vto-gray-600">Reference:</span>
+                                            <span class="font-medium text-vto-orange-dark">{{ donation.donation_id }}</span>
+                                        </div>
+                                    </div>
+                                    <p class="mt-4 text-sm text-vto-gray-500">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        Please use the reference above when making your transfer
+                                    </p>
+                                </div>
+                                
+                                <div class="space-y-6">
+                                    <div>
+                                        <label for="{{ payment_form.reference_number.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                            Your Transfer Reference Number *
+                                        </label>
+                                        {{ payment_form.reference_number }}
+                                        {% if payment_form.reference_number.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ payment_form.reference_number.errors.0 }}</p>
+                                        {% endif %}
+                                        <p class="mt-2 text-sm text-vto-gray-500">
+                                            Enter the reference number from your bank transfer
+                                        </p>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="{{ payment_form.transfer_date.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                            Transfer Date *
+                                        </label>
+                                        {{ payment_form.transfer_date }}
+                                        {% if payment_form.transfer_date.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ payment_form.transfer_date.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="{{ payment_form.receipt_upload.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                            Upload Receipt (Optional)
+                                        </label>
+                                        {{ payment_form.receipt_upload }}
+                                        {% if payment_form.receipt_upload.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ payment_form.receipt_upload.errors.0 }}</p>
+                                        {% endif %}
+                                        <p class="mt-2 text-sm text-vto-gray-500">
+                                            Upload a screenshot or scan of your transfer confirmation
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                        <div class="flex">
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-info-circle text-blue-400"></i>
+                                            </div>
+                                            <div class="ml-3">
+                                                <h4 class="text-sm font-medium text-blue-800">Processing Time</h4>
+                                                <div class="mt-2 text-sm text-blue-700">
+                                                    <p>Bank transfers typically take 24-48 hours to process. We will verify your payment and update your donation status once confirmed.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-8 border-t border-vto-gray-100 flex justify-between items-center">
+                                <a href="{% url 'donations:make_donation' %}" class="text-vto-orange-dark hover:text-vto-orange-golden">
+                                    <i class="fas fa-arrow-left mr-2"></i> Back to Donation
+                                </a>
+                                <button type="submit" class="btn-primary px-8">
+                                    <i class="fas fa-paper-plane mr-2"></i> Submit Transfer Details
+                                </button>
+                            </div>
+                        </form>
+                        
+                        {% else %}
+                        <!-- PayPal or other methods -->
+                        <div class="text-center py-12">
+                            <div class="text-4xl text-vto-gray-300 mb-4">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-vto-black mb-2">Payment Method Coming Soon</h3>
+                            <p class="text-vto-gray-600 mb-6">
+                                This payment method is not yet available. Please choose a different payment method.
+                            </p>
+                            <a href="{% url 'donations:make_donation' %}" class="btn-primary">
+                                <i class="fas fa-arrow-left mr-2"></i> Choose Different Payment
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security & Support -->
+            <div class="lg:col-span-1">
+                <div class="card p-6 sticky top-24">
+                    <h3 class="text-xl font-bold text-vto-black mb-6">Security & Support</h3>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-vto-black">Secure Payment</h4>
+                                <p class="text-sm text-vto-gray-600">All transactions are encrypted and secure</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="w-10 h-10 rounded-full bg-vto-purple/10 text-vto-purple flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-receipt"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-vto-black">Instant Receipt</h4>
+                                <p class="text-sm text-vto-gray-600">Receive your tax receipt immediately via email</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="w-10 h-10 rounded-full bg-vto-orange-dark/10 text-vto-orange-dark flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-vto-black">24/7 Support</h4>
+                                <p class="text-sm text-vto-gray-600">Need help? Contact our support team anytime</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Info -->
+                    <div class="mt-8 pt-8 border-t border-vto-gray-100">
+                        <h4 class="font-bold text-vto-black mb-4">Need Assistance?</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center text-sm">
+                                <i class="fas fa-phone text-vto-orange-dark mr-3"></i>
+                                <span>+254 712 345 678</span>
+                            </div>
+                            <div class="flex items-center text-sm">
+                                <i class="fas fa-envelope text-vto-orange-dark mr-3"></i>
+                                <span>donations@victoryteens.org</span>
+                            </div>
+                            <div class="flex items-center text-sm">
+                                <i class="fas fa-clock text-vto-orange-dark mr-3"></i>
+                                <span>Mon-Fri, 8AM-5PM EAT</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Donation Protection -->
+                <div class="card p-6 mt-6">
+                    <h4 class="font-bold text-vto-black mb-4">Donation Protection</h4>
+                    <p class="text-sm text-vto-gray-600 mb-4">
+                        Your donation is protected by our 100% satisfaction guarantee. If you're not satisfied with how your donation is used, contact us within 30 days for a full refund.
+                    </p>
+                    <div class="flex items-center text-sm text-green-600">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <span>100% Money-Back Guarantee</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if payment_method == 'stripe' %}
+<script>
+// Card number formatting
+document.getElementById('{{ payment_form.card_number.id_for_label }}').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    let matches = value.match(/\d{4,16}/g);
+    let match = matches && matches[0] || '';
+    let parts = [];
+    
+    for (let i = 0, len = match.length; i < len; i += 4) {
+        parts.push(match.substring(i, i + 4));
+    }
+    
+    if (parts.length) {
+        e.target.value = parts.join(' ');
+    } else {
+        e.target.value = value;
+    }
+});
+
+// Expiry date formatting
+document.getElementById('{{ payment_form.card_expiry.id_for_label }}').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    
+    if (value.length >= 2) {
+        e.target.value = value.substring(0, 2) + '/' + value.substring(2, 4);
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

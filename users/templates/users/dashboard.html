@@ -1,0 +1,180 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Welcome Header -->
+    <div class="bg-gradient-to-r from-vto-orange-dark/10 to-vto-purple/10 rounded-2xl p-6 mb-8">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+            <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                <div class="w-20 h-20 rounded-full bg-vto-purple text-white flex items-center justify-center text-2xl font-bold">
+                    {{ user.get_initials }}
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-vto-black">Welcome back, {{ user.first_name|default:user.username }}!</h1>
+                    <p class="text-vto-gray-600">Here's what's happening with Victory Teens today</p>
+                </div>
+            </div>
+            <div class="text-center md:text-right">
+                <p class="text-sm text-vto-gray-500 mb-1">Account Status</p>
+                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    <i class="fas fa-check-circle mr-2"></i> Active
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dashboard Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="stat-card">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 rounded-lg bg-vto-orange-golden/20 text-vto-orange-dark flex items-center justify-center mr-4">
+                            <i class="fas fa-heart text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-vto-gray-500">Total Donations</p>
+                            <p class="text-2xl font-bold text-vto-black">Le 0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 rounded-lg bg-vto-purple/20 text-vto-purple flex items-center justify-center mr-4">
+                            <i class="fas fa-hands-helping text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-vto-gray-500">Volunteer Hours</p>
+                            <p class="text-2xl font-bold text-vto-black">0 hrs</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 rounded-lg bg-green-100 text-green-600 flex items-center justify-center mr-4">
+                            <i class="fas fa-calendar-check text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-vto-gray-500">Upcoming Events</p>
+                            <p class="text-2xl font-bold text-vto-black">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="card">
+                <div class="p-6 border-b border-vto-gray-100">
+                    <h2 class="text-xl font-bold text-vto-black">Recent Activity</h2>
+                </div>
+                <div class="p-6">
+                    <div class="text-center py-8">
+                        <div class="text-4xl text-vto-gray-300 mb-4">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <p class="text-vto-gray-500">No recent activity yet</p>
+                        <p class="text-sm text-vto-gray-400 mt-2">Your donations and volunteer activities will appear here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column -->
+        <div class="space-y-8">
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="p-6 border-b border-vto-gray-100">
+                    <h2 class="text-xl font-bold text-vto-black">Quick Actions</h2>
+                </div>
+                <div class="p-6 space-y-4">
+                    <a href="#" class="flex items-center justify-between p-4 rounded-lg border border-vto-gray-200 hover:border-vto-orange-dark hover:bg-vto-orange-dark/5 transition-all group">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-vto-orange-dark/10 text-vto-orange-dark flex items-center justify-center mr-3">
+                                <i class="fas fa-donate"></i>
+                            </div>
+                            <span class="font-medium">Make a Donation</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-vto-gray-400 group-hover:text-vto-orange-dark"></i>
+                    </a>
+                    
+                    <a href="#" class="flex items-center justify-between p-4 rounded-lg border border-vto-gray-200 hover:border-vto-purple hover:bg-vto-purple/5 transition-all group">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-vto-purple/10 text-vto-purple flex items-center justify-center mr-3">
+                                <i class="fas fa-hands-helping"></i>
+                            </div>
+                            <span class="font-medium">Volunteer Opportunities</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-vto-gray-400 group-hover:text-vto-purple"></i>
+                    </a>
+                    
+                    <a href="#" class="flex items-center justify-between p-4 rounded-lg border border-vto-gray-200 hover:border-green-500 hover:bg-green-50 transition-all group">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-green-100 text-green-600 flex items-center justify-center mr-3">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <span class="font-medium">View Events</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-vto-gray-400 group-hover:text-green-500"></i>
+                    </a>
+                    
+                    <a href="#" class="flex items-center justify-between p-4 rounded-lg border border-vto-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all group">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <span class="font-medium">Update Profile</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-vto-gray-400 group-hover:text-blue-500"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Profile Completion -->
+            <div class="card">
+                <div class="p-6 border-b border-vto-gray-100">
+                    <h2 class="text-xl font-bold text-vto-black">Profile Status</h2>
+                </div>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-vto-gray-600">Completion</span>
+                            <span class="font-medium">40%</span>
+                        </div>
+                        <div class="w-full bg-vto-gray-200 rounded-full h-2">
+                            <div class="bg-vto-orange-dark h-2 rounded-full" style="width: 40%"></div>
+                        </div>
+                    </div>
+                    <ul class="space-y-3">
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            <span class="text-sm">Basic Information</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-circle text-vto-gray-300 mr-2 text-xs"></i>
+                            <span class="text-sm text-vto-gray-500">Add Profile Photo</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-circle text-vto-gray-300 mr-2 text-xs"></i>
+                            <span class="text-sm text-vto-gray-500">Complete Address</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-circle text-vto-gray-300 mr-2 text-xs"></i>
+                            <span class="text-sm text-vto-gray-500">Set Preferences</span>
+                        </li>
+                    </ul>
+                    <a href="#" class="btn-primary w-full mt-6">
+                        <i class="fas fa-user-edit mr-2"></i> Complete Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

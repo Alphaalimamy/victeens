@@ -1,0 +1,452 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Meet Our Teens - {{ block.super }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-vto-purple/5 to-vto-orange-dark/5 py-16">
+    <div class="container mx-auto px-4">
+        <div class="text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-vto-black mb-6">Meet Our Teens</h1>
+            <p class="text-xl text-vto-gray-600 max-w-3xl mx-auto mb-8">
+                Each teen at Victory Teens has a unique story of resilience and hope. 
+                Get to know them and consider becoming a sponsor.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#children-grid" class="btn-primary">
+                    <i class="fas fa-users mr-2"></i> Meet Our Teens
+                </a>
+                <a href="{% url 'children:success_stories' %}" class="btn-secondary">
+                    <i class="fas fa-graduation-cap mr-2"></i> Success Stories
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search & Filters -->
+<section class="py-8 bg-white border-b border-vto-gray-100">
+    <div class="container mx-auto px-4">
+        <form method="get" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Search -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-vto-gray-700 mb-2">Search</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-search text-vto-gray-400"></i>
+                        </div>
+                        {{ search_form.search }}
+                    </div>
+                </div>
+                
+                <!-- Category -->
+                <div>
+                    <label class="block text-sm font-medium text-vto-gray-700 mb-2">Category</label>
+                    {{ search_form.category }}
+                </div>
+                
+                <!-- Sort -->
+                <div>
+                    <label class="block text-sm font-medium text-vto-gray-700 mb-2">Sort By</label>
+                    {{ search_form.sort_by }}
+                </div>
+            </div>
+            
+            <!-- Age Filter -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-vto-gray-700 mb-2">Minimum Age</label>
+                    {{ search_form.min_age }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-vto-gray-700 mb-2">Maximum Age</label>
+                    {{ search_form.max_age }}
+                </div>
+                
+                <div class="flex items-end">
+                    <button type="submit" class="btn-primary w-full">
+                        <i class="fas fa-filter mr-2"></i> Apply Filters
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Active Filters -->
+            {% if active_filters.category or active_filters.min_age or active_filters.max_age or active_filters.search %}
+            <div class="flex flex-wrap gap-2">
+                <span class="text-sm text-vto-gray-600">Active filters:</span>
+                
+                {% if active_filters.search %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-vto-orange-dark/10 text-vto-orange-dark">
+                    Search: "{{ active_filters.search }}"
+                    <a href="?{% for key, value in active_filters.items %}{% if key != 'search' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" class="ml-2">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </span>
+                {% endif %}
+                
+                {% if active_filters.category %}
+                {% with category=active_filters.category %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-vto-purple/10 text-vto-purple">
+                    Category: {{ category|title }}
+                    <a href="?{% for key, value in active_filters.items %}{% if key != 'category' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" class="ml-2">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </span>
+                {% endwith %}
+                {% endif %}
+                
+                {% if active_filters.min_age %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-vto-orange-golden/10 text-vto-orange-golden">
+                    Min Age: {{ active_filters.min_age }}
+                    <a href="?{% for key, value in active_filters.items %}{% if key != 'min_age' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" class="ml-2">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </span>
+                {% endif %}
+                
+                {% if active_filters.max_age %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-vto-orange-golden/10 text-vto-orange-golden">
+                    Max Age: {{ active_filters.max_age }}
+                    <a href="?{% for key, value in active_filters.items %}{% if key != 'max_age' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" class="ml-2">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </span>
+                {% endif %}
+                
+                {% if active_filters.category or active_filters.min_age or active_filters.max_age or active_filters.search %}
+                <a href="{% url 'children:list' %}" class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-vto-gray-200 text-vto-gray-700 hover:bg-vto-gray-300">
+                    <i class="fas fa-times mr-1"></i> Clear All
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</section>
+
+<!-- Statistics Banner -->
+<section class="py-8 bg-vto-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="text-center">
+                <div class="text-3xl font-bold text-vto-orange-dark mb-2">{{ total_children|intcomma }}</div>
+                <div class="text-sm text-vto-gray-600">Teens in Our Care</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-vto-purple mb-2">
+                    {% with active=page_obj.paginator.count %}{{ active|intcomma }}{% endwith %}
+                </div>
+                <div class="text-sm text-vto-gray-600">Need Sponsorship</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-vto-orange-golden mb-2">
+                    {% with sponsored=total_children|add:"-page_obj.paginator.count" %}{{ sponsored|intcomma }}{% endwith %}
+                </div>
+                <div class="text-sm text-vto-gray-600">Currently Sponsored</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-green-600 mb-2">150+</div>
+                <div class="text-sm text-vto-gray-600">Success Stories</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Children Grid -->
+<section id="children-grid" class="py-16">
+    <div class="container mx-auto px-4">
+        {% if page_obj.object_list %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {% for child in page_obj %}
+            <div class="card overflow-hidden hover-lift">
+                <!-- Child Photo -->
+                <div class="relative h-64 overflow-hidden bg-vto-gray-100">
+                    {% with profile_photo=child.photos.filter.photo_type='profile'.first %}
+                    {% if profile_photo and profile_photo.can_display %}
+                    <img src="{{ profile_photo.photo.url }}" alt="{{ child.code_name }}" 
+                         class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="w-24 h-24 rounded-full bg-gradient-to-br from-vto-purple to-vto-orange-dark flex items-center justify-center mx-auto mb-4">
+                                <span class="text-white text-3xl font-bold">
+                                    {{ child.code_name|slice:":1" }}
+                                </span>
+                            </div>
+                            <p class="text-vto-gray-500">Photo protected for privacy</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                    
+                    <!-- Age Badge -->
+                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold">
+                        {{ child.age }} years
+                    </div>
+                    
+                    <!-- Status Badge -->
+                    {% if child.is_sponsored %}
+                    <div class="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                        <i class="fas fa-heart mr-1"></i> Sponsored
+                    </div>
+                    {% else %}
+                    <div class="absolute top-4 left-4 bg-vto-orange-dark text-white px-3 py-1 rounded-full text-xs font-bold">
+                        <i class="fas fa-hands-helping mr-1"></i> Needs Sponsor
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Child Info -->
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-vto-black mb-2">{{ child.code_name }}</h3>
+                    
+                    <div class="flex items-center text-vto-gray-500 text-sm mb-4">
+                        <i class="fas fa-{{ child.gender }} mr-2"></i>
+                        <span class="mr-4">{{ child.get_gender_display }}</span>
+                        <i class="fas fa-home mr-2"></i>
+                        <span>With us {{ child.years_in_care }} year{{ child.years_in_care|pluralize }}</span>
+                    </div>
+                    
+                    <p class="text-vto-gray-600 mb-6 line-clamp-3">
+                        {{ child.background_summary|truncatewords:30 }}
+                    </p>
+                    
+                    <!-- Interests -->
+                    {% if child.interests %}
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-vto-gray-700 mb-2">Interests</h4>
+                        <div class="flex flex-wrap gap-2">
+                            {% for interest in child.interests|slice:":3"|split:"," %}
+                            <span class="px-2 py-1 bg-vto-gray-100 text-vto-gray-700 rounded text-xs">
+                                {{ interest|strip }}
+                            </span>
+                            {% endfor %}
+                            {% if child.interests|split:","|length > 3 %}
+                            <span class="px-2 py-1 bg-vto-gray-100 text-vto-gray-700 rounded text-xs">
+                                +{{ child.interests|split:","|length|add:"-3" }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Categories -->
+                    {% if child.categories.all %}
+                    <div class="mb-6">
+                        <div class="flex flex-wrap gap-2">
+                            {% for category in child.categories.all|slice:":2" %}
+                            <span class="px-2 py-1 bg-vto-orange-dark/10 text-vto-orange-dark rounded text-xs">
+                                {{ category.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Action Buttons -->
+                    <div class="space-y-3">
+                        <a href="{% url 'children:detail' child.slug %}" class="btn-outline w-full">
+                            <i class="fas fa-user mr-2"></i> View Profile
+                        </a>
+                        
+                        {% if not child.is_sponsored and child.sponsorship_needed %}
+                        <a href="{% url 'children:start_sponsorship' child.slug %}" class="btn-primary w-full">
+                            <i class="fas fa-heart mr-2"></i> Sponsor {{ child.code_name }}
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="mt-12">
+            <nav class="flex justify-center">
+                <ul class="inline-flex items-center space-x-2">
+                    {% if page_obj.has_previous %}
+                    <li>
+                        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in active_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                           class="px-3 py-2 rounded-lg border border-vto-gray-300 text-vto-gray-700 hover:bg-vto-gray-50">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li>
+                            <span class="px-4 py-2 rounded-lg bg-vto-orange-dark text-white font-medium">
+                                {{ num }}
+                            </span>
+                        </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li>
+                            <a href="?page={{ num }}{% for key, value in active_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               class="px-4 py-2 rounded-lg border border-vto-gray-300 text-vto-gray-700 hover:bg-vto-gray-50">
+                                {{ num }}
+                            </a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li>
+                        <a href="?page={{ page_obj.next_page_number }}{% for key, value in active_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                           class="px-3 py-2 rounded-lg border border-vto-gray-300 text-vto-gray-700 hover:bg-vto-gray-50">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <p class="text-center text-vto-gray-500 mt-4">
+                Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} teens
+            </p>
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <!-- No Results -->
+        <div class="text-center py-16">
+            <div class="text-4xl text-vto-gray-300 mb-4">
+                <i class="fas fa-users"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-vto-black mb-2">No Teens Found</h3>
+            <p class="text-vto-gray-600 mb-6 max-w-md mx-auto">
+                We couldn't find any teens matching your search criteria. Try adjusting your filters or browse all teens.
+            </p>
+            <a href="{% url 'children:list' %}" class="btn-primary">
+                <i class="fas fa-users mr-2"></i> View All Teens
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- How Sponsorship Works -->
+<section class="py-16 bg-gradient-to-b from-white to-vto-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="section-title">How Child Sponsorship Works</h2>
+            <p class="section-subtitle">Your sponsorship makes a lasting impact on a teen's life</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="text-center">
+                <div class="w-20 h-20 rounded-full bg-vto-orange-dark/10 text-vto-orange-dark flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-user-plus text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-vto-black mb-3">1. Choose a Teen</h3>
+                <p class="text-vto-gray-600">
+                    Browse profiles and select a teen you'd like to sponsor
+                </p>
+            </div>
+            
+            <div class="text-center">
+                <div class="w-20 h-20 rounded-full bg-vto-purple/10 text-vto-purple flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-heart text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-vto-black mb-3">2. Start Sponsorship</h3>
+                <p class="text-vto-gray-600">
+                    Complete the sponsorship application and choose your monthly amount
+                </p>
+            </div>
+            
+            <div class="text-center">
+                <div class="w-20 h-20 rounded-full bg-vto-orange-golden/10 text-vto-orange-golden flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-envelope text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-vto-black mb-3">3. Receive Updates</h3>
+                <p class="text-vto-gray-600">
+                    Get regular updates on your teen's progress and achievements
+                </p>
+            </div>
+            
+            <div class="text-center">
+                <div class="w-20 h-20 rounded-full bg-green-100 text-green-600 flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-graduation-cap text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-vto-black mb-3">4. Change a Life</h3>
+                <p class="text-vto-gray-600">
+                    Watch your sponsored teen grow and thrive with your support
+                </p>
+            </div>
+        </div>
+        
+        <div class="text-center mt-12">
+            <a href="#children-grid" class="btn-primary px-8 py-4 text-lg">
+                <i class="fas fa-heart mr-2"></i> Start Sponsoring Today
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="py-16">
+    <div class="container mx-auto px-4">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            
+            <div class="space-y-6 mt-8">
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold text-vto-black mb-3">How are the teens' identities protected?</h3>
+                    <p class="text-vto-gray-600">
+                        We use code names instead of real names to protect the teens' identities. 
+                        All photos are carefully reviewed and faces are blurred when necessary to ensure privacy.
+                    </p>
+                </div>
+                
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold text-vto-black mb-3">How much does sponsorship cost?</h3>
+                    <p class="text-vto-gray-600">
+                        Sponsorship starts at KES 2,000 per month for specific needs (like healthcare) 
+                        and goes up to KES 10,000 per month for full sponsorship. You can choose the 
+                        amount that works best for you.
+                    </p>
+                </div>
+                
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold text-vto-black mb-3">Can I communicate with the teen I sponsor?</h3>
+                    <p class="text-vto-gray-600">
+                        Yes! You can send messages through our moderated system. All communication 
+                        goes through our staff to ensure safety and appropriateness. You'll also receive 
+                        regular updates about your teen's progress.
+                    </p>
+                </div>
+                
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold text-vto-black mb-3">How long does sponsorship last?</h3>
+                    <p class="text-vto-gray-600">
+                        You can sponsor a teen for as long as they are in our program, typically until 
+                        they graduate at age 19. However, you can pause or cancel your sponsorship 
+                        at any time with 30 days' notice.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="text-center mt-8">
+                <a href="{% url 'contact' %}" class="btn-outline">
+                    <i class="fas fa-question-circle mr-2"></i> Have More Questions? Contact Us
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,40 @@
+# Django
+*.log
+*.sqlite3
+*.pyc
+__pycache__/
+media/
+staticfiles/
+
+# Environment
+.env
+venv/
+env/
+.venv/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Database
+*.db
+dump.rdb
+
+# Coverage
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+*.swp
+*.swo
+EOF
+
+# Initial commit
+git add .
+git commit -m "Initial project setup: Django + Tailwind"

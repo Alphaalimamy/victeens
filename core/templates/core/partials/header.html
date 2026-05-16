@@ -1,0 +1,65 @@
+{% load static %}
+<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-vto-gray-100 shadow-sm">
+    <nav class="container mx-auto flex flex-wrap items-center justify-between gap-4 px-6 py-4">
+        <div class="flex w-full justify-between items-center gap-6">
+            <!-- Brand -->
+            <a href="{% url 'home' %}" class="group flex items-center gap-3 transition-all duration-300 hover:scale-[1.01]">
+                <div class="flex h-14 w-14 items-center justify-center rounded-3xl bg-gradient-to-br from-vto-orange to-vto-purple shadow-lg shadow-vto-orange-dark/10 transition-all duration-300">
+                    <img src="{% static 'images/logo.png' %}" alt="Victory Teens Logo" class="h-11 w-11 object-contain" />
+                </div>
+                <div class="leading-tight">
+                    <p class="text-xs uppercase tracking-[0.3em] text-vto-orange-dark/80">Community Impact</p>
+                    <h1 class="text-xl font-semibold tracking-tight text-vto-black md:text-2xl">Victory Teens</h1>
+                </div>
+            </a>
+
+            <div class="hidden md:flex items-center gap-4 text-sm md:text-base font-medium text-vto-gray-700">
+                <a href="{% url 'home' %}" class="rounded-full px-4 py-2 transition duration-300 hover:bg-vto-gray-100 {% if request.resolver_match.url_name == 'home' %}text-vto-orange-dark bg-vto-orange-golden/10{% endif %}">Home</a>
+                <a href="{% url 'about' %}" class="rounded-full px-4 py-2 transition duration-300 hover:bg-vto-gray-100 {% if request.resolver_match.url_name == 'about' %}text-vto-orange-dark bg-vto-orange-golden/10{% endif %}">About</a>
+                <a href="{% url 'programs' %}" class="rounded-full px-4 py-2 transition duration-300 hover:bg-vto-gray-100 {% if request.resolver_match.url_name == 'programs' %}text-vto-orange-dark bg-vto-orange-golden/10{% endif %}">Programs</a>
+                <a href="{% url 'blog:blog' %}" class="rounded-full px-4 py-2 transition duration-300 hover:bg-vto-gray-100 {% if 'blog' in request.resolver_match.app_names %}text-vto-orange-dark bg-vto-orange-golden/10{% endif %}">Blog</a>
+            </div>
+
+            <div class="hidden md:flex items-center gap-3">
+                <a href="{% url 'volunteer' %}" class="rounded-full border border-vto-orange-dark/15 bg-vto-orange-dark/5 px-4 py-2 text-sm font-semibold text-vto-orange-dark transition duration-300 hover:bg-vto-orange-dark/10">Volunteer</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden rounded-full bg-vto-orange-dark px-4 py-3 text-white shadow-sm shadow-vto-orange-dark/20 transition duration-300 hover:bg-vto-orange-golden" aria-controls="mobile-menu" aria-expanded="false" aria-label="Open navigation menu">
+                <i class="fas fa-bars text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden w-full rounded-3xl border border-vto-gray-200 bg-white/95 p-5 shadow-lg shadow-vto-gray-200/20 md:hidden">
+            <div class="flex flex-col gap-3">
+                <a href="{% url 'home' %}" class="rounded-2xl px-4 py-3 text-base font-medium text-vto-gray-700 transition duration-200 hover:bg-vto-gray-100">Home</a>
+                <a href="{% url 'about' %}" class="rounded-2xl px-4 py-3 text-base font-medium text-vto-gray-700 transition duration-200 hover:bg-vto-gray-100">About</a>
+                <a href="{% url 'programs' %}" class="rounded-2xl px-4 py-3 text-base font-medium text-vto-gray-700 transition duration-200 hover:bg-vto-gray-100">Programs</a>
+                <a href="{% url 'blog:blog' %}" class="rounded-2xl px-4 py-3 text-base font-medium text-vto-gray-700 transition duration-200 hover:bg-vto-gray-100">Blog</a>
+                <a href="{% url 'volunteer' %}" class="rounded-2xl bg-vto-orange-dark px-4 py-3 text-base font-semibold text-white transition duration-200 hover:bg-vto-orange-golden">Volunteer</a>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                const icon = mobileMenuButton.querySelector('i');
+                if (mobileMenu.classList.contains('hidden')) {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                    mobileMenuButton.setAttribute('aria-expanded', 'false');
+                } else {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                    mobileMenuButton.setAttribute('aria-expanded', 'true');
+                }
+            });
+        }
+    </script>
+</header>

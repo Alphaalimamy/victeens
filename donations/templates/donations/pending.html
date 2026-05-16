@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Donation Pending - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <div class="max-w-2xl mx-auto text-center">
+        <!-- Pending Icon -->
+        <div class="mx-auto flex items-center justify-center h-32 w-32 rounded-full bg-yellow-100 mb-8">
+            <i class="fas fa-clock text-yellow-600 text-6xl"></i>
+        </div>
+        
+        <!-- Message -->
+        <h1 class="text-4xl font-bold text-vto-black mb-4">Donation Pending Verification</h1>
+        <p class="text-xl text-vto-gray-600 mb-8">
+            Your bank transfer of <span class="font-bold text-vto-orange-dark">KES {{ donation.amount|floatformat:2 }}</span> 
+            has been recorded and is awaiting verification.
+        </p>
+        
+        <!-- Instructions Card -->
+        <div class="card p-8 mb-8 text-left">
+            <h2 class="text-2xl font-bold text-vto-black mb-6">Next Steps</h2>
+            
+            <div class="space-y-6">
+                <div class="flex items-start">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-4 flex-shrink-0">
+                        <span class="font-bold">1</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-vto-black mb-2">Complete Your Bank Transfer</h3>
+                        <p class="text-vto-gray-600">
+                            Transfer KES {{ donation.amount|floatformat:2 }} to our bank account using the reference:
+                            <span class="font-bold text-vto-orange-dark">{{ donation.donation_id }}</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-4 flex-shrink-0">
+                        <span class="font-bold">2</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-vto-black mb-2">Bank Details</h3>
+                        <div class="bg-vto-gray-50 p-4 rounded-lg">
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="text-vto-gray-600">Bank:</span>
+                                    <span class="font-medium">Equity Bank Kenya Ltd</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-vto-gray-600">Account Name:</span>
+                                    <span class="font-medium">Victory Teens Organization</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-vto-gray-600">Account Number:</span>
+                                    <span class="font-medium">0123456789012</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-vto-gray-600">Reference:</span>
+                                    <span class="font-bold text-vto-orange-dark">{{ donation.donation_id }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-4 flex-shrink-0">
+                        <span class="font-bold">3</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-vto-black mb-2">Email Your Receipt</h3>
+                        <p class="text-vto-gray-600">
+                            Email a copy of your transfer receipt to 
+                            <span class="font-medium text-vto-orange-dark">donations@victoryteens.org</span> 
+                            to speed up verification.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Donation Summary -->
+        <div class="card p-8 mb-8">
+            <h2 class="text-2xl font-bold text-vto-black mb-6">Donation Summary</h2>
+            
+            <div class="space-y-4">
+                <div class="flex justify-between">
+                    <span class="text-vto-gray-600">Donation ID</span>
+                    <span class="font-bold">{{ donation.donation_id }}</span>
+                </div>
+                
+                <div class="flex justify-between">
+                    <span class="text-vto-gray-600">Amount</span>
+                    <span class="font-bold text-vto-orange-dark">KES {{ donation.amount|floatformat:2 }}</span>
+                </div>
+                
+                <div class="flex justify-between">
+                    <span class="text-vto-gray-600">Date Submitted</span>
+                    <span class="font-medium">{{ donation.created_at|date:"F j, Y g:i A" }}</span>
+                </div>
+                
+                <div class="flex justify-between">
+                    <span class="text-vto-gray-600">Status</span>
+                    <span class="px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                        Pending Verification
+                    </span>
+                </div>
+                
+                {% if donation.campaign %}
+                <div class="flex justify-between">
+                    <span class="text-vto-gray-600">Campaign</span>
+                    <span class="font-medium">{{ donation.campaign.title }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Processing Time -->
+        <div class="card p-8 mb-8 bg-blue-50 border border-blue-200">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle text-blue-500 text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-bold text-blue-800 mb-2">Processing Time</h3>
+                    <p class="text-blue-700">
+                        Bank transfers typically take 24-48 hours to appear in our account. 
+                        We will verify your payment and update your donation status as soon as possible.
+                    </p>
+                    <p class="text-sm text-blue-600 mt-2">
+                        You will receive an email confirmation once your donation is verified.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap justify-center gap-6">
+            <button onclick="window.print()" class="btn-outline">
+                <i class="fas fa-print mr-2"></i> Print Instructions
+            </button>
+            
+            <button onclick="emailInstructions()" class="btn-outline">
+                <i class="fas fa-envelope mr-2"></i> Email Instructions
+            </button>
+            
+            <a href="{% url 'donations:make_donation' %}" class="btn-primary">
+                <i class="fas fa-heart mr-2"></i> Make Another Donation
+            </a>
+        </div>
+        
+        <!-- Need Help? -->
+        <div class="mt-12 pt-8 border-t border-vto-gray-200">
+            <h3 class="text-xl font-bold text-vto-black mb-4">Need Assistance?</h3>
+            <div class="space-y-3">
+                <div class="flex items-center justify-center text-sm">
+                    <i class="fas fa-phone text-vto-orange-dark mr-3"></i>
+                    <span>+254 712 345 678 (Donations Department)</span>
+                </div>
+                <div class="flex items-center justify-center text-sm">
+                    <i class="fas fa-envelope text-vto-orange-dark mr-3"></i>
+                    <span>donations@victoryteens.org</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function emailInstructions() {
+    // In production, this would send an email
+    alert('Bank transfer instructions will be emailed to {{ donation.donor_email }}');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,509 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Make a Donation - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Progress Steps -->
+        <div class="mb-12">
+            <div class="flex items-center justify-center">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-vto-orange-dark text-white flex items-center justify-center font-bold">
+                        1
+                    </div>
+                    <div class="text-sm font-medium text-vto-orange-dark ml-2">Amount</div>
+                </div>
+                <div class="w-24 h-1 bg-vto-gray-300 mx-4"></div>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-vto-gray-300 text-white flex items-center justify-center font-bold">
+                        2
+                    </div>
+                    <div class="text-sm font-medium text-vto-gray-500 ml-2">Details</div>
+                </div>
+                <div class="w-24 h-1 bg-vto-gray-300 mx-4"></div>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-vto-gray-300 text-white flex items-center justify-center font-bold">
+                        3
+                    </div>
+                    <div class="text-sm font-medium text-vto-gray-500 ml-2">Payment</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Donation Form -->
+            <div class="lg:col-span-2">
+                <div class="card p-8">
+                    <h1 class="text-3xl font-bold text-vto-black mb-2">Make a Donation</h1>
+                    <p class="text-vto-gray-600 mb-8">
+                        Your support helps provide education, shelter, and hope for orphaned teens.
+                    </p>
+                    
+                    <form method="post" id="donationForm" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Step 1: Amount & Frequency -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold text-vto-black mb-6">1. Select Amount & Frequency</h3>
+                            
+                            <!-- Preset Amounts -->
+                            <div class="mb-8">
+                                <label class="block text-sm font-medium text-vto-gray-700 mb-4">
+                                    Select Amount (Le)
+                                </label>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                    {% for value, label in form.preset_amount.field.choices %}
+                                    <label class="relative">
+                                        <input type="radio" name="{{ form.preset_amount.name }}" 
+                                               value="{{ value }}" 
+                                               class="absolute opacity-0" 
+                                               {% if form.preset_amount.value == value %}checked{% endif %}>
+                                        <div class="cursor-pointer border-2 border-vto-gray-300 rounded-xl p-4 text-center transition-all duration-200 hover:border-vto-orange-dark hover:bg-vto-orange-dark/5 donation-amount-option">
+                                            <div class="text-lg font-bold text-vto-black">{{ label|slice:":label|find:' - '" }}</div>
+                                           
+                                            <div class="text-xs text-vto-gray-500 mt-1">{{ label|slice:"label|find:' - ' + 3:" }}</div>
+                                          
+                                        </div>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Custom Amount -->
+                            <div class="mb-8" id="customAmountSection" style="display: none;">
+                                <label for="{{ form.custom_amount.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                    Enter Custom Amount (Le)
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span class="text-vto-gray-500">Le</span>
+                                    </div>
+                                    {{ form.custom_amount }}
+                                </div>
+                                {% if form.custom_amount.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.custom_amount.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Donation Type -->
+                            <div class="mb-8">
+                                <label class="block text-sm font-medium text-vto-gray-700 mb-4">
+                                    How often would you like to give?
+                                </label>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    {% for value, label in form.donation_type.field.choices %}
+                                    <label class="relative">
+                                        <input type="radio" name="{{ form.donation_type.name }}" 
+                                               value="{{ value }}" 
+                                               class="absolute opacity-0" 
+                                               {% if form.donation_type.value == value %}checked{% endif %}>
+                                        <div class="cursor-pointer border-2 border-vto-gray-300 rounded-xl p-4 text-center transition-all duration-200 hover:border-vto-orange-dark hover:bg-vto-orange-dark/5 donation-type-option">
+                                            <div class="text-lg font-bold text-vto-black">{{ label }}</div>
+                                            {% if value == 'monthly' %}
+                                            <div class="text-xs text-vto-gray-500 mt-1">Most popular</div>
+                                            {% endif %}
+                                        </div>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Campaign Selection -->
+                            <div class="mb-8">
+                                <label for="{{ form.campaign.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                    Where would you like your donation to go? (Optional)
+                                </label>
+                                {{ form.campaign }}
+                                {% if form.campaign.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.campaign.errors.0 }}</p>
+                                {% endif %}
+                                <p class="mt-1 text-sm text-vto-gray-500">
+                                    If not selected, your donation will go to our General Fund where it's needed most.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2: Donor Details -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold text-vto-black mb-6">2. Your Information</h3>
+                            
+                            <!-- Guest Donor Option -->
+                            {% if not user.is_authenticated %}
+                            <div class="mb-6">
+                                <label class="inline-flex items-center">
+                                    {{ form.guest_donor }}
+                                    <span class="ml-2 text-sm text-vto-gray-700">I'm donating as a guest (don't create an account)</span>
+                                </label>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Donor Information -->
+                            <div id="donorInfo">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label for="{{ form.donor_name.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                            Full Name *
+                                        </label>
+                                        {{ form.donor_name }}
+                                        {% if form.donor_name.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ form.donor_name.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="{{ form.donor_email.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                            Email Address *
+                                        </label>
+                                        {{ form.donor_email }}
+                                        {% if form.donor_email.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ form.donor_email.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="{{ form.donor_phone.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                            Phone Number
+                                        </label>
+                                        {{ form.donor_phone }}
+                                        {% if form.donor_phone.errors %}
+                                        <p class="mt-1 text-sm text-red-600">{{ form.donor_phone.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                            &nbsp;
+                                        </label>
+                                        <label class="inline-flex items-center">
+                                            {{ form.is_anonymous }}
+                                            <span class="ml-2 text-sm text-vto-gray-700">Donate anonymously</span>
+                                        </label>
+                                        <p class="text-xs text-vto-gray-500 mt-1">
+                                            Your name won't appear on public donor lists
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Dedication -->
+                            <div class="mb-6">
+                                <label class="inline-flex items-center mb-4">
+                                    {{ form.is_dedicated }}
+                                    <span class="ml-2 text-sm text-vto-gray-700">This donation is in honor or memory of someone</span>
+                                </label>
+                                
+                                <div id="dedicationDetails" style="display: none;">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label for="{{ form.dedication_name.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                                Name of Person *
+                                            </label>
+                                            {{ form.dedication_name }}
+                                            {% if form.dedication_name.errors %}
+                                            <p class="mt-1 text-sm text-red-600">{{ form.dedication_name.errors.0 }}</p>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div>
+                                            <label for="{{ form.dedication_message.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                                Message (Optional)
+                                            </label>
+                                            {{ form.dedication_message }}
+                                            {% if form.dedication_message.errors %}
+                                            <p class="mt-1 text-sm text-red-600">{{ form.dedication_message.errors.0 }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3: Payment Method -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold text-vto-black mb-6">3. Payment Method</h3>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                {% for value, label in form.payment_method.field.choices %}
+                                <label class="relative">
+                                    <input type="radio" name="{{ form.payment_method.name }}" 
+                                           value="{{ value }}" 
+                                           class="absolute opacity-0" 
+                                           {% if form.payment_method.value == value %}checked{% endif %}>
+                                    <div class="cursor-pointer border-2 border-vto-gray-300 rounded-xl p-4 text-center transition-all duration-200 hover:border-vto-orange-dark hover:bg-vto-orange-dark/5 payment-method-option">
+                                        <div class="text-2xl mb-2">
+                                            {% if value == 'mpesa' %}
+                                            <i class="fas fa-mobile-alt text-green-600"></i>
+                                            {% elif value == 'stripe' %}
+                                            <i class="fab fa-cc-stripe text-vto-purple"></i>
+                                            {% elif value == 'paypal' %}
+                                            <i class="fab fa-cc-paypal text-blue-600"></i>
+                                            {% elif value == 'bank_transfer' %}
+                                            <i class="fas fa-university text-vto-orange-golden"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-sm font-medium text-vto-black">{{ label }}</div>
+                                    </div>
+                                </label>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Payment Method Details -->
+                            <div id="paymentDetails">
+                                <!-- Details will be shown based on selection -->
+                            </div>
+                        </div>
+                        
+                        <!-- Terms & Submit -->
+                        <div class="pt-8 border-t border-vto-gray-100">
+                            <div class="mb-6">
+                                <label class="inline-flex items-center">
+                                    {{ form.agree_terms }}
+                                    <span class="ml-2 text-sm text-vto-gray-700">
+                                        I agree to the 
+                                        <a href="#" class="text-vto-orange-dark hover:underline">Terms of Service</a> 
+                                        and 
+                                        <a href="#" class="text-vto-orange-dark hover:underline">Privacy Policy</a>
+                                    </span>
+                                </label>
+                                {% if form.agree_terms.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.agree_terms.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <a href="{% url 'donations:donations' %}" class="text-vto-orange-dark hover:text-vto-orange-golden">
+                                    <i class="fas fa-arrow-left mr-2"></i> Back
+                                </a>
+                                <button type="submit" class="btn-primary px-8">
+                                    Continue to Payment <i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Donation Summary -->
+            <div class="lg:col-span-1">
+                <div class="card p-6 sticky top-24">
+                    <h3 class="text-xl font-bold text-vto-black mb-6">Donation Summary</h3>
+                    
+                    <div class="space-y-4 mb-6">
+                        <div class="flex justify-between">
+                            <span class="text-vto-gray-600">Amount:</span>
+                            <span id="summaryAmount" class="font-bold text-vto-black">Le1,000</span>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <span class="text-vto-gray-600">Frequency:</span>
+                            <span id="summaryFrequency" class="font-bold text-vto-black text-sm">One-time</span>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <span class="text-vto-gray-600">Payment Method:</span>
+                            <span id="summaryPaymentMethod" class="font-bold text-vto-black text-sm">M-Pesa</span>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <span class="text-vto-gray-600">Campaign:</span>
+                            <span id="summaryCampaign" class="font-bold text-vto-black text-sm">General Fund</span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-vto-gray-100 pt-4 mb-6">
+                        <div class="flex justify-between text-lg font-bold text-vto-black">
+                            <span>Total:</span>
+                            <span id="summaryTotal">Le1,000</span>
+                        </div>
+                        <p class="text-sm text-vto-gray-500 mt-1">100% tax deductible</p>
+                    </div>
+                    
+                    <!-- Impact Preview -->
+                    <div class="mt-8 p-4 bg-vto-gray-50 rounded-lg">
+                        <h4 class="font-bold text-vto-black mb-3">Your Impact</h4>
+                        <p class="text-sm text-vto-gray-600" id="impactMessage">
+                            Your donation of Le 1,000 can provide school supplies for a teen for one week.
+                        </p>
+                    </div>
+                    
+                    <!-- Security Badge -->
+                    <div class="mt-6 text-center">
+                        <div class="inline-flex items-center text-sm text-vto-gray-500">
+                            <i class="fas fa-lock text-green-500 mr-2"></i>
+                            <span>Secure & Encrypted Payment</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Need Help? -->
+                <div class="card p-6 mt-6">
+                    <h4 class="font-bold text-vto-black mb-4">Need Help?</h4>
+                    <div class="space-y-3">
+                        <a href="#" class="flex items-center text-sm text-vto-gray-600 hover:text-vto-orange-dark">
+                            <i class="fas fa-question-circle mr-3"></i>
+                            Frequently Asked Questions
+                        </a>
+                        <a href="{% url 'contact' %}" class="flex items-center text-sm text-vto-gray-600 hover:text-vto-orange-dark">
+                            <i class="fas fa-envelope mr-3"></i>
+                            Contact Our Team
+                        </a>
+                        <a href="#" class="flex items-center text-sm text-vto-gray-600 hover:text-vto-orange-dark">
+                            <i class="fas fa-phone mr-3"></i>
+                            Call: +254 712 345 678
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Update summary based on form inputs
+    function updateSummary() {
+        // Amount
+        const presetAmount = document.querySelector('input[name="preset_amount"]:checked');
+        const customAmount = document.getElementById('{{ form.custom_amount.id_for_label }}');
+        
+        let amount = 0;
+        if (presetAmount && presetAmount.value !== 'custom') {
+            amount = parseInt(presetAmount.value);
+        } else if (customAmount && customAmount.value) {
+            amount = parseFloat(customAmount.value);
+        }
+        
+        // Format amount with commas
+        const formattedAmount = amount.toLocaleString('en-US');
+        document.getElementById('summaryAmount').textContent = `Le${formattedAmount}`;
+        document.getElementById('summaryTotal').textContent = `Le${formattedAmount}`;
+        
+        // Update impact message
+        updateImpactMessage(amount);
+        
+        // Frequency
+        const frequency = document.querySelector('input[name="donation_type"]:checked');
+        if (frequency) {
+            const frequencyText = frequency.nextElementSibling.querySelector('.text-lg').textContent;
+            document.getElementById('summaryFrequency').textContent = frequencyText;
+        }
+        
+        // Payment Method
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+        if (paymentMethod) {
+            const paymentText = paymentMethod.nextElementSibling.querySelector('.text-sm').textContent;
+            document.getElementById('summaryPaymentMethod').textContent = paymentText.split(' - ')[0];
+        }
+        
+        // Campaign
+        const campaignSelect = document.getElementById('{{ form.campaign.id_for_label }}');
+        if (campaignSelect) {
+            const campaignText = campaignSelect.options[campaignSelect.selectedIndex].text;
+            document.getElementById('summaryCampaign').textContent = campaignText;
+        }
+    }
+    
+    // Update impact message based on amount
+    function updateImpactMessage(amount) {
+        let message = '';
+        
+        if (amount >= 500 && amount < 1000) {
+            message = `Your donation of Le${amount.toLocaleString()} can provide a nutritious meal for a teen for one day.`;
+        } else if (amount >= 1000 && amount < 5000) {
+            message = `Your donation of Le${amount.toLocaleString()} can provide school supplies for a teen for one week.`;
+        } else if (amount >= 5000 && amount < 10000) {
+            message = `Your donation of Le${amount.toLocaleString()} can provide medical care for a teen for one month.`;
+        } else if (amount >= 10000 && amount < 25000) {
+            message = `Your donation of Le${amount.toLocaleString()} can provide vocational training materials for a teen.`;
+        } else if (amount >= 25000) {
+            message = `Your donation of Le${amount.toLocaleString()} can provide shelter and food for a teen for one month.`;
+        } else {
+            message = `Every shilling counts! Your donation helps support orphaned teens in need.`;
+        }
+        
+        document.getElementById('impactMessage').textContent = message;
+    }
+    
+    // Toggle custom amount field
+    const presetAmountRadios = document.querySelectorAll('input[name="preset_amount"]');
+    const customAmountSection = document.getElementById('customAmountSection');
+    
+    presetAmountRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                customAmountSection.style.display = 'block';
+                document.getElementById('{{ form.custom_amount.id_for_label }}').focus();
+            } else {
+                customAmountSection.style.display = 'none';
+                document.getElementById('{{ form.custom_amount.id_for_label }}').value = '';
+            }
+            updateSummary();
+        });
+    });
+    
+    // Toggle dedication details
+    const isDedicatedCheckbox = document.getElementById('{{ form.is_dedicated.id_for_label }}');
+    const dedicationDetails = document.getElementById('dedicationDetails');
+    
+    if (isDedicatedCheckbox) {
+        isDedicatedCheckbox.addEventListener('change', function() {
+            dedicationDetails.style.display = this.checked ? 'block' : 'none';
+        });
+    }
+    
+    // Style selected options
+    function styleSelectedOptions(selector, activeClass = 'border-vto-orange-dark bg-vto-orange-dark/10') {
+        const options = document.querySelectorAll(selector);
+        options.forEach(option => {
+            const radio = option.previousElementSibling;
+            if (radio.checked) {
+                option.classList.add(...activeClass.split(' '));
+            } else {
+                option.classList.remove(...activeClass.split(' '));
+            }
+        });
+    }
+    
+    // Add event listeners for styling
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Style amount options
+            styleSelectedOptions('.donation-amount-option', 'border-vto-orange-dark bg-vto-orange-dark/10');
+            
+            // Style donation type options
+            styleSelectedOptions('.donation-type-option', 'border-vto-orange-dark bg-vto-orange-dark/10');
+            
+            // Style payment method options
+            styleSelectedOptions('.payment-method-option', 'border-vto-orange-dark bg-vto-orange-dark/10');
+            
+            updateSummary();
+        });
+    });
+    
+    // Update summary on input changes
+    document.getElementById('{{ form.custom_amount.id_for_label }}').addEventListener('input', updateSummary);
+    document.getElementById('{{ form.campaign.id_for_label }}').addEventListener('change', updateSummary);
+    
+    // Initialize summary
+    updateSummary();
+    styleSelectedOptions('.donation-amount-option', 'border-vto-orange-dark bg-vto-orange-dark/10');
+    styleSelectedOptions('.donation-type-option', 'border-vto-orange-dark bg-vto-orange-dark/10');
+    styleSelectedOptions('.payment-method-option', 'border-vto-orange-dark bg-vto-orange-dark/10');
+    
+    // Show dedication details if already checked
+    if (isDedicatedCheckbox && isDedicatedCheckbox.checked) {
+        dedicationDetails.style.display = 'block';
+    }
+    
+    // Show custom amount if selected
+    if (document.querySelector('input[name="preset_amount"][value="custom"]:checked')) {
+        customAmountSection.style.display = 'block';
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,431 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit Post{% else %}Create New Post{% endif %} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="container mx-auto px-4">
+        <!-- Back Button -->
+        <div class="mb-6">
+            <a href="{% url 'blog:post_list' %}" 
+               class="inline-flex items-center text-vto-orange hover:text-vto-orange-dark">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Blog
+            </a>
+        </div>
+
+        <div class="max-w-4xl mx-auto">
+            <!-- Form Header -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                    {% if form.instance.pk %}
+                    <i class="fas fa-edit mr-2 text-vto-orange"></i>Edit Post
+                    {% else %}
+                    <i class="fas fa-plus mr-2 text-vto-orange"></i>Create New Post
+                    {% endif %}
+                </h1>
+                <p class="text-gray-600">
+                    {% if form.instance.pk %}
+                    Update your blog post below. Changes will be visible after saving.
+                    {% else %}
+                    Share your story with the world. Fill in the details below to create a new blog post.
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- Main Form -->
+            <form method="post" enctype="multipart/form-data" class="space-y-8">
+                {% csrf_token %}
+                
+                <!-- Basic Information Card -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6 border-b pb-3">
+                        <i class="fas fa-info-circle mr-2 text-vto-orange"></i>Basic Information
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <!-- Title -->
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2" for="id_title">
+                                Post Title *
+                            </label>
+                            <input type="text" 
+                                   name="title" 
+                                   id="id_title"
+                                   value="{{ form.title.value|default:'' }}"
+                                   required
+                                   class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-vto-orange focus:border-transparent"
+                                   placeholder="Enter a compelling title...">
+                            {% if form.title.errors %}
+                            <div class="mt-2 text-red-600 text-sm">
+                                {% for error in form.title.errors %}
+                                <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Excerpt -->
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2" for="id_excerpt">
+                                Excerpt *
+                            </label>
+                            <textarea name="excerpt" 
+                                      id="id_excerpt"
+                                      rows="3"
+                                      required
+                                      class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-vto-orange focus:border-transparent"
+                                      placeholder="Write a short summary of your post...">{{ form.excerpt.value|default:'' }}</textarea>
+                            <p class="mt-1 text-sm text-gray-500">This will appear in blog listings and social media previews.</p>
+                            {% if form.excerpt.errors %}
+                            <div class="mt-2 text-red-600 text-sm">
+                                {% for error in form.excerpt.errors %}
+                                <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Category -->
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2" for="id_category">
+                                    Category *
+                                </label>
+                                <select name="category" 
+                                        id="id_category"
+                                        required
+                                        class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-vto-orange focus:border-transparent">
+                                    <option value="">Select a category</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}" 
+                                            {% if form.category.value|stringformat:"s" == category.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Post Type -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2" for="id_post_type">
+                                    Post Type *
+                                </label>
+                                <select name="post_type" 
+                                        id="id_post_type"
+                                        required
+                                        class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-vto-orange focus:border-transparent">
+                                    {% for value, label in form.fields.post_type.choices %}
+                                    <option value="{{ value }}" 
+                                            {% if form.post_type.value|stringformat:"s" == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Tags -->
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2" for="id_tags_input">
+                                Tags
+                            </label>
+                            <input type="text" 
+                                   name="tags_input" 
+                                   id="id_tags_input"
+                                   value="{{ form.tags_input.value|default:'' }}"
+                                   class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-vto-orange focus:border-transparent"
+                                   placeholder="Add tags separated by commas (e.g., charity, education, news)">
+                            <p class="mt-1 text-sm text-gray-500">These help users find related content.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Card -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6 border-b pb-3">
+                        <i class="fas fa-file-alt mr-2 text-vto-orange"></i>Content
+                    </h2>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="id_content">
+                            Content *
+                        </label>
+                        <textarea name="content" 
+                                  id="id_content"
+                                  rows="20"
+                                  required
+                                  class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-vto-orange focus:border-transparent ckeditor">{{ form.content.value|default:'' }}</textarea>
+                        {% if form.content.errors %}
+                        <div class="mt-2 text-red-600 text-sm">
+                            {% for error in form.content.errors %}
+                            <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Media Card -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6 border-b pb-3">
+                        <i class="fas fa-images mr-2 text-vto-orange"></i>Media
+                    </h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Featured Image -->
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2" for="id_featured_image">
+                                Featured Image
+                            </label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-vto-orange transition">
+                                <div class="mb-4">
+                                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
+                                </div>
+                                <input type="file" 
+                                       name="featured_image" 
+                                       id="id_featured_image"
+                                       accept="image/*"
+                                       class="hidden"
+                                       onchange="previewImage(this, 'featured-preview')">
+                                <label for="id_featured_image" 
+                                       class="cursor-pointer bg-vto-orange text-white px-6 py-2 rounded-lg hover:bg-vto-orange-dark transition inline-block">
+                                    Choose Image
+                                </label>
+                                <p class="mt-2 text-sm text-gray-500">Recommended: 1200x630px (will be shown at the top)</p>
+                            </div>
+                            <!-- Preview -->
+                            <div id="featured-preview" class="mt-4 hidden">
+                                <img src="" alt="Preview" class="w-full h-48 object-cover rounded-lg">
+                            </div>
+                            {% if form.instance.featured_image %}
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-600 mb-2">Current image:</p>
+                                <img src="{{ form.instance.featured_image.url }}" 
+                                     alt="Current featured image" 
+                                     class="w-full h-48 object-cover rounded-lg">
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Thumbnail Image -->
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2" for="id_thumbnail_image">
+                                Thumbnail Image
+                            </label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-vto-orange transition">
+                                <div class="mb-4">
+                                    <i class="fas fa-image text-4xl text-gray-400"></i>
+                                </div>
+                                <input type="file" 
+                                       name="thumbnail_image" 
+                                       id="id_thumbnail_image"
+                                       accept="image/*"
+                                       class="hidden"
+                                       onchange="previewImage(this, 'thumbnail-preview')">
+                                <label for="id_thumbnail_image" 
+                                       class="cursor-pointer bg-vto-orange text-white px-6 py-2 rounded-lg hover:bg-vto-orange-dark transition inline-block">
+                                    Choose Image
+                                </label>
+                                <p class="mt-2 text-sm text-gray-500">Recommended: 400x300px (for listings)</p>
+                            </div>
+                            <!-- Preview -->
+                            <div id="thumbnail-preview" class="mt-4 hidden">
+                                <img src="" alt="Preview" class="w-full h-48 object-cover rounded-lg">
+                            </div>
+                            {% if form.instance.thumbnail_image %}
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-600 mb-2">Current image:</p>
+                                <img src="{{ form.instance.thumbnail_image.url }}" 
+                                     alt="Current thumbnail image" 
+                                     class="w-full h-48 object-cover rounded-lg">
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Card -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6 border-b pb-3">
+                        <i class="fas fa-cog mr-2 text-vto-orange"></i>Settings
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- Status -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2" for="id_status">
+                                    Status *
+                                </label>
+                                <select name="status" 
+                                        id="id_status"
+                                        required
+                                        class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-vto-orange focus:border-transparent">
+                                    {% for value, label in form.fields.status.choices %}
+                                    <option value="{{ value }}" 
+                                            {% if form.status.value|stringformat:"s" == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Published Date -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2" for="id_published_date">
+                                    Publish Date
+                                </label>
+                                <input type="datetime-local" 
+                                       name="published_date" 
+                                       id="id_published_date"
+                                       value="{{ form.published_date.value|date:'Y-m-d\TH:i'|default:'' }}"
+                                       class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-vto-orange focus:border-transparent">
+                                <p class="mt-1 text-sm text-gray-500">Leave empty for immediate publication</p>
+                            </div>
+                        </div>
+
+                        <!-- Options -->
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" 
+                                       name="is_featured" 
+                                       id="id_is_featured"
+                                       class="h-5 w-5 text-vto-orange focus:ring-vto-orange border-gray-300 rounded"
+                                       {% if form.is_featured.value %}checked{% endif %}>
+                                <label for="id_is_featured" class="ml-3 text-gray-700">
+                                    Mark as featured post
+                                </label>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <input type="checkbox" 
+                                       name="allow_comments" 
+                                       id="id_allow_comments"
+                                       class="h-5 w-5 text-vto-orange focus:ring-vto-orange border-gray-300 rounded"
+                                       {% if form.allow_comments.value|default_if_none:True %}checked{% endif %}>
+                                <label for="id_allow_comments" class="ml-3 text-gray-700">
+                                    Allow comments on this post
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEO Card -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6 border-b pb-3">
+                        <i class="fas fa-search mr-2 text-vto-orange"></i>SEO Settings
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <!-- Meta Title -->
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2" for="id_meta_title">
+                                Meta Title
+                            </label>
+                            <input type="text" 
+                                   name="meta_title" 
+                                   id="id_meta_title"
+                                   value="{{ form.meta_title.value|default:'' }}"
+                                   class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-vto-orange focus:border-transparent"
+                                   placeholder="Title for search engines (optional)">
+                            <p class="mt-1 text-sm text-gray-500">Leave empty to use post title</p>
+                        </div>
+
+                        <!-- Meta Description -->
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2" for="id_meta_description">
+                                Meta Description
+                            </label>
+                            <textarea name="meta_description" 
+                                      id="id_meta_description"
+                                      rows="3"
+                                      class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-vto-orange focus:border-transparent"
+                                      placeholder="Description for search engines (optional)">{{ form.meta_description.value|default:'' }}</textarea>
+                            <p class="mt-1 text-sm text-gray-500">Leave empty to use post excerpt</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            {% if form.instance.pk %}
+                            <p class="text-sm text-gray-600">
+                                <i class="fas fa-history mr-1"></i>
+                                Last updated: {{ form.instance.updated_at|date:"F d, Y H:i" }}
+                            </p>
+                            {% endif %}
+                        </div>
+                        <div class="flex space-x-4">
+                            <a href="{% url 'blog:post_list' %}" 
+                               class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                                Cancel
+                            </a>
+                            <button type="submit" 
+                                    class="bg-vto-orange text-white px-8 py-3 rounded-lg font-semibold hover:bg-vto-orange-dark transition flex items-center">
+                                <i class="fas fa-save mr-2"></i>
+                                {% if form.instance.pk %}Update Post{% else %}Create Post{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Image preview functionality
+function previewImage(input, previewId) {
+    const preview = document.getElementById(previewId);
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.innerHTML = `<img src="${e.target.result}" alt="Preview" class="w-full h-48 object-cover rounded-lg">`;
+            preview.classList.remove('hidden');
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Auto-generate slug from title
+document.getElementById('id_title').addEventListener('input', function(e) {
+    const title = e.target.value;
+    const slugInput = document.getElementById('id_slug');
+    if (slugInput && !slugInput.value) {
+        slugInput.value = title.toLowerCase()
+            .replace(/[^\w\s]/g, '')
+            .replace(/\s+/g, '-');
+    }
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const title = document.getElementById('id_title').value.trim();
+    const content = document.getElementById('id_content').value.trim();
+    
+    if (!title || title.length < 10) {
+        e.preventDefault();
+        alert('Title must be at least 10 characters long.');
+        return;
+    }
+    
+    if (!content || content.length < 100) {
+        e.preventDefault();
+        alert('Content must be at least 100 characters long.');
+        return;
+    }
+    
+    // Add loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
+    submitBtn.disabled = true;
+});
+</script>
+{% endblock %}

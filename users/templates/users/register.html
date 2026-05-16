@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Register - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-vto-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl w-full">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <a href="{% url 'home' %}" class="inline-flex items-center space-x-3">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-vto-orange-dark to-vto-purple flex items-center justify-center">
+                    <span class="text-white font-bold text-2xl">VTO</span>
+                </div>
+                <div class="text-left">
+                    <h1 class="text-2xl font-bold text-vto-black">Victory Teens</h1>
+                    <p class="text-sm text-vto-gray-500">Organization</p>
+                </div>
+            </a>
+            <h2 class="mt-6 text-3xl font-bold text-vto-black">Create your account</h2>
+            <p class="mt-2 text-sm text-vto-gray-600">
+                Join our community of donors, volunteers, and supporters
+            </p>
+        </div>
+
+        <!-- Registration Form -->
+        <div class="card p-8">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-red-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">Please correct the errors below</h3>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="space-y-6">
+                    <!-- Email -->
+                    <div>
+                        <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                            Email Address *
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-vto-gray-400"></i>
+                            </div>
+                            <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}" 
+                                   class="input-field pl-10" placeholder="your@email.com" 
+                                   value="{{ form.email.value|default:'' }}" required>
+                        </div>
+                        {% if form.email.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Name Fields -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                First Name *
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-user text-vto-gray-400"></i>
+                                </div>
+                                <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}" 
+                                       class="input-field pl-10" placeholder="John" 
+                                       value="{{ form.first_name.value|default:'' }}" required>
+                            </div>
+                            {% if form.first_name.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.first_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                Last Name *
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-user text-vto-gray-400"></i>
+                                </div>
+                                <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}" 
+                                       class="input-field pl-10" placeholder="Doe" 
+                                       value="{{ form.last_name.value|default:'' }}" required>
+                            </div>
+                            {% if form.last_name.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.last_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Phone & Role -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                Phone Number
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-phone text-vto-gray-400"></i>
+                                </div>
+                                <input type="tel" name="{{ form.phone.name }}" id="{{ form.phone.id_for_label }}" 
+                                       class="input-field pl-10" placeholder="+254712345678" 
+                                       value="{{ form.phone.value|default:'' }}">
+                            </div>
+                            {% if form.phone.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.phone.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label for="{{ form.role.id_for_label }}" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                I want to join as a *
+                            </label>
+                            <select name="{{ form.role.name }}" id="{{ form.role.id_for_label }}" 
+                                    class="input-field" required>
+                                <option value="">Select your role</option>
+                                <option value="donor" {% if form.role.value == 'donor' %}selected{% endif %}>Donor/Supporter</option>
+                                <option value="volunteer" {% if form.role.value == 'volunteer' %}selected{% endif %}>Volunteer</option>
+                                <option value="staff" {% if form.role.value == 'staff' %}selected{% endif %}>Staff Member</option>
+                            </select>
+                            {% if form.role.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.role.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Password Fields -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="id_password1" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                Password *
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-vto-gray-400"></i>
+                                </div>
+                                <input type="password" name="password1" id="id_password1" 
+                                       class="input-field pl-10" placeholder="Create a password" required>
+                            </div>
+                            {% if form.password1.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.password1.errors.0 }}</p>
+                            {% endif %}
+                            <div class="mt-2 space-y-1">
+                                <p class="text-xs text-vto-gray-500">Password must contain:</p>
+                                <ul class="text-xs text-vto-gray-500 space-y-1">
+                                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-1 text-xs"></i> At least 8 characters</li>
+                                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-1 text-xs"></i> At least one number</li>
+                                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-1 text-xs"></i> At least one uppercase letter</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="id_password2" class="block text-sm font-medium text-vto-gray-700 mb-2">
+                                Confirm Password *
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-vto-gray-400"></i>
+                                </div>
+                                <input type="password" name="password2" id="id_password2" 
+                                       class="input-field pl-10" placeholder="Confirm your password" required>
+                            </div>
+                            {% if form.password2.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.password2.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Terms & Conditions -->
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="terms" name="terms" type="checkbox" 
+                                   class="h-4 w-4 text-vto-orange-dark focus:ring-vto-orange-dark border-vto-gray-300 rounded" required>
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="terms" class="font-medium text-vto-gray-700">
+                                I agree to the 
+                                <a href="#" class="text-vto-orange-dark hover:text-vto-orange-golden hover:underline">
+                                    Terms of Service
+                                </a> 
+                                and 
+                                <a href="#" class="text-vto-orange-dark hover:text-vto-orange-golden hover:underline">
+                                    Privacy Policy
+                                </a>
+                            </label>
+                            <p class="text-vto-gray-500 mt-1">
+                                I consent to receiving emails about Victory Teens Organization's work and how I can help.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div>
+                        <button type="submit" class="btn-primary w-full">
+                            <i class="fas fa-user-plus mr-2"></i> Create Account
+                        </button>
+                    </div>
+                </div>
+            </form>
+            
+            <!-- Social Registration -->
+            <div class="mt-8">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-vto-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-4 bg-white text-vto-gray-500">Or sign up with</span>
+                    </div>
+                </div>
+                
+                <div class="mt-6 grid grid-cols-2 gap-3">
+                    <a href="#" class="w-full inline-flex justify-center py-3 px-4 border border-vto-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-vto-gray-700 hover:bg-vto-gray-50 transition-colors">
+                        <i class="fab fa-google text-red-500 mr-2"></i> Google
+                    </a>
+                    <a href="#" class="w-full inline-flex justify-center py-3 px-4 border border-vto-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-vto-gray-700 hover:bg-vto-gray-50 transition-colors">
+                        <i class="fab fa-facebook-f text-blue-600 mr-2"></i> Facebook
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Login Link -->
+            <div class="mt-8 text-center">
+                <p class="text-sm text-vto-gray-600">
+                    Already have an account?
+                    <a href="{% url 'login' %}" class="font-medium text-vto-orange-dark hover:text-vto-orange-golden">
+                        Sign in here
+                    </a>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Benefits of Registration -->
+        <div class="mt-8 card p-6">
+            <h3 class="text-lg font-bold text-vto-black mb-4">Benefits of creating an account:</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="flex items-start">
+                    <i class="fas fa-heart text-vto-orange-dark mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-medium text-vto-black">Track Donations</h4>
+                        <p class="text-sm text-vto-gray-600">View your donation history and download receipts</p>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-calendar-check text-vto-purple mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-medium text-vto-black">Volunteer Dashboard</h4>
+                        <p class="text-sm text-vto-gray-600">Manage your volunteer schedule and track hours</p>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-bell text-vto-orange-golden mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-medium text-vto-black">Personalized Updates</h4>
+                        <p class="text-sm text-vto-gray-600">Get updates on teens you support and our impact</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle password visibility
+    const passwordFields = ['id_password1', 'id_password2'];
+    
+    passwordFields.forEach(fieldId => {
+        const passwordField = document.getElementById(fieldId);
+        if (passwordField) {
+            const toggleBtn = document.createElement('button');
+            toggleBtn.type = 'button';
+            toggleBtn.className = 'absolute inset-y-0 right-0 pr-3 flex items-center';
+            toggleBtn.innerHTML = '<i class="fas fa-eye text-vto-gray-400"></i>';
+            
+            toggleBtn.addEventListener('click', function() {
+                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordField.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+            
+            passwordField.parentNode.appendChild(toggleBtn);
+        }
+    });
+    
+    // Real-time password validation
+    const password1 = document.getElementById('id_password1');
+    const password2 = document.getElementById('id_password2');
+    
+    function validatePasswords() {
+        if (password1.value && password2.value) {
+            if (password1.value !== password2.value) {
+                password2.classList.add('border-red-300', 'focus:ring-red-500', 'focus:border-red-500');
+                password2.classList.remove('border-vto-gray-300', 'focus:ring-vto-orange-dark', 'focus:border-transparent');
+            } else {
+                password2.classList.remove('border-red-300', 'focus:ring-red-500', 'focus:border-red-500');
+                password2.classList.add('border-vto-gray-300', 'focus:ring-vto-orange-dark', 'focus:border-transparent');
+            }
+        }
+    }
+    
+    password1.addEventListener('input', validatePasswords);
+    password2.addEventListener('input', validatePasswords);
+});
+</script>
+{% endblock %}
+{% endblock %}

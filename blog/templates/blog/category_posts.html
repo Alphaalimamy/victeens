@@ -1,0 +1,65 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}{{ category.name }} - {{ site_name }}{% endblock %}
+{% block meta_description %}Browse all blog posts in {{ category.name }} category on Victory Teens Organization.{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-b from-vto-white to-vto-gray-50">
+    <!-- Hero Section -->
+    <div class="relative bg-gradient-to-r from-vto-orange to-vto-purple text-white">
+        <div class="absolute inset-0 bg-black opacity-40"></div>
+        <div class="relative container mx-auto px-4 py-16 md:py-24">
+            <div class="max-w-3xl mx-auto text-center">
+                <h1 class="text-4xl md:text-5xl font-bold mb-6 font-montserrat">
+                    {{ category.name }}
+                </h1>
+                {% if category.description %}
+                <p class="text-xl mb-8 opacity-90">
+                    {{ category.description }}
+                </p>
+                {% endif %}
+                <div class="flex items-center justify-center gap-4">
+                    <span class="text-lg">
+                        <i class="fas fa-folder-open mr-2"></i>
+                        {{ page_obj.paginator.count }} article{{ page_obj.paginator.count|pluralize }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Posts Column -->
+            <div class="lg:w-2/3">
+                <!-- Posts Grid -->
+                <div class="space-y-8 mb-12">
+                    {% for post in page_obj %}
+                    <!-- Same article structure as in tag_posts.html -->
+                    <!-- Copy from Solution 1 -->
+                    {% empty %}
+                    <div class="text-center py-12">
+                        <i class="fas fa-newspaper text-6xl text-gray-300 mb-4"></i>
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">No articles in this category</h3>
+                        <p class="text-gray-500">Check back soon for updates!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                <!-- Same as in tag_posts.html -->
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:w-1/3">
+                <!-- Categories -->
+                <!-- Same as in tag_posts.html -->
+                <!-- Popular Tags -->
+                <!-- Same as in tag_posts.html -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,645 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ child.code_name }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<!-- Child Header -->
+<section class="relative py-16">
+    <div class="absolute inset-0 bg-gradient-to-r from-vto-purple/10 to-vto-orange-dark/10"></div>
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="max-w-6xl mx-auto">
+            <!-- Back Button -->
+            <a href="{% url 'children:list' %}" class="inline-flex items-center text-vto-orange-dark hover:text-vto-orange-golden mb-6">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Teens
+            </a>
+            
+            <!-- Child Profile -->
+            <div class="card overflow-hidden mb-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Photo Section -->
+                    <div class="lg:col-span-1">
+                        <div class="relative">
+                            {% with profile_photo=child.photos.filter.photo_type='profile'.first %}
+                            {% if profile_photo and profile_photo.can_display %}
+                            <img src="{{ profile_photo.photo.url }}" alt="{{ child.code_name }}" 
+                                 class="w-full h-64 lg:h-full object-cover rounded-lg">
+                            {% else %}
+                            <div class="w-full h-64 lg:h-full bg-gradient-to-br from-vto-purple to-vto-orange-dark rounded-lg flex items-center justify-center">
+                                <div class="text-center">
+                                    <span class="text-white text-6xl font-bold">
+                                        {{ child.code_name|slice:":1" }}
+                                    </span>
+                                    <p class="text-white/80 mt-4">Photo protected for privacy</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+                            
+                            <!-- Age Badge -->
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
+                                <span class="font-bold text-vto-black">{{ child.current_age }} years old</span>
+                            </div>
+                            
+                            <!-- Sponsorship Badge -->
+                            {% if child.is_sponsored %}
+                            <div class="absolute bottom-4 left-4">
+                                <span class="bg-green-500 text-white px-4 py-2 rounded-full text-sm font-bold">
+                                    <i class="fas fa-heart mr-1"></i> Sponsored
+                                </span>
+                            </div>
+                            {% elif child.sponsorship_needed %}
+                            <div class="absolute bottom-4 left-4">
+                                <span class="bg-vto-orange-dark text-white px-4 py-2 rounded-full text-sm font-bold">
+                                    <i class="fas fa-hands-helping mr-1"></i> Needs Sponsor
+                                </span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Quick Info -->
+                        <div class="mt-6 space-y-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-{{ child.gender }} text-vto-purple mr-3"></i>
+                                <span>{{ child.get_gender_display }}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-home text-vto-orange-dark mr-3"></i>
+                                <span>With us {{ child.years_in_care }} year{{ child.years_in_care|pluralize }}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-graduation-cap text-vto-orange-golden mr-3"></i>
+                                <span>{{ child.educational_level|default:"In school" }}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Categories -->
+                        {% if child.categories.all %}
+                        <div class="mt-6">
+                            <h4 class="font-bold text-vto-black mb-2">Interests & Skills</h4>
+                            <div class="flex flex-wrap gap-2">
+                                {% for category in child.categories.all %}
+                                <span class="px-3 py-1 bg-vto-orange-dark/10 text-vto-orange-dark rounded-full text-sm">
+                                    {{ category.name }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Info Section -->
+                    <div class="lg:col-span-2 p-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+                            <div>
+                                <h1 class="text-3xl md:text-4xl font-bold text-vto-black mb-2">{{ child.code_name }}</h1>
+                                <p class="text-vto-gray-600">{{ child.age }} years old • {{ child.get_gender_display }}</p>
+                            </div>
+                            
+                            {% if child.sponsorship_needed and not child.is_sponsored %}
+                            <div class="mt-4 md:mt-0">
+                                <a href="{% url 'children:start_sponsorship' child.slug %}" class="btn-primary">
+                                    <i class="fas fa-heart mr-2"></i> Sponsor {{ child.code_name }}
+                                </a>
+                            </div>
+                            {% elif is_sponsor %}
+                            <div class="mt-4 md:mt-0">
+                                <span class="bg-green-100 text-green-800 px-4 py-2 rounded-lg font-medium">
+                                    <i class="fas fa-check-circle mr-2"></i> You sponsor {{ child.code_name }}
+                                </span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Background Story -->
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-vto-black mb-4">About {{ child.code_name }}</h2>
+                            <div class="prose max-w-none">
+                                {{ child.background_summary|linebreaks }}
+                            </div>
+                        </div>
+                        
+                        <!-- Interests & Aspirations -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            {% if child.interests %}
+                            <div>
+                                <h3 class="text-xl font-bold text-vto-black mb-4">Interests & Hobbies</h3>
+                                <div class="flex flex-wrap gap-2">
+                                    {% for interest in child.interests|split:","|slice:":6" %}
+                                    <span class="px-3 py-1 bg-vto-gray-100 text-vto-gray-700 rounded-full">
+                                        {{ interest|strip }}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if child.career_aspirations %}
+                            <div>
+                                <h3 class="text-xl font-bold text-vto-black mb-4">Career Aspirations</h3>
+                                <p class="text-vto-gray-600">{{ child.career_aspirations }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <div class="mb-8 border-b border-vto-gray-200">
+                <nav class="flex space-x-8 overflow-x-auto">
+                    <a href="#story" class="tab-link active py-4 px-1 text-sm font-medium border-b-2 border-vto-orange-dark text-vto-orange-dark whitespace-nowrap">
+                        <i class="fas fa-book mr-2"></i> Story
+                    </a>
+                    <a href="#needs" class="tab-link py-4 px-1 text-sm font-medium border-b-2 border-transparent text-vto-gray-500 hover:text-vto-gray-700 whitespace-nowrap">
+                        <i class="fas fa-hands-helping mr-2"></i> Needs
+                    </a>
+                    <a href="#gallery" class="tab-link py-4 px-1 text-sm font-medium border-b-2 border-transparent text-vto-gray-500 hover:text-vto-gray-700 whitespace-nowrap">
+                        <i class="fas fa-images mr-2"></i> Gallery
+                    </a>
+                    <a href="#updates" class="tab-link py-4 px-1 text-sm font-medium border-b-2 border-transparent text-vto-gray-500 hover:text-vto-gray-700 whitespace-nowrap">
+                        <i class="fas fa-newspaper mr-2"></i> Updates
+                    </a>
+                    {% if can_view_private %}
+                    <a href="#private" class="tab-link py-4 px-1 text-sm font-medium border-b-2 border-transparent text-vto-gray-500 hover:text-vto-gray-700 whitespace-nowrap">
+                        <i class="fas fa-lock mr-2"></i> Private Info
+                    </a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Story Tab -->
+<section id="story" class="py-16 tab-content">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <!-- Featured Stories -->
+            {% if stories %}
+            <div class="mb-12">
+                <h2 class="section-title text-left mb-8">Latest Stories</h2>
+                <div class="space-y-8">
+                    {% for story in stories|slice:":3" %}
+                    <div class="card p-8 hover-lift">
+                        <div class="flex items-center mb-4">
+                            <span class="px-3 py-1 bg-vto-purple/10 text-vto-purple rounded-full text-sm font-medium">
+                                {{ story.get_story_type_display }}
+                            </span>
+                            <span class="mx-4 text-vto-gray-400">•</span>
+                            <span class="text-vto-gray-500">{{ story.created_at|date:"F j, Y" }}</span>
+                        </div>
+                        
+                        <h3 class="text-2xl font-bold text-vto-black mb-4">{{ story.title }}</h3>
+                        
+                        <div class="prose max-w-none mb-6">
+                            {{ story.content|truncatewords:100|linebreaks }}
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <a href="{% url 'children:story_detail' story.slug %}" class="text-vto-orange-dark hover:text-vto-orange-golden font-medium">
+                                Read full story <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                            {% if story.is_featured %}
+                            <span class="px-2 py-1 bg-vto-orange-golden/10 text-vto-orange-golden rounded text-xs">
+                                <i class="fas fa-star mr-1"></i> Featured
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if stories|length > 3 %}
+                <div class="text-center mt-8">
+                    <a href="{% url 'children:stories' child.slug %}" class="btn-outline">
+                        <i class="fas fa-history mr-2"></i> View All Stories
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Timeline -->
+            <div class="card p-8">
+                <h2 class="text-2xl font-bold text-vto-black mb-8">{{ child.code_name }}'s Journey</h2>
+                
+                <div class="relative">
+                    <!-- Timeline Line -->
+                    <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-vto-gray-300"></div>
+                    
+                    <div class="space-y-8">
+                        <!-- Admission -->
+                        <div class="flex items-start">
+                            <div class="relative">
+                                <div class="w-8 h-8 rounded-full bg-vto-orange-dark flex items-center justify-center z-10">
+                                    <i class="fas fa-home text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="ml-6">
+                                <p class="font-bold text-vto-black">Joined Victory Teens</p>
+                                <p class="text-vto-gray-600">{{ child.date_admitted|date:"F j, Y" }}</p>
+                                <p class="text-sm text-vto-gray-500 mt-1">
+                                    {{ child.code_name }} joined our family {{ child.years_in_care }} year{{ child.years_in_care|pluralize }} ago
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Education Milestones -->
+                        <div class="flex items-start">
+                            <div class="relative">
+                                <div class="w-8 h-8 rounded-full bg-vto-purple flex items-center justify-center z-10">
+                                    <i class="fas fa-graduation-cap text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="ml-6">
+                                <p class="font-bold text-vto-black">Education Progress</p>
+                                <p class="text-vto-gray-600">Currently in {{ child.educational_level|default:"school" }}</p>
+                                {% if child.career_aspirations %}
+                                <p class="text-sm text-vto-gray-500 mt-1">
+                                    Aspires to be: {{ child.career_aspirations }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Personal Growth -->
+                        <div class="flex items-start">
+                            <div class="relative">
+                                <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center z-10">
+                                    <i class="fas fa-heart text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="ml-6">
+                                <p class="font-bold text-vto-black">Personal Growth</p>
+                                <p class="text-vto-gray-600">Developing skills and confidence</p>
+                                {% if child.interests %}
+                                <p class="text-sm text-vto-gray-500 mt-1">
+                                    Interests: {{ child.interests|truncatewords:10 }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Future Goals -->
+                        <div class="flex items-start">
+                            <div class="relative">
+                                <div class="w-8 h-8 rounded-full bg-vto-orange-golden flex items-center justify-center z-10">
+                                    <i class="fas fa-flag text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="ml-6">
+                                <p class="font-bold text-vto-black">Future Goals</p>
+                                <p class="text-vto-gray-600">Working towards independence</p>
+                                <p class="text-sm text-vto-gray-500 mt-1">
+                                    With continued support, {{ child.code_name }} will graduate from our program at age 19
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Needs Tab -->
+<section id="needs" class="py-16 tab-content hidden">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="mb-8">
+                <h2 class="section-title text-left mb-2">{{ child.code_name }}'s Needs</h2>
+                <p class="text-vto-gray-600">
+                    Your support can help meet {{ child.code_name }}'s specific needs and goals
+                </p>
+            </div>
+            
+            {% if needs %}
+            <div class="space-y-6">
+                {% for need in needs %}
+                <div class="card p-8 hover-lift">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+                        <div>
+                            <div class="flex items-center mb-2">
+                                <h3 class="text-xl font-bold text-vto-black">{{ need.title }}</h3>
+                                <span class="ml-4 px-3 py-1 rounded-full text-xs font-medium 
+                                    {% if need.priority == 'urgent' %}bg-red-100 text-red-800
+                                    {% elif need.priority == 'high' %}bg-orange-100 text-orange-800
+                                    {% elif need.priority == 'medium' %}bg-yellow-100 text-yellow-800
+                                    {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                    {{ need.get_priority_display }} Priority
+                                </span>
+                            </div>
+                            <p class="text-vto-gray-600">{{ need.description }}</p>
+                        </div>
+                        
+                        <div class="mt-4 md:mt-0 text-right">
+                            <p class="text-2xl font-bold text-vto-orange-dark">KES {{ need.estimated_cost|floatformat:0|intcomma }}</p>
+                            <p class="text-sm text-vto-gray-500">{{ need.get_need_type_display }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress -->
+                    <div class="mb-6">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-vto-gray-600">Raised: KES {{ need.amount_raised|floatformat:0|intcomma }}</span>
+                            <span class="text-vto-gray-600">Needed: KES {{ need.amount_needed|floatformat:0|intcomma }}</span>
+                        </div>
+                        <div class="w-full bg-vto-gray-200 rounded-full h-3">
+                            <div class="bg-vto-orange-dark h-3 rounded-full" style="width: {{ need.progress_percentage }}%"></div>
+                        </div>
+                        <div class="text-right text-sm text-vto-gray-500 mt-1">
+                            {{ need.progress_percentage|floatformat:0 }}% funded
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap gap-4">
+                        {% if not need.is_fully_funded %}
+                        <a href="{% url 'donations:make_donation' %}?dedication={{ child.code_name }}&amount={{ need.amount_needed }}" 
+                           class="btn-primary">
+                            <i class="fas fa-donate mr-2"></i> Fund This Need
+                        </a>
+                        {% else %}
+                        <span class="px-4 py-2 bg-green-100 text-green-800 rounded-lg font-medium">
+                            <i class="fas fa-check-circle mr-2"></i> Fully Funded
+                        </span>
+                        {% endif %}
+                        
+                        <button onclick="showNeedDetails({{ need.id }})" class="btn-outline">
+                            <i class="fas fa-info-circle mr-2"></i> Details
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- No Needs -->
+            <div class="card p-12 text-center">
+                <div class="text-4xl text-vto-gray-300 mb-4">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-vto-black mb-2">All Needs Met</h3>
+                <p class="text-vto-gray-600 mb-6 max-w-md mx-auto">
+                    {{ child.code_name }}'s current needs are fully supported. 
+                    You can still support their ongoing education and development.
+                </p>
+                <a href="{% url 'children:start_sponsorship' child.slug %}" class="btn-primary">
+                    <i class="fas fa-heart mr-2"></i> Support {{ child.code_name }}
+                </a>
+            </div>
+            {% endif %}
+            
+            <!-- General Support -->
+            <div class="mt-12 card p-8 bg-gradient-to-r from-vto-orange-dark/5 to-vto-purple/5">
+                <h2 class="text-2xl font-bold text-vto-black mb-4">General Support</h2>
+                <p class="text-vto-gray-600 mb-6">
+                    Even if specific needs are funded, ongoing support through sponsorship ensures 
+                    {{ child.code_name }} has consistent care, education, and opportunities.
+                </p>
+                <div class="flex flex-wrap gap-6">
+                    <a href="{% url 'children:start_sponsorship' child.slug %}" class="btn-primary">
+                        <i class="fas fa-heart mr-2"></i> Become a Sponsor
+                    </a>
+                    <a href="{% url 'donations:make_donation' %}?dedication={{ child.code_name }}" class="btn-secondary">
+                        <i class="fas fa-gift mr-2"></i> Make a One-time Gift
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Gallery Tab -->
+<section id="gallery" class="py-16 tab-content hidden">
+    <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="mb-8">
+                <h2 class="section-title text-left mb-2">Photos of {{ child.code_name }}</h2>
+                <p class="text-vto-gray-600">
+                    {% if child.can_display_photo %}
+                    Photos shared with {{ child.code_name }}'s consent
+                    {% else %}
+                    Photos are protected for {{ child.code_name }}'s privacy
+                    {% endif %}
+                </p>
+            </div>
+            
+            {% if photos %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for photo in photos %}
+                <div class="relative group">
+                    <div class="aspect-square overflow-hidden rounded-lg bg-vto-gray-100">
+                        {% if photo.requires_blur and photo.blur_applied %}
+                        <div class="w-full h-full flex items-center justify-center">
+                            <div class="text-center">
+                                <i class="fas fa-eye-slash text-4xl text-vto-gray-400 mb-2"></i>
+                                <p class="text-sm text-vto-gray-500">Photo blurred for privacy</p>
+                            </div>
+                        </div>
+                        {% else %}
+                        <img src="{{ photo.photo.url }}" alt="{{ photo.caption|default:child.code_name }}" 
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        {% endif %}
+                    </div>
+                    
+                    {% if photo.caption %}
+                    <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <p class="text-sm">{{ photo.caption }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="text-center mt-8">
+                <a href="{% url 'children:gallery' child.slug %}" class="btn-outline">
+                    <i class="fas fa-images mr-2"></i> View Full Gallery
+                </a>
+            </div>
+            {% else %}
+            <!-- No Photos -->
+            <div class="card p-12 text-center">
+                <div class="text-4xl text-vto-gray-300 mb-4">
+                    <i class="fas fa-camera"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-vto-black mb-2">No Photos Available</h3>
+                <p class="text-vto-gray-600 mb-6 max-w-md mx-auto">
+                    Photos of {{ child.code_name }} are protected for privacy or will be added soon.
+                </p>
+                <p class="text-sm text-vto-gray-500">
+                    <i class="fas fa-shield-alt mr-1"></i>
+                    We respect our teens' privacy and only share photos with consent
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Updates Tab -->
+<section id="updates" class="py-16 tab-content hidden">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="mb-8">
+                <h2 class="section-title text-left mb-2">Latest Updates</h2>
+                <p class="text-vto-gray-600">
+                    Recent news and progress reports about {{ child.code_name }}
+                </p>
+            </div>
+            
+            {% if stories %}
+            <div class="space-y-8">
+                {% for story in stories|slice:":5" %}
+                <div class="card p-8">
+                    <div class="flex items-center mb-4">
+                        <span class="px-3 py-1 bg-vto-purple/10 text-vto-purple rounded-full text-sm font-medium">
+                            {{ story.get_story_type_display }}
+                        </span>
+                        <span class="mx-4 text-vto-gray-400">•</span>
+                        <span class="text-vto-gray-500">{{ story.created_at|date:"F j, Y" }}</span>
+                    </div>
+                    
+                    <h3 class="text-2xl font-bold text-vto-black mb-4">{{ story.title }}</h3>
+                    
+                    <div class="prose max-w-none mb-6">
+                        {{ story.excerpt|linebreaks }}
+                    </div>
+                    
+                    <a href="{% url 'children:story_detail' story.slug %}" class="text-vto-orange-dark hover:text-vto-orange-golden font-medium">
+                        Read full update <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="text-center mt-8">
+                <a href="{% url 'children:stories' child.slug %}" class="btn-outline">
+                    <i class="fas fa-history mr-2"></i> View All Updates
+                </a>
+            </div>
+            {% else %}
+            <!-- No Updates -->
+            <div class="card p-12 text-center">
+                <div class="text-4xl text-vto-gray-300 mb-4">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-vto-black mb-2">No Updates Yet</h3>
+                <p class="text-vto-gray-600 mb-6 max-w-md mx-auto">
+                    Updates about {{ child.code_name }} will be posted here soon.
+                </p>
+                {% if is_sponsor %}
+                <p class="text-sm text-vto-gray-500">
+                    As a sponsor, you'll receive regular updates via email
+                </p>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Sponsor Communication -->
+            {% if is_sponsor %}
+            <div class="mt-12 card p-8 bg-gradient-to-r from-green-50 to-blue-50">
+                <h2 class="text-2xl font-bold text-vto-black mb-4">Sponsor Communication</h2>
+                <p class="text-vto-gray-600 mb-6">
+                    As {{ child.code_name }}'s sponsor, you can send messages and receive personalized updates.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <button onclick="showMessageModal()" class="btn-primary">
+                        <i class="fas fa-envelope mr-2"></i> Send Message
+                    </button>
+                    <a href="{% url 'children:sponsorship_detail' sponsorship_id %}" class="btn-outline">
+                        <i class="fas fa-user-circle mr-2"></i> Sponsor Dashboard
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Private Info Tab (for sponsors/staff) -->
+{% if can_view_private %}
+<section id="private" class="py-16 tab-content hidden">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="mb-8">
+                <h2 class="section-title text-left mb-2">Private Information</h2>
+                <p class="text-vto-gray-600">
+                    This information is only visible to staff and sponsors of {{ child.code_name }}
+                </p>
+                <div class="mt-2 flex items-center text-sm text-vto-gray-500">
+                    <i class="fas fa-lock mr-2"></i>
+                    <span>Protected information - please maintain confidentiality</span>
+                </div>
+            </div>
+            
+            <div class="card p-8">
+                <div class="space-y-8">
+                    <!-- Health Information -->
+                    {% if child.health_status or child.special_needs %}
+                    <div>
+                        <h3 class="text-xl font-bold text-vto-black mb-4">Health & Wellness</h3>
+                        {% if child.health_status %}
+                        <div class="mb-4">
+                            <p class="text-sm text-vto-gray-600 mb-1">General Health</p>
+                            <p class="text-vto-gray-700">{{ child.health_status }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if child.special_needs %}
+                        <div>
+                            <p class="text-sm text-vto-gray-600 mb-1">Special Needs</p>
+                            <p class="text-vto-gray-700">{{ child.special_needs }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Detailed Background -->
+                    {% if child.private_background %}
+                    <div>
+                        <h3 class="text-xl font-bold text-vto-black mb-4">Detailed Background</h3>
+                        <div class="prose max-w-none">
+                            {{ child.private_background|linebreaks }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Current Needs Details -->
+                    {% if child.current_needs %}
+                    <div>
+                        <h3 class="text-xl font-bold text-vto-black mb-4">Current Support Needs</h3>
+                        <div class="prose max-w-none">
+                            {{ child.current_needs|linebreaks }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Case Manager -->
+                    {% if child.case_manager %}
+                    <div>
+                        <h3 class="text-xl font-bold text-vto-black mb-4">Case Manager</h3>
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 rounded-full bg-vto-purple/10 text-vto-purple flex items-center justify-center mr-4">
+                                {{ child.case_manager.get_initials }}
+                            </div>
+                            <div>
+                                <p class="font-medium">{{ child.case_manager.get_full_name }}</p>
+                                <p class="text-sm text-vto-gray-600">{{ child.case_manager.email }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA Section -->
+{% if child.sponsorship_needed and not child.is_sponsored %}
+<section class="py-16 bg-gradient-to-r from-vto-orange-dark to-vto-purple text-white">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6">Sponsor {{ child

@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Donation Successful - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <div class="max-w-3xl mx-auto text-center">
+        <!-- Success Icon -->
+        <div class="mx-auto flex items-center justify-center h-32 w-32 rounded-full bg-green-100 mb-8">
+            <i class="fas fa-check-circle text-green-600 text-6xl"></i>
+        </div>
+        
+        <!-- Success Message -->
+        <h1 class="text-4xl font-bold text-vto-black mb-4">Thank You for Your Donation!</h1>
+        <p class="text-xl text-vto-gray-600 mb-8">
+            Your generous donation of <span class="font-bold text-vto-orange-dark">KES {{ donation.amount|floatformat:2 }}</span> 
+            has been received and will make a real difference in the lives of orphaned teens.
+        </p>
+        
+        <!-- Receipt Details -->
+        <div class="card p-8 mb-8 max-w-2xl mx-auto">
+            <h2 class="text-2xl font-bold text-vto-black mb-6">Donation Receipt</h2>
+            
+            <div class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="text-left">
+                        <p class="text-sm text-vto-gray-600">Donation ID</p>
+                        <p class="text-lg font-bold">{{ donation.donation_id }}</p>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-sm text-vto-gray-600">Receipt Number</p>
+                        <p class="text-lg font-bold">{{ receipt_number }}</p>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-sm text-vto-gray-600">Date</p>
+                        <p class="text-lg font-bold">{{ donation.created_at|date:"F j, Y g:i A" }}</p>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-sm text-vto-gray-600">Payment Method</p>
+                        <p class="text-lg font-bold">{{ donation.get_payment_method_display }}</p>
+                    </div>
+                    <div class="text-left md:col-span-2">
+                        <p class="text-sm text-vto-gray-600">Donor Name</p>
+                        <p class="text-lg font-bold">{{ donation.get_donor_display_name }}</p>
+                    </div>
+                    {% if donation.campaign %}
+                    <div class="text-left md:col-span-2">
+                        <p class="text-sm text-vto-gray-600">Campaign</p>
+                        <p class="text-lg font-bold">{{ donation.campaign.title }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="border-t border-vto-gray-100 pt-6">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xl font-bold text-vto-black">Total Amount</span>
+                        <span class="text-2xl font-bold text-vto-orange-dark">KES {{ donation.amount|floatformat:2 }}</span>
+                    </div>
+                    <p class="text-sm text-vto-gray-500 mt-2 text-left">100% tax deductible</p>
+                </div>
+                
+                {% if donation.is_dedicated and donation.dedication_name %}
+                <div class="p-4 bg-vto-gray-50 rounded-lg text-left">
+                    <p class="text-sm text-vto-gray-600">Dedication</p>
+                    <p class="font-medium">{{ donation.dedication_name }}</p>
+                    {% if donation.dedication_message %}
+                    <p class="text-sm text-vto-gray-600 mt-2">"{{ donation.dedication_message }}"</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Receipt Actions -->
+            <div class="mt-8 flex flex-wrap justify-center gap-4">
+                <button onclick="window.print()" class="btn-outline">
+                    <i class="fas fa-print mr-2"></i> Print Receipt
+                </button>
+                <button onclick="downloadReceipt()" class="btn-outline">
+                    <i class="fas fa-download mr-2"></i> Download PDF
+                </button>
+                <button onclick="emailReceipt()" class="btn-primary">
+                    <i class="fas fa-envelope mr-2"></i> Email Receipt
+                </button>
+            </div>
+        </div>
+        
+        <!-- Next Steps -->
+        <div class="card p-8 mb-8">
+            <h2 class="text-2xl font-bold text-vto-black mb-6">What Happens Next?</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 rounded-full bg-vto-orange-dark/10 text-vto-orange-dark flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-envelope text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-vto-black mb-2">Receipt by Email</h3>
+                    <p class="text-vto-gray-600">
+                        Your tax-deductible receipt has been sent to 
+                        <span class="font-medium">{{ donation.donor_email }}</span>
+                    </p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 rounded-full bg-vto-purple/10 text-vto-purple flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-heart text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-vto-black mb-2">Impact Updates</h3>
+                    <p class="text-vto-gray-600">
+                        You'll receive updates on how your donation is making a difference
+                    </p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 rounded-full bg-vto-orange-golden/10 text-vto-orange-golden flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-share-alt text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-vto-black mb-2">Share the Impact</h3>
+                    <p class="text-vto-gray-600">
+                        Inspire others by sharing your donation on social media
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Share & Continue -->
+        <div class="space-y-8">
+            <!-- Share Buttons -->
+            <div>
+                <h3 class="text-xl font-bold text-vto-black mb-4">Share Your Generosity</h3>
+                <div class="flex justify-center space-x-4">
+                    <button onclick="shareOnFacebook()" class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors">
+                        <i class="fab fa-facebook-f"></i>
+                    </button>
+                    <button onclick="shareOnTwitter()" class="w-12 h-12 rounded-full bg-blue-400 text-white flex items-center justify-center hover:bg-blue-500 transition-colors">
+                        <i class="fab fa-twitter"></i>
+                    </button>
+                    <button onclick="shareOnWhatsApp()" class="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition-colors">
+                        <i class="fab fa-whatsapp"></i>
+                    </button>
+                    <button onclick="copyShareLink()" class="w-12 h-12 rounded-full bg-vto-gray-600 text-white flex items-center justify-center hover:bg-vto-gray-700 transition-colors">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap justify-center gap-6">
+                <a href="{% url 'donations:make_donation' %}" class="btn-primary">
+                    <i class="fas fa-heart mr-2"></i> Make Another Donation
+                </a>
+                <a href="{% url 'home' %}" class="btn-outline">
+                    <i class="fas fa-home mr-2"></i> Back to Home
+                </a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'donations:my_donations' %}" class="btn-outline">
+                    <i class="fas fa-history mr-2"></i> View All Donations
+                </a>
+                {% else %}
+                <a href="{% url 'register' %}" class="btn-outline">
+                    <i class="fas fa-user-plus mr-2"></i> Create Account
+                </a>
+                {% endif %}
+            </div>
+            
+            <!-- Follow Us -->
+            <div class="pt-8 border-t border-vto-gray-100">
+                <h3 class="text-xl font-bold text-vto-black mb-4">Stay Connected</h3>
+                <p class="text-vto-gray-600 mb-6">
+                    Follow us on social media to see regular updates on how donations like yours are changing lives.
+                </p>
+                <div class="flex justify-center space-x-6">
+                    <a href="#" class="text-vto-gray-600 hover:text-vto-orange-dark">
+                        <i class="fab fa-facebook-f text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-vto-gray-600 hover:text-vto-orange-dark">
+                        <i class="fab fa-twitter text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-vto-gray-600 hover:text-vto-orange-dark">
+                        <i class="fab fa-instagram text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-vto-gray-600 hover:text-vto-orange-dark">
+                        <i class="fab fa-youtube text-2xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Share Modal -->
+<div id="shareModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full">
+        <div class="p-6 border-b border-vto-gray-100 flex justify-between items-center">
+            <h3 class="text-xl font-bold text-vto-black">Share Your Donation</h3>
+            <button onclick="closeShareModal()" class="text-vto-gray-500 hover:text-vto-black">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <p class="text-vto-gray-600 mb-6">
+                Copy this link to share your donation:
+            </p>
+            <div class="flex mb-6">
+                <input type="text" id="shareLink" readonly 
+                       class="input-field rounded-r-none" 
+                       value="https://victoryteens.org/donation-success/{{ donation.donation_id }}">
+                <button onclick="copyShareLink()" class="bg-vto-orange-dark text-white px-4 rounded-r-lg hover:bg-vto-orange-golden transition-colors">
+                    Copy
+                </button>
+            </div>
+            <p class="text-sm text-vto-gray-500">
+                <i class="fas fa-info-circle mr-1"></i>
+                Sharing your donation inspires others to give too!
+            </p>
+        </div>
+        <div class="p-6 border-t border-vto-gray-100 flex justify-end">
+            <button onclick="closeShareModal()" class="btn-primary">
+                Done
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Share functions
+function shareOnFacebook() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(`I just donated to Victory Teens Organization to support orphaned teens! Join me in making a difference.`);
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank');
+}
+
+function shareOnTwitter() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(`I just donated to @VictoryTeens to support orphaned teens! Join me in making a difference.`);
+    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+}
+
+function shareOnWhatsApp() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(`I just donated to Victory Teens Organization to support orphaned teens! Join me in making a difference. ${url}`);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+
+function copyShareLink() {
+    const shareLink = document.getElementById('shareLink');
+    shareLink.select();
+    shareLink.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+    
+    // Show success message
+    const originalText = shareLink.nextElementSibling.textContent;
+    shareLink.nextElementSibling.textContent = 'Copied!';
+    shareLink.nextElementSibling.classList.add('bg-green-500');
+    
+    setTimeout(() => {
+        shareLink.nextElementSibling.textContent = originalText;
+        shareLink.nextElementSibling.classList.remove('bg-green-500');
+    }, 2000);
+}
+
+function openShareModal() {
+    document.getElementById('shareModal').classList.remove('hidden');
+}
+
+function closeShareModal() {
+    document.getElementById('shareModal').classList.add('hidden');
+}
+
+// Receipt functions
+function downloadReceipt() {
+    // In production, this would generate and download a PDF
+    alert('PDF receipt generation will be available soon!');
+}
+
+function emailReceipt() {
+    // In production, this would send an email
+    alert('Receipt has already been emailed to you!');
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-show share modal if coming from social share
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('share') === 'true') {
+        openShareModal();
+    }
+});
+</script>
+{% endblock %}
