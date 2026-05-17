@@ -25,7 +25,12 @@ SECRET_KEY = 'django-insecure-@x8a@_2!@qy)=4q1ig3q6w@#o==(kv35x8610)ahi%(q)ausjb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "victeens.org",
+    "www.victeens.org",
+    "127.0.0.1",
+    "localhost"
+]
 
 
 # Application definition
