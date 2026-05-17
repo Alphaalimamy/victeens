@@ -1,0 +1,27 @@
+name: Deploy Django to VPS
+
+on:
+  push:
+    branches: [master]  # or 'master' or any branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Deploy over SSH
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          cd /home/warrior_20/www/victeens
+          git pull
+          source venv/bin/activate
+          python manage.py migrate --noinput
+          python manage.py collectstatic --noinput
+          sudo service victeens restart
