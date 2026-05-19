@@ -1,250 +1,339 @@
-{% extends 'core/base.html' %}
-{% load static %}
-
-{% block content %}
+{% extends 'core/base.html' %} {% load static %} {% block content %}
 <div class="min-h-screen">
-    <section class="relative min-h-[88vh] overflow-hidden">
-        <div class="absolute inset-0 pointer-events-none">
-            <div class="absolute top-10 right-0 w-80 h-80 rounded-full bg-vto-orange/20 blur-3xl"></div>
-            <div class="absolute -bottom-20 left-0 w-96 h-96 rounded-full bg-vto-purple/10 blur-3xl"></div>
-            <div class="absolute inset-y-0 left-1/2 w-96 -translate-x-1/2 rounded-full bg-vto-orange-golden/10 blur-3xl"></div>
+  <section class="relative min-h-[88vh] overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none">
+      <div
+        class="absolute top-10 right-0 w-80 h-80 rounded-full bg-vto-orange/20 blur-3xl"
+      ></div>
+      <div
+        class="absolute -bottom-20 left-0 w-96 h-96 rounded-full bg-vto-purple/10 blur-3xl"
+      ></div>
+      <div
+        class="absolute inset-y-0 left-1/2 w-96 -translate-x-1/2 rounded-full bg-vto-orange-golden/10 blur-3xl"
+      ></div>
+    </div>
+
+    <div class="container mx-auto px-6 lg:px-12 relative z-10">
+      <div class="grid gap-12 items-center lg:grid-cols-[1.1fr_0.9fr]">
+        <div class="space-y-8 max-w-2xl">
+          <span
+            class="inline-flex rounded-full 
+            bg-vto-orange/10 mt-2 px-4 
+            py-2 text-sm font-semibold 
+            uppercase tracking-[0.3em] 
+            text-vto-orange-dark"
+          >
+            Empowering Tomorrow's Leaders
+          </span>
+
+          <h1
+            class="text-5xl font-extrabold tracking-tight text-vto-black sm:text-6xl lg:text-7xl leading-tight"
+          >
+            Every Teen <span class="text-purple-700 font-bold">deserves</span> a
+            brighter future.
+          </h1>
+
+          <p
+            class="text-lg text-vto-gray-600 max-w-2xl leading-relaxed sm:text-xl"
+          >
+            We transform the lives of orphaned and underprivileged teens through
+            <span class="text-purple-700 font-bold"
+              >education, mentorship, life skills</span
+            >, and a
+            <span class="text-purple-700 font-bold">safe community</span> where
+            every young person can thrive.
+          </p>
+
+          <div class="flex flex-wrap gap-4 items-center">
+            <a
+              href="{% url 'about' %}"
+              class="inline-flex items-center 
+              justify-center rounded-full 
+              bg-vto-orange-dark px-8 py-4 
+              text-lg font-semibold text-white 
+              shadow-lg shadow-vto-orange-dark/10 
+              transition duration-300 
+              hover:bg-vto-orange-golden"
+            >
+              Our Story
+              <i class="fas fa-arrow-right ml-3"></i>
+            </a>
+            <a
+              href="{% url 'volunteer' %}"
+              class="inline-flex items-center 
+              justify-center rounded-full 
+              border border-vto-orange-dark/15 
+              bg-white px-8 py-4 text-lg 
+              font-semibold text-vto-orange-dark 
+              transition duration-300 
+              hover:border-vto-orange-dark 
+              hover:bg-vto-orange-dark/5"
+            >
+              Volunteer
+            </a>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 mt-8">
+            <div
+              class="rounded-3xl border border-vto-gray-200 bg-white/90 p-5 shadow-sm"
+            >
+              <p class="text-3xl 
+              font-bold text-vto-black">15+</p>
+              <p class="mt-2 text-sm 
+              text-vto-gray-600">Years of Impact</p>
+            </div>
+            <div
+              class="rounded-3xl border border-vto-gray-200 bg-white/90 p-5 shadow-sm"
+            >
+              <p class="text-3xl font-bold text-vto-black">1200+</p>
+              <p class="mt-2 text-sm text-vto-gray-600">Lives Supported</p>
+            </div>
+            <div
+              class="rounded-3xl border border-vto-gray-200 bg-white/90 p-5 shadow-sm"
+            >
+              <p class="text-3xl font-bold text-vto-black">30+</p>
+              <p class="mt-2 text-sm text-vto-gray-600">Community Partners</p>
+            </div>
+          </div>
         </div>
 
-        <div class="container mx-auto px-6 lg:px-12 relative z-10">
-            <div class="grid gap-12 items-center lg:grid-cols-[1.1fr_0.9fr]">
-                <div class="space-y-8 max-w-2xl">
-                    <span class="inline-flex rounded-full bg-vto-orange/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-vto-orange-dark">
-                        Empowering Tomorrow's Leaders
-                    </span>
-
-                    <h1 class="text-5xl font-extrabold tracking-tight text-vto-black sm:text-6xl lg:text-7xl leading-tight">
-                        Every Teen <span class="text-purple-700 font-bold">deserves</span> a brighter future.
-                    </h1>
-
-                    <p class="text-lg text-vto-gray-600 max-w-2xl leading-relaxed sm:text-xl">
-                        We transform the lives of orphaned and underprivileged teens through <span class="text-purple-700 font-bold">education, mentorship, life skills</span>,
-                        and a <span class="text-purple-700 font-bold">safe community</span> where every young person can thrive.
-                    </p>
-
-                    <div class="flex flex-wrap gap-4 items-center">
-                        <a href="{% url 'about' %}" class="inline-flex items-center justify-center rounded-full bg-vto-orange-dark px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-vto-orange-dark/10 transition duration-300 hover:bg-vto-orange-golden">
-                            Our Story
-                            <i class="fas fa-arrow-right ml-3"></i>
-                        </a>
-                        <a href="{% url 'volunteer' %}" class="inline-flex items-center justify-center rounded-full border border-vto-orange-dark/15 bg-white px-8 py-4 text-lg font-semibold text-vto-orange-dark transition duration-300 hover:border-vto-orange-dark hover:bg-vto-orange-dark/5">
-                            Volunteer
-                        </a>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 mt-8">
-                        <div class="rounded-3xl border border-vto-gray-200 bg-white/90 p-5 shadow-sm">
-                            <p class="text-3xl font-bold text-vto-black">15+</p>
-                            <p class="mt-2 text-sm text-vto-gray-600">Years of Impact</p>
-                        </div>
-                        <div class="rounded-3xl border border-vto-gray-200 bg-white/90 p-5 shadow-sm">
-                            <p class="text-3xl font-bold text-vto-black">1200+</p>
-                            <p class="mt-2 text-sm text-vto-gray-600">Lives Supported</p>
-                        </div>
-                        <div class="rounded-3xl border border-vto-gray-200 bg-white/90 p-5 shadow-sm">
-                            <p class="text-3xl font-bold text-vto-black">30+</p>
-                            <p class="mt-2 text-sm text-vto-gray-600">Community Partners</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="relative hidden lg:block">
-                    <div class="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-vto-orange-dark to-vto-purple opacity-20 blur-2xl"></div>
-                    <div class="relative overflow-hidden rounded-[2rem] bg-white shadow-2xl">
-                        <img src="{% static 'images/hero-teens.png' %}" alt="Happy children" class="h-[520px] w-full object-cover" />
-                        <div class="absolute -bottom-8 left-8 rounded-3xl bg-white p-6 shadow-xl border border-vto-gray-200">
-                            <div class="flex items-center gap-4">
-                                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-vto-orange to-vto-orange-dark text-white text-2xl">
-                                    ♥
-                                </div>
-                                <div>
-                                    <p class="text-3xl font-bold text-vto-black">15+</p>
-                                    <p class="text-sm text-vto-gray-600">Years of Impact</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-20 bg-white">
-        <div class="container mx-auto px-6 lg:px-12">
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
-                {% for stat in impact_stats %}
-                <div class="text-center group">
-                    <div
-                        class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#B83E09]/10 to-[#6E3595]/10 rounded-2xl mb-4 group-hover:scale-110 transition-transform">
-                        <i class="{{ stat.icon }} text-2xl text-[#B83E09]"></i>
-                    </div>
-                    <h3 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-2">{{ stat.value }}{{ stat.suffix }}</h3>
-                    <p class="text-gray-600">{{ stat.title }}</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-
-    <section class="py-24 bg-gray-50 w-full">
-        <div class="container mx-auto px-6 lg:px-12">
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <span class="text-vto-orange  font-bold uppercase tracking-widest text-sm">What We Do</span>
-                <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mt-3 mb-6">
-                    Programs That Transform Lives
-                </h2>
-                <p class="text-xl text-gray-600">
-                    Our comprehensive programs address every aspect of a teen's development,
-                    from education to emotional well-being.
-                </p>
-            </div>
-            {% if programs %}
-
-            <div class="grid md:grid-cols-3 gap-8">
-                {% for program in programs %}
+        <div class="relative hidden lg:block">
+          <div
+            class="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-vto-orange-dark to-vto-purple opacity-20 blur-2xl"
+          ></div>
+          <div
+            class="relative overflow-hidden rounded-[2rem] bg-white shadow-2xl"
+          >
+            <img
+              src="{% static 'images/hero-teens.png' %}"
+              alt="Happy children"
+              class="h-[520px] w-full object-cover"
+            />
+            <div
+              class="absolute -bottom-8 left-8 rounded-3xl bg-white p-6 shadow-xl border border-vto-gray-200"
+            >
+              <div class="flex items-center gap-4">
                 <div
-                    class="group relative bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500">
-                    <div class="relative h-64 overflow-hidden">
-                        <img src="{{ program.image_url }}" alt="{{ program.title }}"
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                        <div class="absolute inset-0 bg-gradient-to-t from-vto-orange-dark opacity-60"></div>
-                    </div>
-                    <div class="p-8">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-3">{{program.title}}</h3>
-                        <p class="text-gray-600 leading-relaxed">{{program.description|truncatewords:15}}</p>
-                        <a href="{% url 'programs' %}"
-                            class="inline-flex items-center mt-6 text-vto-orange-dark font-medium hover:translate-x-2 transition-all">
-                            Learn More <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 w-4 h-4" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </a>
-                    </div>
+                  class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-vto-orange to-vto-orange-dark text-white text-2xl"
+                >
+                  ♥
                 </div>
-                {% endfor %}
+                <div>
+                  <p class="text-3xl font-bold text-vto-black">15+</p>
+                  <p class="text-sm text-vto-gray-600">Years of Impact</p>
+                </div>
+              </div>
             </div>
-
-            {% else %}
-            <p class="text-center text-gray-600">No programs available at the moment. Please check back later.</p>
-            {% endif %}
-
+          </div>
         </div>
-    </section>
-    <section class="py-24  text-white w-full relative overflow-hidden rounded-3xl"
-        style="background: linear-gradient(135deg, #6E3595 0%, #E5B899 100%)">
-        <div class="container mx-auto px-6 lg:px-12 relative z-10">
-            <div class="w-full px-6 lg:px-12 relative z-10">
-                  <div class="space-y-6 max-w-lg text-center mx-auto mb-12">
-                    <span class="text-white/60 font-semibold tracking-wide">
-                        Stories of Hope
-                    </span>
+      </div>
+    </div>
+  </section>
 
-                    <h2 class="text-4xl lg:text-5xl font-extrabold leading-tight">
-                        Hear From Our Community
-                    </h2>
-
-                    <p class="text-lg lg:text-xl text-white/80">
-                        Real stories from the lives we've touched and the people who make it possible.
-                    </p>
-                </div>
-
-
-                <div class="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-6 items-start">
-                        {% for testimonial in testimonials %}
-                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8
-                 border border-white/20 shadow-lg relative">
-                            <!-- Quote Icon -->
-                            <div class="text-4xl text-vto-orange-golden mb-4 leading-none">
-                                “”
-                            </div>
-
-                            <!-- Testimonial Content -->
-                            <p class="text-lg leading-relaxed mb-6 italic text-white/90">
-                                "{{ testimonial.content|truncatewords:30 }}"
-                            </p>
-
-                            <!-- Author -->
-                            <div class="flex items-center gap-4">
-                                <img class="w-12 h-12 bg-white/20 rounded-full
-                     flex items-center justify-center
-                     text-vto-orange-golden text-xl"
-                                    src="{{ testimonial.image.url }}" alt="{{ testimonial.name }}">
-                                   
-                        
-                                <div>
-                                    <p class="font-semibold">
-                                        {{ testimonial.name }}
-                                    </p>
-                                    <p class="text-white/70 text-sm">
-                                        {{ testimonial.role }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                 
-
-                </div>
-            </div>
-
-            <!-- Decorative glow -->
-            <div class="absolute -top-32 -left-32 w-96 h-96 bg-vto-purple/30 rounded-full blur-3xl"></div>
-            <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-vto-orange-golden/30 rounded-full blur-3xl"></div>
-    </section>
-
-
-    <section class="py-24 bg-white">
-        <div class="container mx-auto px-6 lg:px-12">
-            <div class="relative rounded-3xl overflow-hidden p-12 lg:p-20 text-center"
-                style="background: linear-gradient(135deg, #FDFDFD 0%, #E5B899 100%)">
-                <div class="relative z-10">
-                    <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-                        Be Part of Their Victory
-                    </h2>
-                    <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
-                        Your support can change a teenager's life forever. Join us in creating
-                        a brighter future for the next generation.
-                    </p>
-                    <div class="flex flex-wrap justify-center gap-4">
-
-                        <a href="{% url 'volunteer' %}"
-                            class="border-2 border-[#6E3595] text-[#6E3595] hover:bg-[#6E3595] hover:text-white px-10 py-4 text-lg rounded-full transition-all">
-                            Become a Volunteer
-                        </a>
-                    </div>
-                </div>
-            </div>
+  <section class="py-20 bg-white">
+    <div class="container mx-auto px-6 lg:px-12">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+        {% for stat in impact_stats %}
+        <div class="text-center group">
+          <div
+            class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#B83E09]/10 to-[#6E3595]/10 rounded-2xl mb-4 group-hover:scale-110 transition-transform"
+          >
+            <i class="{{ stat.icon }} text-2xl text-[#B83E09]"></i>
+          </div>
+          <h3 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-2">
+            {{ stat.value }}{{ stat.suffix }}
+          </h3>
+          <p class="text-gray-600">{{ stat.title }}</p>
         </div>
-    </section>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 bg-gray-50 w-full">
+    <div class="container mx-auto px-6 lg:px-12">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span
+          class="text-vto-orange font-bold uppercase tracking-widest text-sm"
+          >What We Do</span
+        >
+        <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mt-3 mb-6">
+          Programs That Transform Lives
+        </h2>
+        <p class="text-xl text-gray-600">
+          Our comprehensive programs address every aspect of a teen's
+          development, from education to emotional well-being.
+        </p>
+      </div>
+      {% if programs %}
+
+      <div class="grid md:grid-cols-3 gap-8">
+        {% for program in programs %}
+        <div
+          class="group relative bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500"
+        >
+          <div class="relative h-64 overflow-hidden">
+            <img
+              src="{{ program.image_url }}"
+              alt="{{ program.title }}"
+              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-vto-orange-dark opacity-60"
+            ></div>
+          </div>
+          <div class="p-8">
+            <h3 class="text-2xl font-bold text-gray-900 mb-3">
+              {{program.title}}
+            </h3>
+            <p class="text-gray-600 leading-relaxed">
+              {{program.description|truncatewords:15}}
+            </p>
+            <a
+              href="{% url 'programs' %}"
+              class="inline-flex items-center mt-6 text-vto-orange-dark font-medium hover:translate-x-2 transition-all"
+            >
+              Learn More
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="ml-2 w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% else %}
+      <p class="text-center text-gray-600">
+        No programs available at the moment. Please check back later.
+      </p>
+      {% endif %}
+    </div>
+  </section>
+
+
+
+ <section
+  class="py-24 text-white relative overflow-hidden"
+  style="background: linear-gradient(135deg, #6e3595 0%, #e5b899 100%)"
+>
+  <div class="container mx-auto px-6 lg:px-12 relative z-10">
+
+    <div class="text-center max-w-lg mx-auto mb-12 space-y-6">
+      <span class="text-white/60 font-semibold tracking-wide">
+        Stories of Hope
+      </span>
+
+      <h2 class="text-4xl lg:text-5xl font-extrabold leading-tight">
+        Hear From Our Community
+      </h2>
+
+      <p class="text-lg lg:text-xl text-white/80">
+        Real stories from the lives we've touched and the people who make it possible.
+      </p>
+    </div>
+
+    <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-6 items-start">
+      {% for testimonial in testimonials %}
+      <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 shadow-lg">
+
+        <div class="text-4xl text-vto-orange-golden mb-4 leading-none">
+          “”
+        </div>
+
+        <p class="text-lg leading-relaxed mb-6 italic text-white/90">
+          "{{ testimonial.content|truncatewords:30 }}"
+        </p>
+
+        <div class="flex items-center gap-4">
+          <img
+            class="w-12 h-12 rounded-full object-cover"
+            src="{{ testimonial.image.url }}"
+            alt="{{ testimonial.name }}"
+          />
+
+          <div>
+            <p class="font-semibold">{{ testimonial.name }}</p>
+            <p class="text-white/70 text-sm">{{ testimonial.role }}</p>
+          </div>
+        </div>
+
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <!-- Decorative glow -->
+  <div class="absolute -top-32 -left-32 w-96 h-96 bg-vto-purple/30 rounded-full blur-3xl"></div>
+  <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-vto-orange-golden/30 rounded-full blur-3xl"></div>
+</section>
+
+
+  <section class="py-24 px-6 lg:px-12 bg-white">
+    <div
+      class="relative px-12 lg:px-24 rounded-3xl overflow-hidden p-12 lg:p-20 text-center"
+      style="background: linear-gradient(135deg, #fdfdfd 0%, #e5b899 100%)"
+    >
+      <div class="relative z-10">
+        <h2 class="text-xl lg:text-5xl font-bold text-gray-900 mb-6">
+          Be Part of Their Victory
+        </h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
+          Your support can change a teenager's life forever. Join us in creating
+          a brighter future for the next generation.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a
+            href="{% url 'volunteer' %}"
+            class="border-2 
+            border-[#6E3595] 
+            text-[#6E3595] hover:bg-[#6E3595]
+             hover:text-white px-10 py-4 
+             text-sm lg:text-lg 
+             rounded-full transition-all"
+          >
+            Become a Volunteer
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <style>
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
     }
 
-    .animate-fade-in-up {
-        animation: fadeInUp 0.8s ease-out forwards;
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
+  }
 
-    .animate-fade-in {
-        animation: fadeInUp 0.8s ease-out forwards;
-        transform: translateY(0);
-        opacity: 0;
-        animation-fill-mode: forwards;
-    }
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+
+  .animate-fade-in {
+    animation: fadeInUp 0.8s ease-out forwards;
+    transform: translateY(0);
+    opacity: 0;
+    animation-fill-mode: forwards;
+  }
 </style>
 {% endblock %}

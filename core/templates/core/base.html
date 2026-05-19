@@ -106,6 +106,13 @@
     <meta property="og:image" content="{% block og_image %}{{ STATIC_URL }}images/og-image.jpg{% endblock %}">
     
     {% block head_extra %}{% endblock %}
+
+    <style>
+      body {
+    margin: 0;
+    padding: 0;
+}
+    </style>
 </head>
 <body class="bg-vto-white text-vto-black font-sans min-h-screen flex flex-col leading-relaxed">
     <!-- Skip to main content -->
@@ -129,10 +136,11 @@
     {% endif %}
     
     <!-- Main Content -->
-    <main id="main-content" class="flex-grow px-10">
-        {% block content %}{% endblock %}
-    </main>
-    
+  
+    <main id="main-content" class="flex-grow">
+    {% block content %}{% endblock %}
+</main>
+
     <!-- Footer -->
 
     {% include "core/partials/footer.html" %}
