@@ -32,22 +32,16 @@ if not SECRET_KEY:
     raise Exception("SECRET_KEY is not set in environment variables")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+
 
 ALLOWED_HOSTS = [
     "victeens.org",
     "www.victeens.org",
-<<<<<<< HEAD
-    "127.0.0.1:8000",
-    "127.0.0.1"
-]
-=======
     "127.0.0.1",
     "localhost"
 ]
 
-
->>>>>>> f8e14450070fb815e5558e1b6d8a867bf35a3f09
 # Application definition
 
 INSTALLED_APPS = [
