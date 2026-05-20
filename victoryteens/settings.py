@@ -178,11 +178,11 @@ SOCIAL_SHARE_PLATFORMS = ['facebook', 'twitter', 'linkedin', 'whatsapp']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('DB_NAME', default='victoryteens_db'),
-        'USER': config('DB_USER', default='root'),
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='3306'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
     }
 }
 
