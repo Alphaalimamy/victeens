@@ -37,9 +37,17 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "victeens.org",
     "www.victeens.org",
+<<<<<<< HEAD
     "127.0.0.1:8000",
     "127.0.0.1"
 ]
+=======
+    "127.0.0.1",
+    "localhost"
+]
+
+
+>>>>>>> f8e14450070fb815e5558e1b6d8a867bf35a3f09
 # Application definition
 
 INSTALLED_APPS = [
