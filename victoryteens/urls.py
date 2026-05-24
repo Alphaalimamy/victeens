@@ -23,32 +23,26 @@ from django.views.generic import TemplateView
 from core.views import home_view, about_view, contact_view, programs_view, volunteer_view
 from users.views import dashboard_view, profile_view
 
+
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
-    # Admin
-    path('admin/', admin.site.urls),
-    
-    # Core Pages
-   
+    path('vicadmin/', admin.site.urls),
+
     path('', home_view, name='home'),
     path('volunteer/', volunteer_view, name='volunteer'),
     path('programs/', programs_view, name='programs'),
     path('about/', about_view, name='about'),
     path('contact/', contact_view, name='contact'),
+
     path('ckeditor/', include('ckeditor_uploader.urls')),
-    
-    # # User
     path('dashboard/', dashboard_view, name='dashboard'),
     path('profile/', profile_view, name='profile'),
-
-    
     path('blog/', include('blog.urls')),
-    
-    # Tailwind
+
     path("__reload__/", include("django_browser_reload.urls")),
 ]
 
-# Serve media files in development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    
