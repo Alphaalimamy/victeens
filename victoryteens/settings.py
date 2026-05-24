@@ -32,13 +32,14 @@ if not SECRET_KEY:
     raise Exception("SECRET_KEY is not set in environment variables")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 
 ALLOWED_HOSTS = [
     "victeens.org",
     "www.victeens.org",
     "127.0.0.1",
+    "127.0.0.1:8000"
     "localhost"
 ]
 

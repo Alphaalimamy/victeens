@@ -1,141 +1,128 @@
 from django.contrib import admin
-from django.utils.html import format_html
-from .models import (SiteSettings, ImpactStat, Testimonial,Milestone, FAQ, Page, ProgramFeature,
-                     ContactMessage, Program, TeamMember, OrganizationProfile, CoreValue)
+from .models import (
+    SiteConfiguration, SiteSettings, ImpactStat, Program, ProgramFeature,
+    Testimonial, Teen, FAQ, Page, ContactMessage, Milestone,
+    TeamMember, OrganizationProfile, CoreValue
+)
+
+@admin.register(SiteConfiguration)
+class SiteConfigurationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'years_of_impact', 'lives_supported', 'partners_count', 'updated_at')
+    fieldsets = (
+        ('Hero Content', {
+            'fields': ('hero_badge', 'hero_title', 'hero_subtitle', 'hero_image')
+        }),
+        ('Statistics', {
+            'fields': ('years_of_impact', 'lives_supported', 'partners_count')
+        }),
+        ('Call to Action', {
+            'fields': ('primary_cta_text', 'primary_cta_url_name', 
+                       'secondary_cta_text', 'secondary_cta_url_name')
+        }),
+    )
+    readonly_fields = ('hero_image_preview',)
+    
+    def hero_image_preview(self, obj):
+        if obj.hero_image:
+            from django.utils.safestring import mark_safe
+            return mark_safe(f'<img src="{obj.hero_image.url}" width="150" />')
+        return "No image"
+    hero_image_preview.short_description = "Hero Preview"
 
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(admin.ModelAdmin):
-    list_display = ['site_name', 'contact_email', 'updated_at']
-    fieldsets = [
-        ('Basic Information', {
-            'fields': ['site_name', 'tagline', 'contact_email', 'contact_phone', 'address']
-        }),
-        ('Social Media', {
-            'fields': ['facebook_url', 'twitter_url', 'instagram_url', 'linkedin_url']
-        }),
-        ('Donation Settings', {
-            'fields': ['donation_goal', 'donation_currency']
-        }),
-        ('Transparency Settings', {
-            'fields': ['show_live_donations', 'show_impact_stats']
-        }),
-        ('Maintenance', {
-            'fields': ['site_maintenance', 'maintenance_message']
-        }),
-        ('SEO', {
-            'fields': ['meta_description', 'meta_keywords']
-        }),
-    ]
-    
-    def has_add_permission(self, request):
-        # Only allow one settings instance
-        return not SiteSettings.objects.exists()
+    list_display = ('site_name', 'contact_email', 'site_maintenance', 'updated_at')
+    fieldsets = (
+        ('Basic Info', {'fields': ('site_name', 'tagline', 'contact_email', 'contact_phone', 'address')}),
+        ('Social Media', {'fields': ('facebook_url', 'twitter_url', 'instagram_url', 'linkedin_url')}),
+        ('Donations', {'fields': ('donation_goal', 'donation_currency', 'show_live_donations', 'show_impact_stats')}),
+        ('Maintenance', {'fields': ('site_maintenance', 'maintenance_message')}),
+        ('SEO', {'fields': ('meta_description', 'meta_keywords')}),
+    )
 
-@admin.register(Milestone)
-class MilestoneAdmin(admin.ModelAdmin):
-    list_display = ['title']
-    list_filter = ['title']
-    search_fields = ['title', 'description']
-    
+@admin.register(ImpactStat)
+class ImpactStatAdmin(admin.ModelAdmin):
+    list_display = ('title', 'value', 'suffix', 'icon', 'order', 'is_active')
+    list_editable = ('order', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('title', 'description')
+
+@admin.register(Program)
+class ProgramAdmin(admin.ModelAdmin):
+    list_display = ('title', 'order', 'is_active', 'created_at')
+    list_editable = ('order', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('title', 'description')
+    prepopulated_fields = {'slug': ('title',)}
+   
 
 class ProgramFeatureInline(admin.TabularInline):
     model = ProgramFeature
     extra = 1
 
-
-@admin.register(Program)
-class ProgramAdmin(admin.ModelAdmin):
-    list_display = ['title', 'slug', 'is_active']
-    list_editable = ['is_active']
-    list_filter = ['is_active']
-    search_fields = ['title', 'description']
-    prepopulated_fields = {'slug': ('title',)}
-    inlines = [ProgramFeatureInline]
-    
-@admin.register(ImpactStat)
-class ImpactStatAdmin(admin.ModelAdmin):
-    list_display = ['title', 'value', 'suffix', 'is_active', 'order']
-    list_editable = ['order', 'is_active']
-    list_filter = ['is_active']
-    search_fields = ['title', 'description']
-
-
+# Optionally attach inline to ProgramAdmin
+# ProgramAdmin.inlines = [ProgramFeatureInline]
 
 @admin.register(Testimonial)
 class TestimonialAdmin(admin.ModelAdmin):
-    list_display = ['name', 'role', 'is_featured', 'is_approved', 'created_at']
-    list_editable = ['is_featured', 'is_approved']
-    list_filter = ['is_featured', 'is_approved', 'created_at']
-    search_fields = ['name', 'role', 'content']
-    
-    def image_preview(self, obj):
-        if obj.image:
-            return format_html('<img src="{}" width="50" height="50" />', obj.image.url)
-        return "-"
-    image_preview.short_description = 'Image'
+    list_display = ('name', 'role', 'order', 'is_active', 'created_at')
+    list_editable = ('order', 'is_active')
+    list_filter = ('is_active', 'order')
+    search_fields = ('name', 'content')
+    list_per_page = 20
 
-
-
-
-
-
-@admin.register(Page)
-class PageAdmin(admin.ModelAdmin):
-    list_display = ['title', 'slug', 'is_published', 'show_in_navigation', 'created_at']
-    list_editable = ['is_published', 'show_in_navigation']
-    list_filter = ['is_published', 'show_in_navigation']
-    search_fields = ['title', 'content']
-    prepopulated_fields = {'slug': ('title',)}
-
-
-@admin.register(ContactMessage)
-class ContactMessageAdmin(admin.ModelAdmin):
-    list_display = ['name', 'email', 'subject', 'status', 'created_at']
-    list_filter = ['status', 'created_at']
-    search_fields = ['name', 'email', 'subject', 'message']
-    readonly_fields = ['created_at', 'updated_at', 'ip_address', 'user_agent']
-    
-    fieldsets = [
-        ('Message Details', {
-            'fields': ['name', 'email', 'phone', 'subject', 'message', 'status']
-        }),
-        ('Technical Information', {
-            'fields': ['ip_address', 'user_agent', 'created_at', 'updated_at'],
-            'classes': ['collapse']
-        }),
-    ]
-    
-    actions = ['mark_as_read', 'mark_as_replied']
-    
-    def mark_as_read(self, request, queryset):
-        queryset.update(status='read')
-        self.message_user(request, f"{queryset.count()} messages marked as read.")
-    mark_as_read.short_description = "Mark selected messages as read"
-    
-    def mark_as_replied(self, request, queryset):
-        queryset.update(status='replied')
-        self.message_user(request, f"{queryset.count()} messages marked as replied.")
-    mark_as_replied.short_description = "Mark selected messages as replied"
-    
-    
-
-@admin.register(TeamMember)
-class TeamMemberAdmin(admin.ModelAdmin):
-    list_display = ("name", "role", "order", "is_active")
-    list_editable = ("order", "is_active")
-
-
-@admin.register(CoreValue)
-class CoreValueAdmin(admin.ModelAdmin):
-    list_display = ("title", "order")
-    list_editable = ("order",)
-
+@admin.register(Teen)
+class TeenAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name', 'age', 'is_featured', 'joined_date')
+    list_filter = ('is_featured', 'age')
+    search_fields = ('first_name', 'last_name', 'story')
+    list_editable = ('is_featured',)
 
 @admin.register(FAQ)
 class FAQAdmin(admin.ModelAdmin):
-    list_display = ("question", "category", "order", "is_active")
-    list_filter = ("category",)
-    list_editable = ("order", "is_active")
+    list_display = ('question', 'category', 'order', 'is_active')
+    list_editable = ('order', 'is_active')
+    list_filter = ('category', 'is_active')
+    search_fields = ('question', 'answer')
 
+@admin.register(Page)
+class PageAdmin(admin.ModelAdmin):
+    list_display = ('title', 'slug', 'is_published', 'show_in_navigation', 'navigation_order')
+    list_editable = ('is_published', 'show_in_navigation', 'navigation_order')
+    list_filter = ('is_published', 'show_in_navigation')
+    search_fields = ('title', 'content')
+    prepopulated_fields = {'slug': ('title',)}
 
-admin.site.register(OrganizationProfile)
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'subject', 'status', 'created_at')
+    list_filter = ('status', 'created_at')
+    search_fields = ('name', 'email', 'subject', 'message')
+    list_editable = ('status',)
+    readonly_fields = ('ip_address', 'user_agent', 'created_at')
+
+@admin.register(Milestone)
+class MilestoneAdmin(admin.ModelAdmin):
+    list_display = ('year', 'title', 'order')
+    list_editable = ('order',)
+    search_fields = ('title', 'description')
+
+@admin.register(TeamMember)
+class TeamMemberAdmin(admin.ModelAdmin):
+    list_display = ('name', 'role', 'order', 'is_active')
+    list_editable = ('order', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('name', 'role', 'bio')
+
+@admin.register(OrganizationProfile)
+class OrganizationProfileAdmin(admin.ModelAdmin):
+    list_display = ('id',)
+    fieldsets = (
+        ('Mission & Vision', {'fields': ('mission', 'vision', 'image')}),
+    )
+
+@admin.register(CoreValue)
+class CoreValueAdmin(admin.ModelAdmin):
+    list_display = ('title', 'icon', 'order')
+    list_editable = ('order',)
+    search_fields = ('title', 'description')
