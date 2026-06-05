@@ -8,6 +8,9 @@ from django.http import HttpResponseForbidden, JsonResponse, Http404
 from django.db.models import Q, Count
 from django.utils import timezone
 import json
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+
 
 from .models import Post, Category, Tag, Comment, SocialShare
 from .forms import PostForm, CommentForm, CommentModerationForm, SearchForm
@@ -336,7 +339,6 @@ def blog_dashboard(request):
     return render(request, 'blog/dashboard.html', context)
 
 
-# ---------- Social share tracking ----------
 @csrf_exempt
 @require_POST
 def track_social_share(request):

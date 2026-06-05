@@ -21,7 +21,7 @@ urlpatterns = [
     path('category/<slug:slug>/',  views.category_post_list, name='category_post_list'),
     path('tag/<slug:slug>/',  views.tag_post_list,   name='tag_post_list'),
     
-    path('track-share/', views.track_share, name='track_share'),
+    path('track-share/', views.track_social_share, name='track_share'),
     
   
 ]
