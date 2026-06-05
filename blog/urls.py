@@ -11,7 +11,7 @@ urlpatterns = [
     path('search/', views.search_posts, name='search_posts'),
     
     # Post detail (alternative without dates)
-    path('post/<slug:slug>/', views.post_detail, name='post_detail'),
+    path('post/<int:year>/<int:month>/<int:day>/<slug:slug>/', views.post_detail, name='post_detail'),
     
     # Post CRUD
     path('post/<slug:slug>/edit/', views.post_update, name='post_update'),
