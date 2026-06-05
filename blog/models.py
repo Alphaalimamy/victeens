@@ -134,12 +134,7 @@ class Post(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('blog:post_detail', kwargs={
-            'year': self.published_at.year,
-            'month': self.published_at.month,
-            'day': self.published_at.day,
-            'slug': self.slug,
-        })
+        return reverse('blog:post_detail', kwargs={'slug': self.slug})
 
     @property
     def reading_time_minutes(self) -> int:

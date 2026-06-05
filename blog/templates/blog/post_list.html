@@ -193,6 +193,7 @@
                         </h3>
                         <div class="space-y-2">
                             {% for cat in categories %}
+                            <!-- ✅ FIXED: added blog: namespace -->
                             <a href="{% url 'blog:category_post_list' slug=cat.slug %}" class="flex justify-between items-center p-2 rounded-lg hover:bg-orange-50 transition group">
                                 <span class="text-gray-700 group-hover:text-orange-600">{{ cat.name }}</span>
                                 <span class="bg-gray-100 text-gray-500 text-xs px-2 py-1 rounded-full">{{ cat.post_count }}</span>
@@ -208,6 +209,7 @@
                         </h3>
                         <div class="flex flex-wrap gap-2">
                             {% for tag in popular_tags %}
+                            <!-- ✅ FIXED: added blog: namespace -->
                             <a href="{% url 'blog:tag_post_list' slug=tag.slug %}" class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm hover:bg-purple-500 hover:text-white transition">
                                 #{{ tag.name }}
                             </a>
