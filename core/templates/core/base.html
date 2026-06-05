@@ -180,11 +180,6 @@
     </script>
     
     {% block extra_js %}{% endblock %}
-    
-    <!-- Django Browser Reload for development -->
-    {% if debug %}
-        {% load django_browser_reload %}
-        {% django_browser_reload_script %}
-    {% endif %}
+
 </body>
 </html>
