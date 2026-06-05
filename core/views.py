@@ -71,8 +71,8 @@ def volunteer_view(request):
         # Email to admin
         subject = f'New Volunteer Application: {first_name} {last_name}'
         body = f"""
+        
 New Volunteer Application Received:
-
 Name: {first_name} {last_name}
 Email: {email}
 Phone: {phone}

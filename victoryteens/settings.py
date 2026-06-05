@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os 
 from pathlib import Path
 from decouple import config
+import django
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -39,10 +40,9 @@ ALLOWED_HOSTS = [
     "victeens.org",
     "www.victeens.org",
     "127.0.0.1",
-    "127.0.0.1:8000"
+    "127.0.0.1:8000",
     "localhost"
 ]
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -84,8 +84,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
-     'django_browser_reload.middleware.BrowserReloadMiddleware',# For Tailwind
 ]
 
 ROOT_URLCONF = 'victoryteens.urls'
@@ -175,6 +173,7 @@ SOCIAL_SHARE_PLATFORMS = ['facebook', 'twitter', 'linkedin', 'whatsapp']
 #     }
 # }
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -183,10 +182,13 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT'),
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
+        },
     }
 }
 
-# Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
