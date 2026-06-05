@@ -33,10 +33,10 @@ def get_published_posts():
 
 def get_recent_posts(limit=5, exclude_post=None):
     """Get most recent published posts"""
-    posts = get_published_posts()[:limit]
+    posts = get_published_posts()  # no slice yet
     if exclude_post:
         posts = posts.exclude(id=exclude_post.id)
-    return posts
+    return posts[:limit]  
 
 
 def get_featured_posts(limit=3):
