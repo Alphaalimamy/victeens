@@ -58,8 +58,9 @@ INSTALLED_APPS = [
     'django.contrib.humanize',  
     
     # Third party apps
-    'tailwind',
     'ckeditor',
+    'ckeditor_uploader',
+    'tailwind',
     'imagekit',
     'crispy_forms',
     'crispy_tailwind',
@@ -121,9 +122,12 @@ AUTH_USER_MODEL = 'users.User'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 # CKEditor Configuration
+CKEDITOR_UPLOAD_PATH = "uploads/blog_content/"
+CKEDITOR_IMAGE_BACKEND = "pillow"
+
 CKEDITOR_CONFIGS = {
     'default': {
-        'toolbar': 'Full',
+        'toolbar': 'Full',       
         'height': 400,
         'width': '100%',
         'extraPlugins': ','.join([
@@ -132,7 +136,7 @@ CKEDITOR_CONFIGS = {
             'widget',
             'dialog',
         ]),
-        'toolbar_Full': [
+        'toolbar_Full': [          
             ['Styles', 'Format', 'Bold', 'Italic', 'Underline', 'Strike', 'SpellChecker', 'Undo', 'Redo'],
             ['Link', 'Unlink', 'Anchor'],
             ['Image', 'Flash', 'Table', 'HorizontalRule'],

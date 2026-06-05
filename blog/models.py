@@ -1,11 +1,11 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from django.utils.text import slugify
 from django.utils import timezone
+from django.utils.text import slugify
+from ckeditor_uploader.fields import RichTextUploadingField
 
 User = get_user_model()
-# In models.py
 
 class Category(models.Model):
     """Category model for blog posts"""
@@ -55,100 +55,119 @@ class Tag(models.Model):
     
 
 
+
+class PublishedManager(models.Manager):
+    def get_queryset(self):
+        now = timezone.now()
+        return super().get_queryset().filter(
+            status=Post.Status.PUBLISHED,
+            published_at__lte=now
+        )
+
+
 class Post(models.Model):
-    """Main blog post model"""
     class Status(models.TextChoices):
         DRAFT = 'draft', 'Draft'
         PUBLISHED = 'published', 'Published'
         ARCHIVED = 'archived', 'Archived'
-    
-    class PostType(models.TextChoices):
-        ARTICLE = 'article', 'Article'
-        NEWS = 'news', 'News'
-        ANNOUNCEMENT = 'announcement', 'Announcement'
-        UPDATE = 'update', 'Update'
-    
-    # Basic information
+
+    # Core
     title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200, unique_for_date='published_date')
-    excerpt = models.TextField(max_length=300, help_text="Short excerpt for preview")
-    content = models.TextField()
-    
-    # Relationships
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='posts')
-    tags = models.ManyToManyField(Tag, blank=True, related_name='posts')
-    
+    slug = models.SlugField(max_length=200, unique=True)
+    excerpt = models.TextField(max_length=300, blank=True)
+    content = RichTextUploadingField(  # <-- RICH TEXT
+        config_name='default',
+        help_text="Rich text editor – add images, videos, lists, etc."
+    )
+
+    # Author & taxonomy
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
+    category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
+    tags = models.ManyToManyField('Tag', blank=True, related_name='posts')
+
     # Media
-    featured_image = models.ImageField(upload_to='blog/featured_images/%Y/%m/%d/', blank=True)
-    thumbnail_image = models.ImageField(upload_to='blog/thumbnails/%Y/%m/%d/', blank=True)
-    
-    # Metadata
+    hero_image = models.ImageField(upload_to='blog/hero/%Y/%m/%d/', blank=True)
+    hero_caption = models.CharField(max_length=200, blank=True)
+    video_url = models.URLField(blank=True)
+
+    # SEO
+    seo_title = models.CharField(max_length=200, blank=True)
+    meta_description = models.CharField(max_length=300, blank=True)
+    og_image = models.ImageField(upload_to='blog/og/%Y/%m/%d/', blank=True)
+
+    # Publishing
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)
-    post_type = models.CharField(max_length=20, choices=PostType.choices, default=PostType.ARTICLE)
-    is_featured = models.BooleanField(default=False)
-    allow_comments = models.BooleanField(default=True)
-    
-    # Dates
+    published_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    published_date = models.DateTimeField(null=True, blank=True)
-    
-    # SEO fields
-    meta_title = models.CharField(max_length=200, blank=True)
-    meta_description = models.TextField(max_length=300, blank=True)
-    
-    # Statistics
+    is_featured = models.BooleanField(default=False)
+    allow_comments = models.BooleanField(default=True)
     view_count = models.PositiveIntegerField(default=0)
-    share_count = models.PositiveIntegerField(default=0)
-    
+
+    # Managers
+    objects = models.Manager()
+    live = PublishedManager()
+
     class Meta:
-        ordering = ['-published_date', '-created_at']
+        ordering = ['-published_at']
         indexes = [
-            models.Index(fields=['-published_date', 'status']),
+            models.Index(fields=['status', 'published_at']),
             models.Index(fields=['slug']),
-            models.Index(fields=['author']),
-            models.Index(fields=['status']),
         ]
-    
+
     def __str__(self):
         return self.title
-    
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
-        
-        # Set published_date when status changes to published
-        if self.status == self.Status.PUBLISHED and not self.published_date:
-            self.published_date = timezone.now()
-        
-        # Generate meta fields if empty
-        if not self.meta_title:
-            self.meta_title = self.title
+
+        # Auto excerpt (strip HTML from rich text)
+        if not self.excerpt and self.content:
+            from django.utils.html import strip_tags
+            plain = strip_tags(self.content)
+            self.excerpt = plain[:250] + ('…' if len(plain) > 250 else '')
+
         if not self.meta_description and self.excerpt:
             self.meta_description = self.excerpt[:160]
-        
+
         super().save(*args, **kwargs)
-    
+
     def get_absolute_url(self):
-      
-        return reverse('blog:post_detail', kwargs={'slug': self.slug})
-    
+        return reverse('blog:post_detail', kwargs={
+            'year': self.published_at.year,
+            'month': self.published_at.month,
+            'day': self.published_at.day,
+            'slug': self.slug,
+        })
+
+    @property
+    def reading_time_minutes(self) -> int:
+        from django.utils.html import strip_tags
+        plain = strip_tags(self.content)
+        word_count = len(plain.split())
+        return max(1, round(word_count / 200))
+
+    @property
+    def is_published(self) -> bool:
+        return (self.status == self.Status.PUBLISHED and
+                self.published_at <= timezone.now())
+
     def increment_view_count(self):
         self.view_count += 1
         self.save(update_fields=['view_count'])
-    
-    @property
-    def is_published(self):
-        return self.status == self.Status.PUBLISHED and self.published_date <= timezone.now()
-    
-    @property
-    def reading_time(self):
-        """Calculate estimated reading time (200 words per minute)"""
-        word_count = len(self.content.split())
-        minutes = max(1, round(word_count / 200))
-        return f"{minutes} min read"
 
+
+class PostImage(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='gallery')
+    image = models.ImageField(upload_to='blog/gallery/%Y/%m/%d/')
+    alt_text = models.CharField(max_length=200, blank=True)
+    caption = models.CharField(max_length=300, blank=True)
+    order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order']
+        
 
 class Comment(models.Model):
     """Comment system for blog posts with moderation"""

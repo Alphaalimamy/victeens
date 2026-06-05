@@ -1,69 +1,106 @@
+# admin.py
 from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
-from django.contrib import messages
-from .models import Post, Category, Tag, Comment, PostView, SocialShare
+from .models import Post, PostImage, Category, Tag, Comment, PostView, SocialShare
 from .forms import CommentModerationForm
 
 
+class PostImageInline(admin.TabularInline):
+    """Inline gallery images for the post"""
+    model = PostImage
+    extra = 1
+    fields = ['image', 'alt_text', 'caption', 'order']
+    ordering = ['order']
+
+
+@admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'category', 'status', 'is_featured', 'published_date', 'view_count', 'admin_actions')
-    list_filter = ('status', 'category', 'is_featured', 'post_type', 'created_at')
-    search_fields = ('title', 'content', 'excerpt', 'author__username')
+    list_display = ['title', 'author', 'status', 'published_at', 'is_featured', 'view_count', 'preview_hero']
+    list_filter = ['status', 'is_featured', 'category', 'published_at', 'author']
+    search_fields = ['title', 'excerpt', 'content', 'seo_title', 'meta_description']
     prepopulated_fields = {'slug': ('title',)}
-    readonly_fields = ('view_count', 'share_count', 'created_at', 'updated_at')
+    date_hierarchy = 'published_at'
+    raw_id_fields = ['author']
+    inlines = [PostImageInline]
+    
     fieldsets = (
-        ('Basic Information', {
-            'fields': ('title', 'slug', 'excerpt', 'content', 'author', 'category', 'tags')
+        ('Basic Content', {
+            'fields': ('title', 'slug', 'author', 'category', 'tags', 'excerpt', 'content')
         }),
         ('Media', {
-            'fields': ('featured_image', 'thumbnail_image'),
-            'classes': ('collapse',)
+            'fields': ('hero_image', 'hero_caption', 'video_url', 'og_image'),
+            'classes': ('wide',),
+            'description': 'Hero image appears at top of post. OG image used for social sharing.'
         }),
-        ('Metadata', {
-            'fields': ('status', 'post_type', 'is_featured', 'allow_comments', 'published_date')
+        ('SEO & Metadata', {
+            'fields': ('seo_title', 'meta_description'),
+            'classes': ('collapse',),
         }),
-        ('SEO', {
-            'fields': ('meta_title', 'meta_description'),
-            'classes': ('collapse',)
+        ('Publishing Options', {
+            'fields': ('status', 'published_at', 'is_featured', 'allow_comments'),
         }),
         ('Statistics', {
-            'fields': ('view_count', 'share_count', 'created_at', 'updated_at'),
-            'classes': ('collapse',)
+            'fields': ('view_count',),
+            'classes': ('collapse',),
+            'description': 'Auto‑incremented when a post is viewed.'
         }),
     )
-    actions = ['make_published', 'make_draft', 'make_featured', 'remove_featured']
+    
+    readonly_fields = ['view_count', 'created_at', 'updated_at']
+    actions = ['make_published', 'make_featured']
+    
+    def preview_hero(self, obj):
+        if obj.hero_image:
+            return format_html('<img src="{}" width="50" height="50" style="object-fit:cover;"/>', obj.hero_image.url)
+        return "No image"
+    preview_hero.short_description = 'Hero preview'
     
     def make_published(self, request, queryset):
-        updated = queryset.update(status=Post.Status.PUBLISHED)
-        self.message_user(request, f'{updated} posts were successfully published.')
+        queryset.update(status=Post.Status.PUBLISHED)
     make_published.short_description = "Mark selected posts as published"
     
-    def make_draft(self, request, queryset):
-        updated = queryset.update(status=Post.Status.DRAFT)
-        self.message_user(request, f'{updated} posts were marked as draft.')
-    make_draft.short_description = "Mark selected posts as draft"
-    
     def make_featured(self, request, queryset):
-        updated = queryset.update(is_featured=True)
-        self.message_user(request, f'{updated} posts were marked as featured.')
+        queryset.update(is_featured=True)
     make_featured.short_description = "Mark selected posts as featured"
-    
-    def remove_featured(self, request, queryset):
-        updated = queryset.update(is_featured=False)
-        self.message_user(request, f'{updated} posts were removed from featured.')
-    remove_featured.short_description = "Remove selected posts from featured"
-    
-    def admin_actions(self, obj):
-        return format_html(
-            '<a class="button" href="{}">View</a>&nbsp;'
-            '<a class="button" href="{}">Edit</a>',
-            obj.get_absolute_url(),
-            reverse('admin:blog_post_change', args=[obj.id])
-        )
-    admin_actions.short_description = 'Actions'
 
 
+@admin.register(PostImage)
+class PostImageAdmin(admin.ModelAdmin):
+    list_display = ['post', 'order', 'alt_text', 'thumbnail_preview']
+    list_filter = ['post']
+    search_fields = ['alt_text', 'caption']
+    
+    def thumbnail_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" width="40" height="40" style="object-fit:cover;"/>', obj.image.url)
+        return "No image"
+    thumbnail_preview.short_description = 'Preview'
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', 'slug', 'post_count', 'created_at']
+    prepopulated_fields = {'slug': ('name',)}
+    search_fields = ['name', 'description']
+    
+    def post_count(self, obj):
+        return obj.posts.count()
+    post_count.short_description = 'Number of posts'
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ['name', 'slug', 'post_count', 'created_at']
+    prepopulated_fields = {'slug': ('name',)}
+    search_fields = ['name']
+    
+    def post_count(self, obj):
+        return obj.posts.count()
+    post_count.short_description = 'Number of posts'
+
+
+@admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('name', 'post_link', 'content_preview', 'status', 'created_at', 'admin_actions')
     list_filter = ('status', 'created_at', 'post')
@@ -107,26 +144,7 @@ class CommentAdmin(admin.ModelAdmin):
     admin_actions.short_description = 'Actions'
 
 
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'post_count', 'created_at')
-    prepopulated_fields = {'slug': ('name',)}
-    search_fields = ('name', 'description')
-    
-    def post_count(self, obj):
-        return obj.posts.count()
-    post_count.short_description = 'Posts'
-
-
-class TagAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'post_count', 'created_at')
-    prepopulated_fields = {'slug': ('name',)}
-    search_fields = ('name',)
-    
-    def post_count(self, obj):
-        return obj.posts.count()
-    post_count.short_description = 'Posts'
-
-
+@admin.register(PostView)
 class PostViewAdmin(admin.ModelAdmin):
     list_display = ('post', 'ip_address', 'created_at')
     list_filter = ('created_at',)
@@ -134,15 +152,8 @@ class PostViewAdmin(admin.ModelAdmin):
     readonly_fields = ('post', 'session_key', 'ip_address', 'user_agent', 'referrer', 'created_at')
 
 
+@admin.register(SocialShare)
 class SocialShareAdmin(admin.ModelAdmin):
     list_display = ('post', 'platform', 'shared_by', 'shared_at')
     list_filter = ('platform', 'shared_at')
     search_fields = ('post__title', 'platform')
-
-
-admin.site.register(Post, PostAdmin)
-admin.site.register(Category, CategoryAdmin)
-admin.site.register(Tag, TagAdmin)
-admin.site.register(Comment, CommentAdmin)
-admin.site.register(PostView, PostViewAdmin)
-admin.site.register(SocialShare, SocialShareAdmin)
