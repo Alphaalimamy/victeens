@@ -61,7 +61,6 @@ INSTALLED_APPS = [
     'tailwind',
     'ckeditor',
     'imagekit',
-    'django_browser_reload',
     'crispy_forms',
     'crispy_tailwind',
     'django_extensions',
