@@ -198,9 +198,7 @@
                                     <span class="font-semibold text-gray-900">{{ comment.display_name }}</span>
                                     <span class="text-xs text-gray-500 ml-2">{{ comment.created_at|date:"M d, Y" }}</span>
                                 </div>
-                                {% if comment.website %}
-                                <a href="{{ comment.website }}" target="_blank" class="text-orange-500 text-xs hover:underline">Website</a>
-                                {% endif %}
+                                
                             </div>
                             <p class="text-gray-700 text-sm mb-2">{{ comment.content|linebreaks }}</p>
                             <button onclick="replyTo({{ comment.id }}, '{{ comment.display_name|escapejs }}')" class="text-xs text-orange-500 hover:text-orange-600 font-medium">↩ Reply</button>
