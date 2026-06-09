@@ -11,89 +11,80 @@
             {% if title %}{{ title }} - {% endif %}{{ site_name|default:"Victory Teens Organization" }}
         {% endblock %}
     </title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="icon" type="image/x-icon" href="{{ STATIC_URL }}images/favicon.ico">
+    
+    <!-- Google Fonts - Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
+    <link rel="icon" type="image/x-icon" href="{{ STATIC_URL }}images/favicon.ico">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        fontFamily: {
-          sans: ['Inter', 'system-ui', 'sans-serif'],
-          poppins: ['Poppins', 'sans-serif'],
-          montserrat: ['Montserrat', 'sans-serif'],
-          'open-sans': ['Open Sans', 'sans-serif'],
-        },
-        colors: {
-          /* Victory Teens Organization Color Palette */
-          'vto-white': '#FDFDFD',
-
-          'vto-orange': {
-            DEFAULT: '#B83E09',
-            dark: '#B83E09',
-            golden: '#EEA552',
-          },
-          
-          'vto-purple': '#6E3595',
-          'vto-peach': '#E5B899',
-          'vto-black': '#1C1C1C',
-
-          'vto-gray': {
-            50: '#f9fafb',
-            100: '#f3f4f6',
-            200: '#e5e7eb',
-            300: '#d1d5db',
-            400: '#9ca3af',
-            500: '#6b7280',
-            600: '#4b5563',
-            700: '#374151',
-            800: '#1f2937',
-            900: '#111827',
-          },
-        },
-
-        animation: {
-          'fade-in': 'fadeIn 0.5s ease-in-out',
-          'slide-up': 'slideUp 0.3s ease-out',
-          'pulse-gentle': 'pulseGentle 2s infinite',
-        },
-
-        keyframes: {
-          fadeIn: {
-            '0%': { opacity: '0' },
-            '100%': { opacity: '1' },
-          },
-          slideUp: {
-            '0%': { transform: 'translateY(10px)', opacity: '0' },
-            '100%': { transform: 'translateY(0)', opacity: '1' },
-          },
-          pulseGentle: {
-            '0%, 100%': { opacity: '1' },
-            '50%': { opacity: '0.8' },
-          },
-        },
-
-        backgroundImage: {
-          'hero-gradient': 'linear-gradient(135deg, #FDFDFD 0%, #E5B899 100%)',
-          'donation-gradient': 'linear-gradient(135deg, #B83E09 0%, #EEA552 100%)',
-          'volunteer-gradient': 'linear-gradient(135deg, #6E3595 0%, #B83E09 100%)',
-        },
-      },
-    },
-  };
-</script>
-
-   
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'poppins': ['Poppins', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        /* Victory Teens Organization Color Palette */
+                        'vto-white': '#FDFDFD',
+                        'vto-orange': {
+                            DEFAULT: '#B83E09',
+                            dark: '#B83E09',
+                            golden: '#EEA552',
+                        },
+                        'vto-purple': '#6E3595',
+                        'vto-peach': '#E5B899',
+                        'vto-black': '#1C1C1C',
+                        'vto-gray': {
+                            50: '#f9fafb',
+                            100: '#f3f4f6',
+                            200: '#e5e7eb',
+                            300: '#d1d5db',
+                            400: '#9ca3af',
+                            500: '#6b7280',
+                            600: '#4b5563',
+                            700: '#374151',
+                            800: '#1f2937',
+                            900: '#111827',
+                        },
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'pulse-gentle': 'pulseGentle 2s infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        pulseGentle: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0.8' },
+                        },
+                    },
+                    backgroundImage: {
+                        'hero-gradient': 'linear-gradient(135deg, #FDFDFD 0%, #E5B899 100%)',
+                        'donation-gradient': 'linear-gradient(135deg, #B83E09 0%, #EEA552 100%)',
+                        'volunteer-gradient': 'linear-gradient(135deg, #6E3595 0%, #B83E09 100%)',
+                    },
+                },
+            },
+        }
+    </script>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-  
     <!-- Meta tags -->
     <meta name="description" content="{% block meta_description %}Victory Teens Organization - Providing hope and future for orphaned teens{% endblock %}">
     <meta name="keywords" content="orphanage, charity, teens, donations, volunteers, Kenya">
@@ -108,40 +99,469 @@
     {% block head_extra %}{% endblock %}
 
     <style>
-      body {
-    margin: 0;
+        /* Apply Poppins font globally */
+        * {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif !important;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background-color: #FDFDFD;
+            color: #1C1C1C;
+        }
+        
+        /* Ensure Tailwind classes don't override Poppins */
+        .font-sans,
+        .font-poppins,
+        [class*="font-"] {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif !important;
+        }
+        
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #B83E09 0%, #EEA552 100%);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B83E09;
+        }
+        
+        /* Animation classes */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        
+        /* Message styling */
+        .message {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: currentColor;
+            opacity: 0.3;
+        }
+
+
+  :root {
+    --primary-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    --secondary-gradient: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    --accent-gradient: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  }
+
+  /* Rich Text Content Styling */
+  .rich-text-content {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.8;
+    color: #374151;
+    font-size: 1.05rem;
+  }
+  
+  /* Headings with modern styling */
+  .rich-text-content h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+  }
+  
+  .rich-text-content h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-top: 1.75rem;
+    margin-bottom: 1rem;
+    color: #1f2937;
+    letter-spacing: -0.01em;
+    border-left: 4px solid #f59e0b;
+    padding-left: 1rem;
+  }
+  
+  .rich-text-content h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: #374151;
+  }
+  
+  .rich-text-content h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: #4b5563;
+  }
+  
+  /* Modern List Styling */
+  .rich-text-content ul,
+  .rich-text-content ol {
+    margin: 1.5rem 0;
+    padding-left: 0;
+    list-style: none;
+  }
+  
+  .rich-text-content ul li {
+    position: relative;
+    padding-left: 1.75rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+  
+  .rich-text-content ul li::before {
+    content: "▹";
+    position: absolute;
+    left: 0;
+    color: #f59e0b;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+  
+  .rich-text-content ol {
+    counter-reset: item;
+  }
+  
+  .rich-text-content ol li {
+    position: relative;
+    padding-left: 2rem;
+    margin-bottom: 0.75rem;
+    counter-increment: item;
+  }
+  
+  .rich-text-content ol li::before {
+    content: counter(item) ".";
+    position: absolute;
+    left: 0;
+    color: #f59e0b;
+    font-weight: 600;
+    background: #fef3c7;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+  }
+  
+  /* Nested lists */
+  .rich-text-content ul ul li::before {
+    content: "◦";
+    color: #8b5cf6;
+  }
+  
+  .rich-text-content ul ul ul li::before {
+    content: "▪";
+    color: #10b981;
+  }
+  
+  /* Modern Blockquotes */
+  .rich-text-content blockquote {
+    position: relative;
+    background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+    border-radius: 1rem;
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+    font-style: normal;
+    color: #4b5563;
+    border: none;
+    box-shadow: var(--shadow-md);
+  }
+  
+  .rich-text-content blockquote::before {
+    content: '"';
+    position: absolute;
+    top: -0.5rem;
+    left: 1rem;
+    font-size: 4rem;
+    color: #f59e0b;
+    opacity: 0.3;
+    font-family: serif;
+  }
+  
+  .rich-text-content blockquote p {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Modern Links */
+  .rich-text-content a {
+    color: #f59e0b;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .rich-text-content a:hover {
+    color: #d97706;
+    border-bottom-color: #f59e0b;
+  }
+  
+  /* Modern Images */
+  .rich-text-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 1rem;
+    margin: 1.5rem 0;
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s ease;
+  }
+  
+  .rich-text-content img:hover {
+    transform: scale(1.02);
+    box-shadow: var(--shadow-xl);
+  }
+  
+  /* Modern Tables */
+  .rich-text-content table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 1.5rem 0;
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+  
+  .rich-text-content th {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    padding: 1rem;
+    font-weight: 600;
+    text-align: left;
+  }
+  
+  .rich-text-content td {
+    padding: 1rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .rich-text-content tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .rich-text-content tr:hover td {
+    background-color: #fef3c7;
+  }
+  
+  /* Modern Code Blocks */
+  .rich-text-content pre {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    position: relative;
+  }
+  
+  .rich-text-content pre::before {
+    content: "</>";
+    position: absolute;
+    top: 0.5rem;
+    right: 1rem;
+    color: #6b7280;
+    font-size: 0.75rem;
+    font-family: monospace;
+  }
+  
+  .rich-text-content code {
+    background: #f3f4f6;
+    color: #dc2626;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+  }
+  
+  .rich-text-content pre code {
+    background: transparent;
+    color: #f3f4f6;
     padding: 0;
-}
-    </style>
+  }
+  
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border-radius: 10px;
+  }
+  
+  /* Glass morphism effects */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Animation classes */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .animate-fade-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+  
+  .animate-slide-left {
+    animation: slideInLeft 0.6s ease-out forwards;
+  }
+  
+  .animate-slide-right {
+    animation: slideInRight 0.6s ease-out forwards;
+  }
+  
+  /* Hover effects */
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+  }
+  
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #f59e0b 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+</style>
 </head>
-<body class="bg-vto-white text-vto-black font-sans min-h-screen flex flex-col leading-relaxed">
+
+<body class="bg-vto-white text-vto-black font-poppins min-h-screen flex flex-col leading-relaxed">
     <!-- Skip to main content -->
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-vto-orange-dark text-white p-2 rounded-lg z-50">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-vto-orange-dark text-white p-2 rounded-lg z-50 focus:outline-none focus:ring-2 focus:ring-vto-orange-golden">
         Skip to main content
     </a>
     
     <!-- Header/Navigation -->
-   
     {% include "core/partials/header.html" %}
+    
     <!-- Messages/Notifications -->
     {% if messages %}
     <div class="container mx-auto px-4 mt-4">
         {% for message in messages %}
-        <div class="message p-4 mb-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800{% else %}bg-blue-100 text-blue-800{% endif %}">
-            {{ message }}
-            <button type="button" class="float-right text-lg" onclick="this.parentElement.style.display='none'">&times;</button>
+        <div class="message p-4 mb-4 rounded-lg animate-fade-in {% if message.tags == 'success' %}bg-green-50 text-green-800 border-l-4 border-green-500{% elif message.tags == 'error' %}bg-red-50 text-red-800 border-l-4 border-red-500{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border-l-4 border-yellow-500{% else %}bg-blue-50 text-blue-800 border-l-4 border-blue-500{% endif %}">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    {% if message.tags == 'success' %}
+                        <i class="fas fa-check-circle text-green-500"></i>
+                    {% elif message.tags == 'error' %}
+                        <i class="fas fa-exclamation-circle text-red-500"></i>
+                    {% elif message.tags == 'warning' %}
+                        <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+                    {% else %}
+                        <i class="fas fa-info-circle text-blue-500"></i>
+                    {% endif %}
+                    <span>{{ message }}</span>
+                </div>
+                <button type="button" class="text-gray-400 hover:text-gray-600 transition" onclick="this.parentElement.parentElement.style.display='none'">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
         </div>
         {% endfor %}
     </div>
     {% endif %}
     
     <main id="main-content" class="flex-grow">
-    {% block content %}{% endblock %}
+        {% block content %}{% endblock %}
     </main>
 
     {% include "core/partials/footer.html" %}
+    
     <!-- Back to Top Button -->
-    <button id="back-to-top" class="fixed bottom-8 right-8 bg-vto-orange-dark text-white p-3 rounded-full shadow-lg hover:bg-vto-orange-golden transition-all duration-300 hidden z-40">
+    <button id="back-to-top" class="fixed bottom-8 right-8 bg-gradient-to-r from-vto-orange-dark to-vto-orange-golden text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hidden z-40 hover:scale-110">
         <i class="fas fa-arrow-up"></i>
     </button>
     
@@ -150,31 +570,63 @@
         // Back to Top Button
         const backToTopButton = document.getElementById('back-to-top');
         
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 300) {
-                backToTopButton.classList.remove('hidden');
-            } else {
-                backToTopButton.classList.add('hidden');
-            }
-        });
-        
-        backToTopButton.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+        if (backToTopButton) {
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.classList.remove('hidden');
+                    backToTopButton.classList.add('flex');
+                } else {
+                    backToTopButton.classList.add('hidden');
+                    backToTopButton.classList.remove('flex');
+                }
+            });
+            
+            backToTopButton.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
         
         // Auto-dismiss messages after 5 seconds
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
                 const messages = document.querySelectorAll('.message');
                 messages.forEach(message => {
-                    message.style.transition = 'opacity 0.5s';
+                    message.style.transition = 'opacity 0.5s, transform 0.5s';
                     message.style.opacity = '0';
+                    message.style.transform = 'translateX(20px)';
                     setTimeout(() => message.remove(), 500);
                 });
             }, 5000);
+            
+            // Add fade-in animation to main content
+            const mainContent = document.getElementById('main-content');
+            if (mainContent) {
+                mainContent.style.opacity = '0';
+                mainContent.style.transform = 'translateY(20px)';
+                mainContent.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                
+                setTimeout(() => {
+                    mainContent.style.opacity = '1';
+                    mainContent.style.transform = 'translateY(0)';
+                }, 100);
+            }
+        });
+        
+        // Add active state to navigation links
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('nav a');
+            
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href');
+                if (linkPath && currentPath === linkPath) {
+                    link.classList.add('text-vto-orange-dark', 'font-semibold');
+                    link.classList.remove('text-gray-600');
+                }
+            });
         });
     </script>
-  
-
+    
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

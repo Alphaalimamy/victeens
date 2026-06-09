@@ -1,8 +1,10 @@
 from django.db import models
 from django.utils.text import slugify
 from django.utils.safestring import mark_safe
+from django.urls import reverse
+from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField  # Optional: for image uploads
 
-# ==================== SINGLETON CONFIGURATION MODELS ====================
 
 class SiteConfiguration(models.Model):
     """
@@ -123,12 +125,13 @@ class Program(models.Model):
     """Program cards shown on homepage."""
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, blank=True)
-    description = models.TextField()
+    description = RichTextField(help_text="Program description with rich text formatting")
     image = models.ImageField(upload_to='programs/', blank=True, null=True,
                               help_text="Recommended size: 800x600px")
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         ordering = ['order', '-created_at']
@@ -146,6 +149,9 @@ class Program(models.Model):
     def image_url(self):
         """Convenience property for template compatibility."""
         return self.image.url if self.image else ''
+    
+    def get_absolute_url(self):
+        return reverse('program_detail', args=[self.slug])
 
 
 class ProgramFeature(models.Model):
@@ -161,7 +167,7 @@ class Testimonial(models.Model):
     """Community testimonials – used in the Stories of Hope section."""
     name = models.CharField(max_length=100)
     role = models.CharField(max_length=100, blank=True, help_text="e.g., Donor, Volunteer, Parent")
-    content = models.TextField()
+    content = RichTextField(help_text="Testimonial content with rich text formatting")
     image = models.ImageField(upload_to='testimonials/', blank=True, null=True,
                               help_text="Profile photo (square recommended)")
     order = models.PositiveIntegerField(default=0)
@@ -177,18 +183,16 @@ class Testimonial(models.Model):
     def __str__(self):
         return f"{self.name} – {self.role or 'Community member'}"
 
-
-# ==================== ADDITIONAL MODELS ====================
-
 class Teen(models.Model):
     """Individual teens supported – for success stories."""
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     photo = models.ImageField(upload_to='teens/', blank=True, null=True)
     age = models.PositiveSmallIntegerField()
-    story = models.TextField(help_text="Short success story")
+    story = RichTextField(help_text="Success story with rich text formatting")
     is_featured = models.BooleanField(default=False)
     joined_date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)  # Allow null temporarily
     
     class Meta:
         ordering = ['-joined_date', 'first_name']
@@ -196,9 +200,10 @@ class Teen(models.Model):
     
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.age})"
-
-
+    
+    
 class FAQ(models.Model):
+    """Model for Frequently Asked Questions"""
     CATEGORY_CHOICES = [
         ('general', 'General'),
         ('donation', 'Donations'),
@@ -207,7 +212,7 @@ class FAQ(models.Model):
         ('other', 'Other'),
     ]
     question = models.CharField(max_length=200)
-    answer = models.TextField()
+    answer = RichTextField(help_text="FAQ answer with rich text formatting")
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='general')
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
@@ -216,6 +221,7 @@ class FAQ(models.Model):
         ordering = ['category', 'order', 'question']
         verbose_name = "FAQ"
         verbose_name_plural = "FAQs"
+        indexes = [models.Index(fields=['category', 'is_active', 'order'])]
     
     def __str__(self):
         return self.question
@@ -225,7 +231,7 @@ class Page(models.Model):
     """Dynamic content pages (About, Contact, etc.)"""
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
-    content = models.TextField()
+    content = RichTextField(help_text="Page content with rich text formatting (images, links, etc.)")
     meta_title = models.CharField(max_length=200, blank=True)
     meta_description = models.TextField(blank=True)
     is_published = models.BooleanField(default=True)
@@ -245,6 +251,9 @@ class Page(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
+    
+    def get_absolute_url(self):
+        return reverse('page_detail', args=[self.slug])
 
 
 class ContactMessage(models.Model):
@@ -273,13 +282,21 @@ class ContactMessage(models.Model):
     
     def __str__(self):
         return f"{self.name} – {self.subject}"
+    
+    def mark_as_read(self):
+        self.status = 'read'
+        self.save()
+    
+    def mark_as_replied(self):
+        self.status = 'replied'
+        self.save()
 
 
 class Milestone(models.Model):
     """Timeline milestones."""
     year = models.PositiveIntegerField()
     title = models.CharField(max_length=100)
-    description = models.TextField()
+    description = RichTextField(help_text="Milestone description with rich text formatting")
     highlight_stats = models.CharField(max_length=255, blank=True,
                                        help_text="Optional stats e.g. '2,500 children, 850+ volunteers'")
     order = models.PositiveIntegerField(default=0)
@@ -294,11 +311,12 @@ class Milestone(models.Model):
 
 
 class TeamMember(models.Model):
-    """Staff/leadership team."""
     name = models.CharField(max_length=100)
-    role = models.CharField(max_length=100)
-    bio = models.TextField()
-    image = models.ImageField(upload_to='team/')
+    role = models.CharField(max_length=100, help_text="General role (e.g., 'Executive Director', 'Program Manager')")
+    bio = RichTextField(blank=True, help_text="Team member biography with rich text formatting")
+    image = models.ImageField(upload_to='team/', blank=True, null=True)
+    email = models.EmailField(blank=True)
+    linkedin_url = models.URLField(blank=True)
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
     
@@ -308,13 +326,20 @@ class TeamMember(models.Model):
     
     def __str__(self):
         return self.name
+    
+    @property
+    def role_display(self):
+        return self.get_role_display()
 
 
-class OrganizationProfile(models.Model):
+class OrganizationProfiles(models.Model):
     """Mission & vision (singleton)."""
-    mission = models.TextField()
-    vision = models.TextField()
+    history = RichTextField(help_text="Organization history with rich text formatting")
+    mission = RichTextField(help_text="Organization mission statement with rich text formatting")
+    vision = RichTextField(help_text="Organization vision statement with rich text formatting")
     image = models.ImageField(upload_to='profile/', blank=True, null=True)
+    background_image = models.ImageField(upload_to='profile/', blank=True, null=True,
+                                         help_text="Background image for mission/vision section")
     
     class Meta:
         verbose_name = "Organization Profile"
@@ -324,21 +349,138 @@ class OrganizationProfile(models.Model):
         return "Organization Profile"
     
     def save(self, *args, **kwargs):
-        if not self.pk and OrganizationProfile.objects.exists():
+        if not self.pk and OrganizationProfiles.objects.exists():
             raise ValueError("Only one OrganizationProfile instance allowed.")
         super().save(*args, **kwargs)
 
 
 class CoreValue(models.Model):
-    """Core values displayed on About page."""
-    title = models.CharField(max_length=50)
+    """Core values displayed on About page - unified model"""
+    title = models.CharField(max_length=100)
     icon = models.CharField(max_length=100, help_text="Font Awesome icon class, e.g., 'fas fa-heart'")
-    description = models.TextField()
-    order = models.PositiveIntegerField(default=0)
+    description = RichTextField(help_text="Core value description with rich text formatting")
+    order = models.PositiveIntegerField(default=0, help_text="Display order")
+    is_active = models.BooleanField(default=True)
     
     class Meta:
         ordering = ['order', 'title']
+        verbose_name = "Core Value"
+        verbose_name_plural = "Core Values"
     
     def __str__(self):
         return self.title
 
+
+class FocusArea(models.Model):
+    """Model for Key Focus Areas"""
+    title = models.CharField(max_length=100)
+    icon = models.CharField(max_length=50, help_text="Font Awesome icon class (e.g., 'fas fa-home')")
+    description = RichTextField(blank=True, help_text="Focus area description with rich text formatting")
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        ordering = ['order']
+        verbose_name = "Focus Area"
+        verbose_name_plural = "Focus Areas"
+    
+    def __str__(self):
+        return self.title
+
+
+class Impact(models.Model):
+    """Model for impact statistics - unified version"""
+    title = models.CharField(max_length=100)
+    value = models.CharField(max_length=50, help_text="e.g., '10,000+' or '50'")
+    icon = models.CharField(max_length=50)
+    description = RichTextField(blank=True, help_text="Detailed description with rich text formatting")
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        ordering = ['order']
+        verbose_name = "Impact"
+        verbose_name_plural = "Impacts"
+        indexes = [models.Index(fields=['is_active', 'order'])]
+    
+    def __str__(self):
+        return f"{self.title}: {self.value}"
+
+
+class Partner(models.Model):
+    """Model for partner organizations"""
+    PARTNER_TYPE_CHOICES = [
+        ('corporate', 'Corporate Partner'),
+        ('ngo', 'NGO Partner'),
+        ('government', 'Government Partner'),
+        ('community', 'Community Partner'),
+    ]
+    
+    name = models.CharField(max_length=100)
+    partner_type = models.CharField(max_length=20, choices=PARTNER_TYPE_CHOICES, default='corporate')
+    logo = models.ImageField(upload_to='partners/', blank=True, null=True)
+    website_url = models.URLField(blank=True)
+    description = RichTextField(blank=True, help_text="Partner description with rich text formatting")
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    featured = models.BooleanField(default=False, help_text="Show on homepage")
+    
+    class Meta:
+        ordering = ['order']
+    
+    def __str__(self):
+        return self.name
+
+
+class NewsletterSubscriber(models.Model):
+    """Model for email newsletter subscribers"""
+    email = models.EmailField(unique=True)
+    name = models.CharField(max_length=100, blank=True)
+    is_active = models.BooleanField(default=True)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+    unsubscribed_at = models.DateTimeField(blank=True, null=True)
+    
+    class Meta:
+        ordering = ['-subscribed_at']
+        verbose_name = "Newsletter Subscriber"
+        verbose_name_plural = "Newsletter Subscribers"
+    
+    def __str__(self):
+        return self.email
+    
+    def unsubscribe(self):
+        self.is_active = False
+        self.unsubscribed_at = models.DateTimeField(auto_now=True)
+        self.save()
+
+
+class Donation(models.Model):
+    """Model for tracking donations"""
+    DONATION_STATUS = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+        ('refunded', 'Refunded'),
+    ]
+    
+    donor_name = models.CharField(max_length=100)
+    donor_email = models.EmailField()
+    donor_phone = models.CharField(max_length=20, blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(max_length=3, default='USD')
+    message = models.TextField(blank=True)
+    is_anonymous = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=DONATION_STATUS, default='pending')
+    transaction_id = models.CharField(max_length=100, blank=True, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [models.Index(fields=['status', '-created_at'])]
+    
+    def __str__(self):
+        return f"{self.donor_name} - {self.amount} {self.currency}"
+    
+    @property
+    def display_name(self):
+        return "Anonymous" if self.is_anonymous else self.donor_name

@@ -1,22 +1,19 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib import messages
-from django.core.paginator import Paginator
-from django.views.decorators.http import require_POST, require_GET
-from django.views.decorators.cache import cache_page
-from django.http import HttpResponseForbidden, JsonResponse, Http404
-from django.db.models import Q, Count
-from django.utils import timezone
+
 import json
+from django.contrib import messages
+from django.db.models import Q, Count
+from django.core.paginator import Paginator
+from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.http import HttpResponseForbidden, JsonResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.decorators.http import require_POST, require_GET
+from django.contrib.auth.decorators import login_required, user_passes_test
 
-
+from .forms import CommentForm, SearchForm
 from .models import Post, Category, Tag, Comment, SocialShare
-from .forms import PostForm, CommentForm, CommentModerationForm, SearchForm
 
-
-# ---------- Helper functions ----------
 def staff_required(view_func):
     """Decorator: staff only"""
     def wrapper(request, *args, **kwargs):
@@ -28,7 +25,7 @@ def staff_required(view_func):
 
 def get_published_posts():
     """Return queryset of published posts (live and scheduled)"""
-    return Post.live.all()  # using the custom PublishedManager
+    return Post.live.all() 
 
 
 def get_recent_posts(limit=5, exclude_post=None):
@@ -79,8 +76,6 @@ def search_posts(query=None, category=None, tag=None, date_from=None, date_to=No
     
     return posts
 
-
-# ---------- Public views ----------
 @require_GET
 def post_list(request):
     """List view for blog posts"""
@@ -209,8 +204,6 @@ def search_posts(request):
     context = {'form': form, 'page_obj': page_obj, 'query': request.GET.get('q', '')}
     return render(request, 'blog/search_results.html', context)
 
-
-# ---------- Comment handling ----------
 @require_POST
 def add_comment(request, slug):
     """Submit a comment on a post"""
@@ -230,7 +223,7 @@ def add_comment(request, slug):
             'comment_form': form,
             'recent_posts': get_recent_posts(exclude_post=post),
             'comments': post.comments.filter(status=Comment.Status.APPROVED),
-            'social_share_urls': {},  # or compute if needed
+            'social_share_urls': {},  
         })
 
 

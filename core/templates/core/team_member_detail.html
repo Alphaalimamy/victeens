@@ -1,0 +1,259 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="relative overflow-hidden bg-gradient-to-br from-amber-50 via-white to-purple-50">
+  <!-- Animated Background -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-gradient-to-br from-amber-200/30 to-orange-300/20 blur-3xl animate-pulse"></div>
+    <div class="absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-gradient-to-tr from-purple-200/30 to-indigo-200/20 blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+  </div>
+  
+  <div class="relative mx-auto max-w-7xl px-6 py-16 md:py-24 lg:py-32">
+    <!-- Back Button -->
+    <div class="mb-8 animate-fade-up">
+      <a href="{% url 'about' %}#team" class="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm text-amber-600 hover:text-amber-700 transition-all shadow-sm hover:shadow-md">
+        <i class="fas fa-arrow-left text-sm group-hover:-translate-x-1 transition-transform"></i>
+        <span class="text-sm font-medium">Back to Team</span>
+      </a>
+    </div>
+    
+    <!-- Member Details -->
+    <div class="grid gap-8 lg:gap-12 lg:grid-cols-3">
+      <!-- Left Column - Photo & Basic Info -->
+      <div class="lg:col-span-1 animate-slide-left">
+        <div class="sticky top-8 rounded-2xl bg-white/80 backdrop-blur-sm p-8 shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
+          <!-- Profile Image -->
+          <div class="relative">
+            <div class="absolute inset-0 rounded-full bg-gradient-to-r from-amber-500 to-purple-500 blur-xl opacity-30"></div>
+            {% if member.image %}
+            <img src="{{ member.image.url }}" alt="{{ member.name }}" class="relative mx-auto h-48 w-48 rounded-full object-cover ring-4 ring-white shadow-xl transition-transform duration-300 hover:scale-105">
+            {% else %}
+            <div class="relative mx-auto h-48 w-48 rounded-full bg-gradient-to-br from-amber-500 to-purple-500 flex items-center justify-center ring-4 ring-white shadow-xl transition-transform duration-300 hover:scale-105">
+              <i class="fas fa-user text-6xl text-white"></i>
+            </div>
+            {% endif %}
+          </div>
+          
+          <!-- Name & Role -->
+          <div class="mt-6 text-center">
+            <h1 class="text-2xl font-bold text-gray-900">{{ member.name }}</h1>
+            <p class="mt-2 inline-block px-3 py-1 rounded-full bg-gradient-to-r from-amber-100 to-purple-100 text-amber-700 font-semibold text-sm">
+              {{ member.get_role_display }}
+            </p>
+            {% if member.title %}
+            <p class="mt-2 text-gray-500 text-sm">{{ member.title }}</p>
+            {% endif %}
+          </div>
+          
+          <!-- Contact Info -->
+          {% if member.email or member.phone or member.linkedin_url %}
+          <div class="mt-8 space-y-3 border-t border-gray-200 pt-6">
+            {% if member.email %}
+            <div class="group flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-amber-50 transition">
+              <div class="flex items-center gap-2 text-gray-600">
+                <i class="fas fa-envelope text-amber-500 w-5"></i>
+                <span class="text-sm">Email</span>
+              </div>
+              <a href="mailto:{{ member.email }}" class="text-sm text-gray-700 hover:text-amber-600 transition truncate">{{ member.email }}</a>
+            </div>
+            {% endif %}
+            
+            {% if member.phone %}
+            <div class="group flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-amber-50 transition">
+              <div class="flex items-center gap-2 text-gray-600">
+                <i class="fas fa-phone text-amber-500 w-5"></i>
+                <span class="text-sm">Phone</span>
+              </div>
+              <a href="tel:{{ member.phone }}" class="text-sm text-gray-700 hover:text-amber-600 transition">{{ member.phone }}</a>
+            </div>
+            {% endif %}
+            
+            {% if member.linkedin_url %}
+            <div class="group flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-amber-50 transition">
+              <div class="flex items-center gap-2 text-gray-600">
+                <i class="fab fa-linkedin text-amber-500 w-5"></i>
+                <span class="text-sm">LinkedIn</span>
+              </div>
+              <a href="{{ member.linkedin_url }}" target="_blank" class="text-sm text-gray-700 hover:text-amber-600 transition">View Profile <i class="fas fa-external-link-alt text-xs ml-1"></i></a>
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Right Column - Bio & Details -->
+      <div class="lg:col-span-2 space-y-8 animate-slide-right">
+        <!-- Biography Section -->
+        <div class="rounded-2xl bg-white/80 backdrop-blur-sm p-8 shadow-xl transition-all duration-300 hover:shadow-2xl">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-purple-500 flex items-center justify-center">
+              <i class="fas fa-user-circle text-white text-xl"></i>
+            </div>
+            <div>
+              <h2 class="text-2xl font-bold text-gray-900">Biography</h2>
+              <p class="text-sm text-gray-500">Learn more about {{ member.name }}'s journey</p>
+            </div>
+          </div>
+          
+          <!-- Rich Text Content -->
+          <div class="rich-text-content prose prose-lg max-w-none">
+            {% if member.bio %}
+              {{ member.bio|safe }}
+            {% else %}
+              <div class="text-center py-12">
+                <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                  <i class="fas fa-edit text-4xl text-gray-400"></i>
+                </div>
+                <p class="text-gray-500">No biography available for this team member yet.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Achievements Section -->
+        {% if member.achievements.all %}
+        <div class="rounded-2xl bg-white/80 backdrop-blur-sm p-8 shadow-xl transition-all duration-300 hover:shadow-2xl">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-purple-500 flex items-center justify-center">
+              <i class="fas fa-trophy text-white text-xl"></i>
+            </div>
+            <div>
+              <h3 class="text-2xl font-bold text-gray-900">Key Achievements</h3>
+              <p class="text-sm text-gray-500">Notable accomplishments and contributions</p>
+            </div>
+          </div>
+          
+          <div class="grid gap-4">
+            {% for achievement in member.achievements.all %}
+            <div class="group flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-gray-50 to-white hover:from-amber-50 hover:to-purple-50 transition-all duration-300 hover:shadow-md">
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-purple-500 flex items-center justify-center shrink-0">
+                <i class="fas fa-award text-white text-sm"></i>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 group-hover:text-amber-600 transition">{{ achievement.title }}</h4>
+                <p class="text-gray-600 text-sm mt-1">{{ achievement.description }}</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+        
+        <!-- Related Team Members -->
+        {% if related_members %}
+        <div class="rounded-2xl bg-white/80 backdrop-blur-sm p-8 shadow-xl transition-all duration-300 hover:shadow-2xl">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-purple-500 flex items-center justify-center">
+              <i class="fas fa-users text-white text-xl"></i>
+            </div>
+            <div>
+              <h3 class="text-2xl font-bold text-gray-900">Team Colleagues</h3>
+              <p class="text-sm text-gray-500">Other {{ member.get_role_display }}s at Victory Teens</p>
+            </div>
+          </div>
+          
+          <div class="grid gap-4 sm:grid-cols-2">
+            {% for related in related_members %}
+            <a href="{% url 'core:team_member_detail' related.id %}" class="group flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-gray-50 to-white hover:from-amber-50 hover:to-purple-50 transition-all duration-300 hover:shadow-md">
+              {% if related.image %}
+              <img src="{{ related.image.url }}" alt="{{ related.name }}" class="w-14 h-14 rounded-full object-cover ring-2 ring-amber-200 group-hover:ring-4 group-hover:ring-amber-400 transition-all">
+              {% else %}
+              <div class="w-14 h-14 rounded-full bg-gradient-to-br from-amber-500 to-purple-500 flex items-center justify-center ring-2 ring-amber-200 group-hover:ring-4 group-hover:ring-amber-400 transition-all">
+                <i class="fas fa-user text-white text-xl"></i>
+              </div>
+              {% endif %}
+              <div class="flex-1">
+                <h4 class="font-semibold text-gray-900 group-hover:text-amber-600 transition">{{ related.name }}</h4>
+                <p class="text-xs text-gray-500">{{ related.title|default:related.get_role_display }}</p>
+              </div>
+              <i class="fas fa-chevron-right text-gray-400 group-hover:text-amber-500 group-hover:translate-x-1 transition-all"></i>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modern JavaScript for Interactions -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add intersection observer for scroll animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+    
+    // Observe all cards for animation
+    document.querySelectorAll('.rounded-2xl').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'all 0.6s ease-out';
+      observer.observe(el);
+    });
+    
+    // Add hover sound effect (optional - remove if not needed)
+    const links = document.querySelectorAll('a');
+    links.forEach(link => {
+      link.addEventListener('mouseenter', () => {
+        // Optional: Add micro-interaction
+        link.style.transition = 'all 0.3s ease';
+      });
+    });
+    
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        if (href !== '#') {
+          e.preventDefault();
+          const target = document.querySelector(href);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      });
+    });
+    
+    // Add copy to clipboard for code blocks
+    document.querySelectorAll('.rich-text-content pre').forEach(block => {
+      const button = document.createElement('button');
+      button.innerHTML = '<i class="fas fa-copy"></i>';
+      button.className = 'absolute top-3 right-3 p-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 transition text-xs z-10';
+      button.style.cssText = 'position: absolute; top: 0.75rem; right: 0.75rem;';
+      block.style.position = 'relative';
+      block.appendChild(button);
+      
+      button.addEventListener('click', () => {
+        const code = block.querySelector('code');
+        const text = code ? code.innerText : block.innerText;
+        navigator.clipboard.writeText(text);
+        button.innerHTML = '<i class="fas fa-check"></i>';
+        setTimeout(() => {
+          button.innerHTML = '<i class="fas fa-copy"></i>';
+        }, 2000);
+      });
+    });
+  });
+</script>
+
+{% endblock %}
