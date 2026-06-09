@@ -2,7 +2,6 @@
 {% load static %}
 {% block content %}
 
-<!-- Main Content -->
 <main class="bg-gradient-to-br from-amber-50 via-white to-purple-50">
   
   <!-- Hero Section -->
@@ -34,9 +33,6 @@
       </p>
       {% endif %}
       
-    
-      
-      <!-- Buttons - Dynamic from SiteConfiguration -->
       <div class="mt-10 flex flex-wrap justify-center gap-4">
         <a href="{% url 'programs' %}" class="group relative overflow-hidden rounded-full bg-gradient-to-r from-amber-600 to-orange-500 px-8 py-3 text-white font-semibold shadow-lg transition-all hover:scale-105">
           <span class="relative z-10">{% if config.primary_cta_text %}{{ config.primary_cta_text }}{% else %}Explore Programs{% endif %}</span>
@@ -49,7 +45,6 @@
     </div>
   </section>
 
-  <!-- History Section - Dynamic from OrganizationProfile -->
   {% if profile.history %}
   <section class="px-6 py-16 bg-white">
     <div class="mx-auto max-w-5xl">
