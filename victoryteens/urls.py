@@ -40,6 +40,8 @@ urlpatterns = [
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('dashboard/', dashboard_view, name='dashboard'),
     path('profile/', profile_view, name='profile'),
+    
+    
     path('blog/', include('blog.urls')),
 
     path("__reload__/", include("django_browser_reload.urls")),

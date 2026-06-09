@@ -73,24 +73,14 @@ class PostForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['name', 'email', 'website', 'content', 'parent']
+        fields = ['name', 'content', 'parent']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Share your thoughts...'}),
             'name': forms.TextInput(attrs={'class': 'w-full px-4 py-2 border rounded-lg'}),
-            'email': forms.EmailInput(attrs={'class': 'w-full px-4 py-2 border rounded-lg'}),
-            'website': forms.URLInput(attrs={'class': 'w-full px-4 py-2 border rounded-lg'}),
             'parent': forms.HiddenInput(),
         }
     
-    def __init__(self, *args, **kwargs):
-        self.post = kwargs.pop('post', None)
-        self.request = kwargs.pop('request', None)
-        super().__init__(*args, **kwargs)
-        if self.request and self.request.user.is_authenticated:
-            self.fields['name'].initial = self.request.user.get_full_name() or self.request.user.username
-            self.fields['email'].initial = self.request.user.email
-            self.fields['name'].widget.attrs['readonly'] = True
-            self.fields['email'].widget.attrs['readonly'] = True
+
     
     def clean_content(self):
         content = self.cleaned_data.get('content')

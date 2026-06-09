@@ -17,11 +17,10 @@ class PostImageInline(admin.TabularInline):
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'author', 'status', 'published_at', 'is_featured', 'view_count', 'preview_hero']
-    list_filter = ['status', 'is_featured', 'category', 'published_at', 'author']
-    search_fields = ['title', 'excerpt', 'content', 'seo_title', 'meta_description']
+    list_filter = ['status', 'is_featured', 'category', 'published_at']
+    search_fields = ['title', 'excerpt', 'content', 'seo_title', 'meta_description', 'author']
     prepopulated_fields = {'slug': ('title',)}
     date_hierarchy = 'published_at'
-    raw_id_fields = ['author']
     inlines = [PostImageInline]
     
     fieldsets = (

@@ -12,9 +12,8 @@
         {% endblock %}
     </title>
     
-     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
     <!-- Google Fonts - Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,7 +33,6 @@
                         'poppins': ['Poppins', 'system-ui', 'sans-serif'],
                     },
                     colors: {
-                        /* Victory Teens Organization Color Palette */
                         'vto-white': '#FDFDFD',
                         'vto-orange': {
                             DEFAULT: '#B83E09',
@@ -102,7 +100,7 @@
     <style>
         /* Apply Poppins font globally */
         * {
-            font-family: 'Poppins', system-ui, -apple-system, sans-serif !important;
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
         }
         
         body {
@@ -113,11 +111,29 @@
             color: #1C1C1C;
         }
         
-        /* Ensure Tailwind classes don't override Poppins */
+        /* Ensure Font Awesome icons work properly */
+        i, .fas, .far, .fab, .fal, .fad {
+            font-family: "Font Awesome 6 Free" !important;
+        }
+        
+        .fab {
+            font-family: "Font Awesome 6 Brands" !important;
+            font-weight: 400;
+        }
+        
+        .fas {
+            font-weight: 900;
+        }
+        
+        .far {
+            font-weight: 400;
+        }
+        
+        /* Ensure Tailwind doesn't override Poppins */
         .font-sans,
         .font-poppins,
         [class*="font-"] {
-            font-family: 'Poppins', system-ui, -apple-system, sans-serif !important;
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
         }
         
         /* Smooth scroll behavior */
@@ -178,345 +194,338 @@
             opacity: 0.3;
         }
 
+        :root {
+            --primary-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --secondary-gradient: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            --accent-gradient: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+        }
 
-  :root {
-    --primary-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    --secondary-gradient: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
-    --accent-gradient: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-  }
-
-  /* Rich Text Content Styling */
-  .rich-text-content {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    line-height: 1.8;
-    color: #374151;
-    font-size: 1.05rem;
-  }
-  
-  /* Headings with modern styling */
-  .rich-text-content h1 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.02em;
-  }
-  
-  .rich-text-content h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-top: 1.75rem;
-    margin-bottom: 1rem;
-    color: #1f2937;
-    letter-spacing: -0.01em;
-    border-left: 4px solid #f59e0b;
-    padding-left: 1rem;
-  }
-  
-  .rich-text-content h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
-    color: #374151;
-  }
-  
-  .rich-text-content h4 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-top: 1.25rem;
-    margin-bottom: 0.5rem;
-    color: #4b5563;
-  }
-  
-  /* Modern List Styling */
-  .rich-text-content ul,
-  .rich-text-content ol {
-    margin: 1.5rem 0;
-    padding-left: 0;
-    list-style: none;
-  }
-  
-  .rich-text-content ul li {
-    position: relative;
-    padding-left: 1.75rem;
-    margin-bottom: 0.75rem;
-    line-height: 1.6;
-  }
-  
-  .rich-text-content ul li::before {
-    content: "▹";
-    position: absolute;
-    left: 0;
-    color: #f59e0b;
-    font-weight: bold;
-    font-size: 1rem;
-  }
-  
-  .rich-text-content ol {
-    counter-reset: item;
-  }
-  
-  .rich-text-content ol li {
-    position: relative;
-    padding-left: 2rem;
-    margin-bottom: 0.75rem;
-    counter-increment: item;
-  }
-  
-  .rich-text-content ol li::before {
-    content: counter(item) ".";
-    position: absolute;
-    left: 0;
-    color: #f59e0b;
-    font-weight: 600;
-    background: #fef3c7;
-    width: 1.5rem;
-    height: 1.5rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-  }
-  
-  /* Nested lists */
-  .rich-text-content ul ul li::before {
-    content: "◦";
-    color: #8b5cf6;
-  }
-  
-  .rich-text-content ul ul ul li::before {
-    content: "▪";
-    color: #10b981;
-  }
-  
-  /* Modern Blockquotes */
-  .rich-text-content blockquote {
-    position: relative;
-    background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
-    border-radius: 1rem;
-    padding: 1.5rem 2rem;
-    margin: 2rem 0;
-    font-style: normal;
-    color: #4b5563;
-    border: none;
-    box-shadow: var(--shadow-md);
-  }
-  
-  .rich-text-content blockquote::before {
-    content: '"';
-    position: absolute;
-    top: -0.5rem;
-    left: 1rem;
-    font-size: 4rem;
-    color: #f59e0b;
-    opacity: 0.3;
-    font-family: serif;
-  }
-  
-  .rich-text-content blockquote p {
-    position: relative;
-    z-index: 1;
-  }
-  
-  /* Modern Links */
-  .rich-text-content a {
-    color: #f59e0b;
-    text-decoration: none;
-    border-bottom: 2px solid transparent;
-    transition: all 0.3s ease;
-    position: relative;
-  }
-  
-  .rich-text-content a:hover {
-    color: #d97706;
-    border-bottom-color: #f59e0b;
-  }
-  
-  /* Modern Images */
-  .rich-text-content img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 1rem;
-    margin: 1.5rem 0;
-    box-shadow: var(--shadow-lg);
-    transition: all 0.3s ease;
-  }
-  
-  .rich-text-content img:hover {
-    transform: scale(1.02);
-    box-shadow: var(--shadow-xl);
-  }
-  
-  /* Modern Tables */
-  .rich-text-content table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    margin: 1.5rem 0;
-    background: white;
-    border-radius: 1rem;
-    overflow: hidden;
-    box-shadow: var(--shadow-md);
-  }
-  
-  .rich-text-content th {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    color: white;
-    padding: 1rem;
-    font-weight: 600;
-    text-align: left;
-  }
-  
-  .rich-text-content td {
-    padding: 1rem;
-    border-bottom: 1px solid #f3f4f6;
-  }
-  
-  .rich-text-content tr:last-child td {
-    border-bottom: none;
-  }
-  
-  .rich-text-content tr:hover td {
-    background-color: #fef3c7;
-  }
-  
-  /* Modern Code Blocks */
-  .rich-text-content pre {
-    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    overflow-x: auto;
-    margin: 1.5rem 0;
-    position: relative;
-  }
-  
-  .rich-text-content pre::before {
-    content: "</>";
-    position: absolute;
-    top: 0.5rem;
-    right: 1rem;
-    color: #6b7280;
-    font-size: 0.75rem;
-    font-family: monospace;
-  }
-  
-  .rich-text-content code {
-    background: #f3f4f6;
-    color: #dc2626;
-    padding: 0.2rem 0.4rem;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-  }
-  
-  .rich-text-content pre code {
-    background: transparent;
-    color: #f3f4f6;
-    padding: 0;
-  }
-  
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    border-radius: 10px;
-  }
-  
-  /* Glass morphism effects */
-  .glass-card {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  
-  /* Smooth scroll behavior */
-  html {
-    scroll-behavior: smooth;
-  }
-  
-  /* Animation classes */
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  @keyframes slideInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  
-  @keyframes slideInRight {
-    from {
-      opacity: 0;
-      transform: translateX(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  
-  .animate-fade-up {
-    animation: fadeInUp 0.6s ease-out forwards;
-  }
-  
-  .animate-slide-left {
-    animation: slideInLeft 0.6s ease-out forwards;
-  }
-  
-  .animate-slide-right {
-    animation: slideInRight 0.6s ease-out forwards;
-  }
-  
-  /* Hover effects */
-  .hover-lift {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .hover-lift:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
-  }
-  
-  /* Gradient text */
-  .gradient-text {
-    background: linear-gradient(135deg, #f59e0b 0%, #8b5cf6 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-</style>
+        /* Rich Text Content Styling */
+        .rich-text-content {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            line-height: 1.8;
+            color: #374151;
+            font-size: 1.05rem;
+        }
+        
+        /* Headings with modern styling */
+        .rich-text-content h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+        
+        .rich-text-content h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-top: 1.75rem;
+            margin-bottom: 1rem;
+            color: #1f2937;
+            letter-spacing: -0.01em;
+            border-left: 4px solid #f59e0b;
+            padding-left: 1rem;
+        }
+        
+        .rich-text-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: #374151;
+        }
+        
+        .rich-text-content h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #4b5563;
+        }
+        
+        /* Modern List Styling */
+        .rich-text-content ul,
+        .rich-text-content ol {
+            margin: 1.5rem 0;
+            padding-left: 0;
+            list-style: none;
+        }
+        
+        .rich-text-content ul li {
+            position: relative;
+            padding-left: 1.75rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+        
+        .rich-text-content ul li::before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: #f59e0b;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        
+        .rich-text-content ol {
+            counter-reset: item;
+        }
+        
+        .rich-text-content ol li {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 0.75rem;
+            counter-increment: item;
+        }
+        
+        .rich-text-content ol li::before {
+            content: counter(item) ".";
+            position: absolute;
+            left: 0;
+            color: #f59e0b;
+            font-weight: 600;
+            background: #fef3c7;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Nested lists */
+        .rich-text-content ul ul li::before {
+            content: "◦";
+            color: #8b5cf6;
+        }
+        
+        .rich-text-content ul ul ul li::before {
+            content: "▪";
+            color: #10b981;
+        }
+        
+        /* Modern Blockquotes */
+        .rich-text-content blockquote {
+            position: relative;
+            background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+            border-radius: 1rem;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            font-style: normal;
+            color: #4b5563;
+            border: none;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .rich-text-content blockquote::before {
+            content: '"';
+            position: absolute;
+            top: -0.5rem;
+            left: 1rem;
+            font-size: 4rem;
+            color: #f59e0b;
+            opacity: 0.3;
+            font-family: serif;
+        }
+        
+        .rich-text-content blockquote p {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Modern Links */
+        .rich-text-content a {
+            color: #f59e0b;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .rich-text-content a:hover {
+            color: #d97706;
+            border-bottom-color: #f59e0b;
+        }
+        
+        /* Modern Images */
+        .rich-text-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 1rem;
+            margin: 1.5rem 0;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+        }
+        
+        .rich-text-content img:hover {
+            transform: scale(1.02);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        /* Modern Tables */
+        .rich-text-content table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 1.5rem 0;
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .rich-text-content th {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+            text-align: left;
+        }
+        
+        .rich-text-content td {
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .rich-text-content tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .rich-text-content tr:hover td {
+            background-color: #fef3c7;
+        }
+        
+        /* Modern Code Blocks */
+        .rich-text-content pre {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+        
+        .rich-text-content pre::before {
+            content: "</>";
+            position: absolute;
+            top: 0.5rem;
+            right: 1rem;
+            color: #6b7280;
+            font-size: 0.75rem;
+            font-family: monospace;
+        }
+        
+        .rich-text-content code {
+            background: #f3f4f6;
+            color: #dc2626;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        
+        .rich-text-content pre code {
+            background: transparent;
+            color: #f3f4f6;
+            padding: 0;
+        }
+        
+        /* Glass morphism effects */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Animation classes */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .animate-fade-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        
+        .animate-slide-left {
+            animation: slideInLeft 0.6s ease-out forwards;
+        }
+        
+        .animate-slide-right {
+            animation: slideInRight 0.6s ease-out forwards;
+        }
+        
+        /* Hover effects */
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #f59e0b 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Line clamp utility */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
 </head>
 
 <body class="bg-vto-white text-vto-black font-poppins min-h-screen flex flex-col leading-relaxed">
@@ -625,6 +634,26 @@
                     link.classList.remove('text-gray-600');
                 }
             });
+        });
+        
+        // Test if Font Awesome loaded (for debugging)
+        window.addEventListener('load', function() {
+            const testIcon = document.createElement('i');
+            testIcon.className = 'fas fa-star';
+            testIcon.style.position = 'absolute';
+            testIcon.style.visibility = 'hidden';
+            document.body.appendChild(testIcon);
+            
+            const computedStyle = window.getComputedStyle(testIcon);
+            const fontFamily = computedStyle.getPropertyValue('font-family');
+            
+            if (fontFamily.includes('Font Awesome')) {
+                console.log('✓ Font Awesome loaded successfully');
+            } else {
+                console.warn('✗ Font Awesome failed to load');
+            }
+            
+            document.body.removeChild(testIcon);
         });
     </script>
     

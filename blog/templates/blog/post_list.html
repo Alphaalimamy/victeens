@@ -78,7 +78,7 @@
                             <div class="w-8 h-8 rounded-full bg-gradient-to-r from-orange-400 to-purple-500 flex items-center justify-center text-white text-sm">
                                 {{ post.author.get_full_name|first|upper }}
                             </div>
-                            <span class="text-sm font-medium">{{ post.author.get_full_name|default:post.author.username }}</span>
+                            <span class="text-sm font-medium">{{ post.author|default:post.author }}</span>
                         </div>
                         <a href="{{ post.get_absolute_url }}" class="text-orange-600 hover:text-orange-700 font-semibold text-sm group">
                             Read More <i class="fas fa-arrow-right ml-1 group-hover:translate-x-1 transition"></i>
@@ -133,9 +133,9 @@
                                     <div class="flex items-center gap-4">
                                         <div class="flex items-center gap-2">
                                             <div class="w-6 h-6 rounded-full bg-gradient-to-r from-orange-400 to-purple-500 flex items-center justify-center text-white text-xs">
-                                                {{ post.author.get_full_name|first|upper }}
+                                                {{ post.author|first|upper }}
                                             </div>
-                                            <span class="font-medium">{{ post.author.get_full_name|default:post.author.username }}</span>
+                                            <span class="font-medium">{{ post.author|default:post.author }}</span>
                                         </div>
                                         <span><i class="far fa-eye mr-1"></i> {{ post.view_count }}</span>
                                         <span><i class="far fa-comment mr-1"></i> {{ post.comments.count }}</span>

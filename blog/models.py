@@ -27,7 +27,6 @@ class Category(models.Model):
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
     
-    # FIXED: Changed 'category_detail' to 'category_post_list'
     def get_absolute_url(self):
         return reverse('blog:category_post_list', kwargs={'slug': self.slug})
 
@@ -49,11 +48,8 @@ class Tag(models.Model):
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
     
-    # FIXED: Changed 'tag_detail' to 'tag_post_list'
     def get_absolute_url(self):
         return reverse('blog:tag_post_list', kwargs={'slug': self.slug})
-    
-
 
 
 class PublishedManager(models.Manager):
@@ -75,13 +71,13 @@ class Post(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
     excerpt = models.TextField(max_length=300, blank=True)
-    content = RichTextUploadingField(  # <-- RICH TEXT
+    content = RichTextUploadingField(
         config_name='default',
         help_text="Rich text editor – add images, videos, lists, etc."
     )
 
     # Author & taxonomy
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
+    author = models.CharField(max_length=100, blank=True, default='Victory Teens Organization')
     category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
     tags = models.ManyToManyField('Tag', blank=True, related_name='posts')
 
@@ -122,7 +118,13 @@ class Post(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
 
-        # Auto excerpt (strip HTML from rich text)
+        if not self.author:
+            self.author = 'Victory Teens Organization'
+
+        # Auto-set published_at when status changes to PUBLISHED
+        if self.status == self.Status.PUBLISHED and not self.published_at:
+            self.published_at = timezone.now()
+
         if not self.excerpt and self.content:
             from django.utils.html import strip_tags
             plain = strip_tags(self.content)
@@ -162,36 +164,25 @@ class PostImage(models.Model):
 
     class Meta:
         ordering = ['order']
-        
+
 
 class Comment(models.Model):
-    """Comment system for blog posts with moderation"""
     class Status(models.TextChoices):
         PENDING = 'pending', 'Pending Review'
         APPROVED = 'approved', 'Approved'
         REJECTED = 'rejected', 'Rejected'
         SPAM = 'spam', 'Spam'
     
-    # Core fields
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
-    
-    # Commenter information
     name = models.CharField(max_length=100)
     email = models.EmailField()
-    website = models.URLField(blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='comments')
-    
-    # Content
     content = models.TextField(max_length=1000)
-    
-    # Moderation
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     moderated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='moderated_comments')
     moderated_at = models.DateTimeField(null=True, blank=True)
     moderation_notes = models.TextField(blank=True)
-    
-    # Metadata
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -231,7 +222,6 @@ class Comment(models.Model):
 
 
 class PostView(models.Model):
-    """Track post views for analytics"""
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='views')
     session_key = models.CharField(max_length=40, db_index=True)
     ip_address = models.GenericIPAddressField()
@@ -250,9 +240,8 @@ class PostView(models.Model):
 
 
 class SocialShare(models.Model):
-    """Track social media shares"""
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='social_shares')
-    platform = models.CharField(max_length=50)  # facebook, twitter, linkedin, etc.
+    platform = models.CharField(max_length=50)
     shared_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     shared_at = models.DateTimeField(auto_now_add=True)
@@ -261,45 +250,3 @@ class SocialShare(models.Model):
         indexes = [
             models.Index(fields=['post', 'platform']),
         ]
-
-
-# Signals for automatic actions
-from django.db.models.signals import post_save, pre_save
-from django.dispatch import receiver
-from django.core.cache import cache
-
-@receiver(post_save, sender=Post)
-def clear_blog_cache(sender, instance, **kwargs):
-    """Clear cache when posts are saved"""
-    cache_keys = [
-        'blog:featured_posts',
-        'blog:recent_posts',
-        'blog:categories',
-        f'blog:post_{instance.id}',
-    ]
-    for key in cache_keys:
-        cache.delete(key)
-
-@receiver(post_save, sender=Comment)
-def send_comment_notification(sender, instance, created, **kwargs):
-    """Send notifications for new comments"""
-    if created and instance.post.author.notification_preferences.get('new_comment', True):
-        from django.core.mail import send_mail
-        from django.conf import settings
-        
-        subject = f'New comment on your post: {instance.post.title}'
-        message = f"""
-        New comment from {instance.name}:
-        
-        {instance.content}
-        
-        To moderate this comment, visit: {settings.SITE_URL}{instance.post.get_absolute_url()}
-        """
-        
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [instance.post.author.email],
-            fail_silently=True,
-        )

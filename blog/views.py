@@ -1,21 +1,20 @@
-
 import json
-from django.contrib import messages
 from django.db.models import Q, Count
 from django.core.paginator import Paginator
-from django.views.decorators.cache import cache_page
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.decorators.http import require_POST, require_GET
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse, HttpResponseForbidden
+from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import cache_page
+from django.utils import timezone
 
-from .forms import CommentForm, SearchForm
 from .models import Post, Category, Tag, Comment, SocialShare
+from .forms import CommentForm
+
 
 def staff_required(view_func):
-    """Decorator: staff only"""
     def wrapper(request, *args, **kwargs):
         if not request.user.is_staff:
             return HttpResponseForbidden()
@@ -24,73 +23,67 @@ def staff_required(view_func):
 
 
 def get_published_posts():
-    """Return queryset of published posts (live and scheduled)"""
-    return Post.live.all() 
+    """Get all published posts with proper date filtering"""
+    now = timezone.now()
+    return Post.objects.filter(
+        status=Post.Status.PUBLISHED,
+        published_at__lte=now
+    ).select_related('category').prefetch_related('tags')
 
 
 def get_recent_posts(limit=5, exclude_post=None):
-    """Get most recent published posts"""
-    posts = get_published_posts()  # no slice yet
+    posts = get_published_posts()
     if exclude_post:
         posts = posts.exclude(id=exclude_post.id)
-    return posts[:limit]  
+    return posts[:limit]
 
 
 def get_featured_posts(limit=3):
-    """Get featured published posts"""
     return get_published_posts().filter(is_featured=True)[:limit]
 
 
 def get_categories_with_counts():
-    """Return categories with post count (published posts only)"""
     return Category.objects.annotate(
-        post_count=Count('posts', filter=Q(posts__status=Post.Status.PUBLISHED))
+        post_count=Count('posts', filter=Q(posts__status=Post.Status.PUBLISHED, posts__published_at__lte=timezone.now()))
     ).filter(post_count__gt=0)
 
 
 def get_tags_with_counts(limit=10):
-    """Return tags with post count (published posts only)"""
     return Tag.objects.annotate(
-        post_count=Count('posts', filter=Q(posts__status=Post.Status.PUBLISHED))
+        post_count=Count('posts', filter=Q(posts__status=Post.Status.PUBLISHED, posts__published_at__lte=timezone.now()))
     ).filter(post_count__gt=0).order_by('-post_count')[:limit]
 
-
-def search_posts(query=None, category=None, tag=None, date_from=None, date_to=None):
-    """Search published posts"""
-    posts = get_published_posts()
-    
-    if query:
-        posts = posts.filter(
-            Q(title__icontains=query) |
-            Q(excerpt__icontains=query) |
-            Q(content__icontains=query)
-        )
-    if category:
-        posts = posts.filter(category=category)
-    if tag:
-        posts = posts.filter(tags=tag)
-    if date_from:
-        posts = posts.filter(published_at__date__gte=date_from)
-    if date_to:
-        posts = posts.filter(published_at__date__lte=date_to)
-    
-    return posts
 
 @require_GET
 def post_list(request):
     """List view for blog posts"""
     posts = get_published_posts()
     
+    # Get sorting parameter
+    order = request.GET.get('order', 'newest')
+    if order == 'popular':
+        posts = posts.order_by('-view_count', '-published_at')
+    else:
+        posts = posts.order_by('-published_at')
+    
+    # Search functionality
+    q = request.GET.get('q')
+    if q:
+        posts = posts.filter(
+            Q(title__icontains=q) |
+            Q(excerpt__icontains=q) |
+            Q(content__icontains=q)
+        )
+    
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
     context = {
-        'posts': page_obj,
+        'page_obj': page_obj,
         'categories': get_categories_with_counts(),
         'popular_tags': get_tags_with_counts(),
         'featured_posts': get_featured_posts(),
-        'search_form': SearchForm(request.GET or None),
     }
     return render(request, 'blog/post_list.html', context)
 
@@ -99,11 +92,16 @@ def post_list(request):
 @require_GET
 def post_detail(request, slug):
     """Detail view for a blog post"""
-    post = get_object_or_404(get_published_posts(), slug=slug)
+    post = get_object_or_404(
+        Post.objects.filter(
+            status=Post.Status.PUBLISHED,
+            published_at__lte=timezone.now()
+        ),
+        slug=slug
+    )
     
     # Increment view count
-    post.view_count += 1
-    post.save(update_fields=['view_count'])
+    post.increment_view_count()
     
     # Related data
     recent_posts = get_recent_posts(limit=3, exclude_post=post)
@@ -122,7 +120,7 @@ def post_detail(request, slug):
         'post': post,
         'recent_posts': recent_posts,
         'comments': comments,
-        'comment_form': CommentForm(post=post, request=request),
+        'comment_form': CommentForm(),
         'social_share_urls': social_share_urls,
     }
     return render(request, 'blog/post_detail.html', context)
@@ -139,11 +137,13 @@ def category_post_list(request, slug):
     page_obj = paginator.get_page(page_number)
     
     context = {
-        'posts': page_obj,
+        'page_obj': page_obj,
         'category': category,
         'categories': get_categories_with_counts(),
+        'popular_tags': get_tags_with_counts(),
+        'featured_posts': get_featured_posts(),
     }
-    return render(request, 'blog/category_posts.html', context)
+    return render(request, 'blog/post_list.html', context)
 
 
 @require_GET
@@ -161,70 +161,32 @@ def tag_post_list(request, slug):
         'page_obj': page_obj,
         'categories': get_categories_with_counts(),
         'popular_tags': get_tags_with_counts(),
+        'featured_posts': get_featured_posts(),
     }
     return render(request, 'blog/post_list.html', context)
 
-
-@require_GET
-def post_archive_year(request, year):
-    """List posts by year"""
-    posts = get_published_posts().filter(published_at__year=year)
-    paginator = Paginator(posts, 10)
-    page_obj = paginator.get_page(request.GET.get('page'))
-    context = {'posts': page_obj, 'year': year, 'title': f'Posts from {year}'}
-    return render(request, 'blog/archive_year.html', context)
-
-
-@require_GET
-def post_archive_month(request, year, month):
-    """List posts by year and month"""
-    posts = get_published_posts().filter(published_at__year=year, published_at__month=month)
-    paginator = Paginator(posts, 10)
-    page_obj = paginator.get_page(request.GET.get('page'))
-    context = {'posts': page_obj, 'year': year, 'month': month, 'title': f'Posts from {year}/{month:02d}'}
-    return render(request, 'blog/archive_month.html', context)
-
-
-@require_POST
-def search_posts(request):
-    """Search blog posts (POST for form submission, but uses GET params)"""
-    form = SearchForm(request.GET or None)
-    posts = []
-    if form.is_valid():
-        posts = search_posts(
-            query=form.cleaned_data.get('q'),
-            category=form.cleaned_data.get('category'),
-            tag=form.cleaned_data.get('tag'),
-            date_from=form.cleaned_data.get('date_from'),
-            date_to=form.cleaned_data.get('date_to'),
-        )
-    
-    paginator = Paginator(posts, 10)
-    page_obj = paginator.get_page(request.GET.get('page'))
-    context = {'form': form, 'page_obj': page_obj, 'query': request.GET.get('q', '')}
-    return render(request, 'blog/search_results.html', context)
 
 @require_POST
 def add_comment(request, slug):
     """Submit a comment on a post"""
     post = get_object_or_404(Post, slug=slug, status=Post.Status.PUBLISHED)
-    form = CommentForm(request.POST, post=post, request=request)
+    form = CommentForm(request.POST)
     
     if form.is_valid():
         comment = form.save(commit=False)
         comment.post = post
+        comment.ip_address = request.META.get('REMOTE_ADDR')
+        comment.user_agent = request.META.get('HTTP_USER_AGENT', '')
+        if request.user.is_authenticated:
+            comment.user = request.user
+            comment.name = request.user.get_full_name() or request.user.username
+            comment.email = request.user.email
         comment.save()
-        messages.success(request, 'Comment submitted. It will appear after moderation.')
-        return redirect(post.get_absolute_url())
+        messages.success(request, 'Your comment has been submitted and will appear after moderation.')
     else:
         messages.error(request, 'Please correct the errors below.')
-        return render(request, 'blog/post_detail.html', {
-            'post': post,
-            'comment_form': form,
-            'recent_posts': get_recent_posts(exclude_post=post),
-            'comments': post.comments.filter(status=Comment.Status.APPROVED),
-            'social_share_urls': {},  
-        })
+    
+    return redirect(post.get_absolute_url())
 
 
 @login_required
@@ -243,15 +205,12 @@ def moderate_comment(request, comment_id):
     """Approve/reject/spam a comment"""
     comment = get_object_or_404(Comment, id=comment_id)
     action = request.POST.get('action')
-    notes = request.POST.get('notes', '')
     
     if action == 'approve':
-        comment.status = Comment.Status.APPROVED
-        comment.save()
+        comment.approve(request.user)
         messages.success(request, 'Comment approved.')
     elif action == 'reject':
-        comment.status = Comment.Status.REJECTED
-        comment.save()
+        comment.reject(request.user)
         messages.success(request, 'Comment rejected.')
     elif action == 'spam':
         comment.status = Comment.Status.SPAM
@@ -261,6 +220,7 @@ def moderate_comment(request, comment_id):
         messages.error(request, 'Invalid action.')
     
     return redirect('blog:comment_moderation')
+
 
 @csrf_exempt
 @require_POST
@@ -276,12 +236,37 @@ def track_social_share(request):
             post=post,
             platform=platform,
             shared_by=request.user if request.user.is_authenticated else None,
-            ip_address=request.META.get('REMOTE_ADDR', ''),
+            ip_address=request.META.get('REMOTE_ADDR'),
         )
-        
-        post.share_count += 1
-        post.save(update_fields=['share_count'])
         
         return JsonResponse({'success': True})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    
+    
+@require_GET
+def search_posts(request):
+    """Search blog posts"""
+    query = request.GET.get('q', '')
+    posts = get_published_posts()
+    
+    if query:
+        posts = posts.filter(
+            Q(title__icontains=query) |
+            Q(excerpt__icontains=query) |
+            Q(content__icontains=query) |
+            Q(author__icontains=query)
+        )
+    
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'query': query,
+        'categories': get_categories_with_counts(),
+        'popular_tags': get_tags_with_counts(),
+        'featured_posts': get_featured_posts(),
+    }
+    return render(request, 'blog/post_list.html', context)

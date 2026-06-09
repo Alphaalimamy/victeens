@@ -33,7 +33,7 @@ if not SECRET_KEY:
     raise Exception("SECRET_KEY is not set in environment variables")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 
 ALLOWED_HOSTS = [
@@ -172,17 +172,26 @@ SOCIAL_SHARE_PLATFORMS = ['facebook', 'twitter', 'linkedin', 'whatsapp']
 from decouple import config
 
 # Database
-if config('DEBUG', default=False, cast=bool):
-    # Development - use SQLite
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-else:
-    # Production - use MySQL
-    DATABASES = {
+# DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
+
+# if config('DEBUG', default=True, cast=bool):
+#     # Development - use SQLite
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
+# else:
+#     
+
+
+DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': config('DB_NAME'),
@@ -195,8 +204,7 @@ else:
                 'charset': 'utf8mb4',
             },
         }
-    }
-    
+    }  
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
